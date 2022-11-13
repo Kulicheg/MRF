@@ -1,4 +1,5 @@
 Moon Rabbit Fusion
+
 Форк  Moon Rabbit, гофер браузера от Alexander Sharikhin (anihirash@gmail.com) в котором попытались  собрать все возможные версии браузера.
 
     Собраны все доступные таргеты в одной версии
