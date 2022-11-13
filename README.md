@@ -20,10 +20,13 @@ Moon Rabbit Fusion
 Поддержка OS:
  - TR-DOS
  - nedoOS
+ 
 Поддержка экранов:
  - 6912     64 колонки
  - TIMEX80  85 колонок
  - nedoOS   80 колонок
+
+
 Поддержка сети:
  - ESP на ATM ком-порт
  - ESP на EVO ком-порт
@@ -31,6 +34,8 @@ Moon Rabbit Fusion
  - ESP на  AY ком-порт
  - ZXNETUSB (nedoOS)
  - карта ZX-Wifi от izzx
+
+
 
 Релиз 13.11.2022:
  - Обновлен драйвер trdos.asm, теперь  сохраняем TRD и SCL на дискеты
