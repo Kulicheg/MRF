@@ -190,8 +190,14 @@ WAITKEY_scl
 ; A - file stream id
 fclose:
     ;esxCall ESX_FCLOSE
+;WAITKEY2	XOR A:IN A,(#FE):CPL:AND #1F:JR Z,WAITKEY2
+	cp 4 ;если scl
+	jr nz,fclose2
+	ld hl,(scl_temp_hl2)
+	ld b,1
 	call scl_write_buf ;допишем остаток scl, если есть
 	
+fclose2	
 	xor a ;как бы закрываем все файлы
 	ld (f_r_flag),a
 	ld (f_w_flag),a
@@ -287,11 +293,11 @@ fwrite_chek ;запись произвольного типа файла
 
 
 fwrite_chek_trd ;запись trd файла (разворачивание образа)
-	ld a,2
-	out (254),a
-;WAITKEY_t	XOR A:IN A,(#FE):CPL:AND #1F:JR Z,WAITKEY_t
-	xor a
-	out (254),a
+	; ld a,2
+	; out (254),a
+; WAITKEY_t	XOR A:IN A,(#FE):CPL:AND #1F:JR Z,WAITKEY_t
+	; xor a
+	; out (254),a
 	ld a,(f_w_flag)
 	or a
 	jr z,fwrite_no_chek ;файл уже открыт?
@@ -467,35 +473,48 @@ fwrite_trd_ex1
 
 ;------------------scl----------------------
 fwrite_chek_scl ;запись scl файла (разворачивание образа)
-;	ld a,2
-;	out (254),a
-;WAITKEY_s	XOR A:IN A,(#FE):CPL:AND #1F:JR Z,WAITKEY_s
-;	xor a
-;	out (254),a
+	; ld a,2
+	; out (254),a
+; WAITKEY_t	XOR A:IN A,(#FE):CPL:AND #1F:JR Z,WAITKEY_t
+	; xor a
+	; out (254),a
 	ld a,(f_w_flag)
 	or a
 	jp z,fwrite_no_chek ;файл уже открыт?
-	ld (temp_bc),bc ;длина порции пришедших данных
+	ld (temp_bc),bc ;длина
 	ld (temp_hl),hl ;адрес данных
 	ld a,b
 	or c
 	jp z,fwrite_no_chek ; если длина 0, то выход
+	
+	; ld a,b
+	; or a
+	; jr nz,testt1
+	; nop
+	
+; testt1
 	
 	xor a
 	ld (sec_part),a ;обнулить переменные
 	ld (sec_shift2),a
 	ld (sec_shift2+1),a
 	ld (sec_shift_flag),a
+	ld (write_end_flag),a ;
 	
 
 	ld a,(sec_shift)
 	or a
 	jr z,fwrite_scl3 ;если смещения нет, то первую часть пропустим
 	
+
 	ld c,a
 	ld b,0
 	ld hl,(temp_bc) ;проверка заполнится ли целый сектор
 	add hl,bc
+	
+	ld a,1
+	ld (write_end_flag),a ;флаг что не нужно дописывать остаток
+	
 	ld a,h
 	or a
 	jr nz,fwrite_scl4
@@ -507,43 +526,45 @@ fwrite_scl4
 	add hl,bc ;на этой точке остановились
 	ex de,hl
 	ld hl,(temp_hl) ;присоединим начало данных в конец предыдущих
-
+	; ld a,c
+	; or a
+	; jr nz,fwrite_scl2
+	; inc b ;коррекция
+; fwrite_scl2		
+	; ld c,a
 	xor a
 	sub c
 	ld c,a ;сколько осталось перенести до заполнения сектора
-	
-	; ld hl,(temp_bc) ;если вместе с предыдущей порцией целого сектора всё равно не набирается
-	; and a
-	; sbc hl,bc
-	; jr nc,fwrite_scl4_
-	; nop
-	; ld c,l
-	; xor a
-	; sub c
-	; ld c,a ;сколько осталось перенести до заполнения сектора
-; fwrite_scl4_	
-
-	; ld hl,(temp_hl)
-	
 	ld (sec_shift2),bc ;сохраним сколько добавили байт
 	ldir
 
 	ld a,(sec_shift_flag)
 	or a
 	jr nz,fwrite_scl3 ;если сектор ещё не заполнен писать не будем
-	
+
 	ld hl,sec_buf
 	;ld de,(#5cf4)
 	;ld (f_w_cur_trk),de	;запомним позицию
     ld      b,#01 ;пишем 1 сектор из буфера
-    call    scl_write_buf ;во временный буфер
+    call    scl_write_buf	
 	; ld a,c
 	; cp 255
 	; jp z,fwrite_no_chek ;выход если ошибка	
 
+	xor a
+	ld (write_end_flag),a ;флаг что нужно дописывать остаток	
+	; ld de,(f_w_cur_trk) ;если сектор ещё не заполнен, останемся на старой позиции
+	; ld (#5cf4),de
+	; ld b,1 ;на сектор вперёд
+	; ld de,(f_w_cur_trk)
+	; call calc_next_pos
+	; ld (f_w_cur_trk),de	
+
 fwrite_scl3	
 	ld hl,(temp_hl) ;запишем остаток данных
-
+	;ld a,(sec_shift)
+	;ld c,a
+	;ld b,0
 	ld bc,(sec_shift2)
 	add hl,bc ;с этой точки пишем
 	ld (temp_hl2),hl ;сохраним начало записи второго сектора
@@ -565,32 +586,51 @@ fwrite_scl5
 	
 	ld a,l
 	ld (sec_shift),a ;смещение на следующий раз
+	;ld hl,(temp_hl)	
+	
+
+	; or a
+	; jr z,fwrite_scl1
+	; inc b  ;коррекция количества секторов
 	
 	ld a,b ;нужна проверка на количество секторов!!!
 	ld (sec_part),a ;запомним сколько секторов во второй части
+	
+	;ld a,b	
 	or a
-	jr z,fwrite_scl_ex ;если размер данных меньше сектора, то пропустим второй этап
+	jr z,fwrite_scl1 ;если размер данных меньше сектора, то пропустим запись
 	
 	ld hl,(temp_hl2)
 	;push bc
 	;ld de,(#5cf4)
     ;ld      c,6 ;пишем целыми секторами
     call    scl_write_buf	
-	; ld a,c
+	;ld a,c
 	;pop bc
 	; cp 255
 	; jp z,fwrite_no_chek ;выход если ошибка
+	; ld de,(f_w_cur_trk)
+	; call calc_next_pos
+	; ld (f_w_cur_trk),de
+	
+	xor a
+	ld (write_end_flag),a ;флаг что нужно дописывать остаток	
 	
 fwrite_scl1	
-	ld hl,(temp_hl2) ;сохраним последний сектор
+	ld a,(write_end_flag) ;нужно записывать остаток?
+	or a
+	jr nz,fwrite_scl_ex ;не нужно
+
+	ld hl,(temp_hl2) ;сохраним незаписанный остаток
 	ld a,(sec_part)
 	ld b,a
 	ld c,0
 	add hl,bc
-	ld bc,256
 	ld de,sec_buf
+	ld bc,256
 	ldir
-	
+;fwrite_scl2	
+
 	
 fwrite_scl_ex	
 	ld bc,(temp_bc) ;возвратим, что сколько запрашивали, столько и записали байт
@@ -617,7 +657,7 @@ scl_write_buf ;заполнение промежуточного буфера
 	ld de,scl_buf ;перенесём сектор во временный буфер
 	ld bc,256
 	ldir
-	push hl ;сохраним адрес данных
+	ld (scl_temp_hl2),hl ;сохраним адрес данных
 	ld a,(scl_que) ;проверим флаг что нужны данные
 	or a
 	jr z,scl_write_buf_ret ;не будем вызывать парсер если не нужны
@@ -626,7 +666,7 @@ scl_write_buf ;заполнение промежуточного буфера
 	ld hl,(scl_parse_ret_adr) ;адрес для продолжения основного цикла сборки
 	jp (hl) ;отдадим пакет 256 байт парсеру
 scl_write_buf_ret
-	pop hl
+	ld hl,(scl_temp_hl2)
 	pop bc
 	djnz scl_write_buf
 
@@ -1008,6 +1048,7 @@ scl_parse_ret_adr dw 0; адрес возврата в цикл
 scl_cat_cycl db 0 ;переменная цикла
 scl_files db 0 ;всего файлов
 scl_temp_hl dw 0;;хранение регистра
+scl_temp_hl2 dw 0;
 scl_temp_de dw 0;
 scl_temp_bc dw 0;
 cat_cur_adr dw 0;
