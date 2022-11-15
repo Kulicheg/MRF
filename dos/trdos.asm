@@ -190,10 +190,12 @@ WAITKEY_scl
 ; A - file stream id
 fclose:
     ;esxCall ESX_FCLOSE
-;WAITKEY2	XOR A:IN A,(#FE):CPL:AND #1F:JR Z,WAITKEY2
+	; push af
+; WAITKEY2	XOR A:IN A,(#FE):CPL:AND #1F:JR Z,WAITKEY2
+	; pop af
 	cp 4 ;если scl
 	jr nz,fclose2
-	ld hl,(scl_temp_hl2)
+	ld hl,sec_buf ;
 	ld b,1
 	call scl_write_buf ;допишем остаток scl, если есть
 	
@@ -1053,7 +1055,6 @@ scl_temp_de dw 0;
 scl_temp_bc dw 0;
 cat_cur_adr dw 0;
 ;scl end
-
 	align 256 ;временно
 	;по адресу #4000 шрифт
 cat_buf equ #4800 ;буфер для кататога диска 9*256

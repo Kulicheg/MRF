@@ -63,7 +63,7 @@ tcpSendZ
 getPacket
 
     ld de,(buffer_pointer)
-	ld a,0xff
+	ld a,0xfb
 	cp d
 	jp nz, letsgo
 	ld hl, .errMem : call DialogBox.msgBox
@@ -77,7 +77,7 @@ getPacket
 	db "Out of memory. Page loading error.",0
 letsgo:
     ld de,(buffer_pointer)
-    ld hl,250
+    ld hl,1024
     ld a,(sock_fd)
 	OS_WIZNETREAD
     BIT 7,H
