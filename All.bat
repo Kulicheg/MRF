@@ -1,5 +1,5 @@
 set makeall=1
-call !build.bat
+call build.bat
 call build-TR-AU-64.bat
 call build-TR-AY-64.bat
 call build-TR-AY-80.bat

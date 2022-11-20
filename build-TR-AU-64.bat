@@ -1,2 +1,2 @@
 "../../tools\mingw\make.exe" atmtrdos
-if "%makeall%"=="" ..\..\us\emul.exe MR-TR-AU-64.TRD
+if "%makeall%"=="" ..\..\us\emul.exe TRD\MR-TR-AU-64.TRD
