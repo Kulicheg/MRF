@@ -5,6 +5,7 @@ display:
     ld hl, outputBuffer, de, #c000, bc, 6912 : ldir
     call TextMode.disable
 .wait
+	halt
     xor a : in a, (#fe) : cpl : and 31 : jr z, .wait
     call TextMode.cls
     jp History.back

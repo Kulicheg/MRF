@@ -9,6 +9,7 @@ keyCode db 0
 BASIC_KEY = #5C08
 
 waitForKeyUp:
+	halt
    xor a : in a, (#fe) : cpl : and 31 : jr nz, waitForKeyUp
    ld (BASIC_KEY), a
    ret
