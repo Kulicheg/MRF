@@ -18,6 +18,9 @@ asmOrg:
     maj = string.sub(v, 1,1)
     min = string.sub(v, 2,2)
     sj.insert_define("VERSION_STRING", "\"" .. maj .. "." .. min .. "\"")
+
+    b = tostring(sj.get_define("BLD"))
+    sj.insert_define("BUILD_STRING", "\"" .. b .. "\"")
     ENDLUA
 
     include "vdp/index.asm"

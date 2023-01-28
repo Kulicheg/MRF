@@ -1,4 +1,7 @@
+@echo off
 set makeall=1
+call version.bat
+echo Build: %buildnew%
 call build.bat
 call build-TR-AU-64.bat
 call build-TR-AY-64.bat
