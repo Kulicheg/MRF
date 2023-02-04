@@ -71,13 +71,12 @@ getPacket
 	ld (closed),a
 	xor a
 	ld (bytes_avail),a
-	
 	ret
 .errMem:
 	db "Out of memory. Page loading error.",0
 letsgo:
     ld de,(buffer_pointer)
-    ld hl,1024
+    ld hl,2048
     ld a,(sock_fd)
 	OS_WIZNETREAD
     BIT 7,H

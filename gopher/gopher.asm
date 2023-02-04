@@ -72,6 +72,7 @@ loadMod:
     inc hl
     jr .loadLoop
 .nextFrame
+    call pulsing
     call Wifi.continue
     jr .loop
 .exit
@@ -80,9 +81,7 @@ loadMod:
 .progress db "MOD downloading directly to GS!", 0
     endif
 
-
 download:
-
     ld de, historyBlock.locator
     ld hl, de
 .findFileName
@@ -118,7 +117,7 @@ download:
     
     ld a, (.fp), hl, outputBuffer, bc, (Wifi.bytes_avail)
     call Dos.fwrite
-
+    call pulsing
     call Wifi.continue
     jr .loop
 .exit
@@ -128,15 +127,31 @@ download:
 .error
     ld a, (.fp)
     call Dos.fclose
-
     ld hl, .err
     call DialogBox.msgBox
     jp History.back
+
 .err db "Operation failed! Sorry! Check filename or disk space!",0
 .progress db "Downloading in progress! Wait a bit!", 0
 .fp db 0
-
 socket db 0
+pulsator db " "
+pulsing
+    ld de, #0B01 : call TextMode.gotoXY
+    ld a, (pulsator)
+    cp '*'
+    jp z, printasterix
+    ld a, '*'
+    ld (pulsator),a
+    ld a,' '
+    call TextMode.putC
+    ret 
+printasterix
+    ld a, ' '
+    ld (pulsator),a
+    ld a,'*'
+    call TextMode.putC
+    ret 
 
 requestbuffer ds #1ff
     endmodule
