@@ -14,6 +14,8 @@ copy /Y data\logo.scr ..\..\release\bin\browser\logo.scr
 copy /Y data\example.pt3 ..\..\release\bin\browser\example.pt3
 copy /Y data\auth.pwd ..\..\release\bin\browser\auth.pwd
 
+md ..\..\release\downloads
+
 "../../tools/dmimg.exe" ../../us/sd_nedo.vhd put mrf.com /bin/mrf.com
 "../../tools/dmimg.exe" ../../us/sd_nedo.vhd put mrfua.com /bin/kapps/mrfua.com
 "../../tools/dmimg.exe" ../../us/sd_nedo.vhd put mrfue.com /bin/kapps/mrfue.com

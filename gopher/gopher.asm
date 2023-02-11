@@ -101,11 +101,11 @@ download:
 .finishCopy
     ld (de), a
     call DialogBox.inputBox.noclear
-    ld a, (DialogBox.inputBuffer) : and a : jp z, History.back
+    ld a, (DialogBox.namedownload) : and a : jp z, History.back
     
     call makeRequest : jp c, Fetcher.fetchFromNet.error
 
-    ld b, Dos.FMODE_CREATE, hl, DialogBox.inputBuffer
+    ld b, Dos.FMODE_CREATE, hl, DialogBox.namedownload
     call Dos.fopen
     ld (.fp), a
     

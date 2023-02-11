@@ -41,8 +41,11 @@ delayinput:
     halt
     djnz .loop2
     ret
-
-
+    IFDEF NEDOOS
+namedownload db "..",92,"downloads",92
+    ELSE
+namedownload
+    ENDIF
 inputBuffer ds 80
 
 msgBox:

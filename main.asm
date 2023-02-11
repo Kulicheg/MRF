@@ -5,7 +5,7 @@
             include "../_sdk/sysdefs.asm"
         ENDMODULE
         org nos.PROGSTART
-    ELSE
+        ELSE
 	DEFINE CRLF "\r"
         org 24576
     ENDIF
@@ -66,6 +66,9 @@ outputBuffer:
 
     ELSE
         ld sp, 0x4000
+        ld c,nos.CMD_SETSYSDRV
+     	ex af,af'   
+	    call nos.BDOS
     ENDIF
  
     call TextMode.init
