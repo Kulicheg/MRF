@@ -33,7 +33,16 @@
 		ex af,af' ;'
 		call nos.BDOS ;c=CMD
 	endm	
-	
+
+	macro OS_YIELD
+		push bc
+    	ld c,nos.CMD_YIELD
+        call nos.BDOS
+        pop bc
+	endm	
+
+
+
 init:
 	ret
 	
@@ -76,12 +85,12 @@ getPacket
 	db "Out of memory. Page loading error.",0
 letsgo:
     ld de,(buffer_pointer)
-    ld hl,2048
+    ld hl,4096
     ld a,(sock_fd)
 	OS_WIZNETREAD
     BIT 7,H
     JR Z,RECEIVED	;ошибок нет
-    CP 35   ;ERR_EAGAIN
+	CP 35   ;ERR_EAGAIN
     jp z, getPacket
     ;обработка ошибки
     ld a,1
@@ -144,7 +153,7 @@ reqErr
 	
 dns_resolver:		;DE-domain name
     ld (.httphostname),de
-    ld a,254;3
+    ld a,254
     ld (.dns_err_count),a
 .dns_err_loop
 	;push de
@@ -205,7 +214,6 @@ dns_resolver:		;DE-domain name
 	ld (sock_fd),a
 	or a
 	jp m,.dns_exiterr
-	
 	pop hl
 	push hl
 	ld de,0xffff&(-outputBuffer)
@@ -270,6 +278,7 @@ dns_resolver:		;DE-domain name
     ld a,(.dns_err_count)
     add a,a
     ld (.dns_err_count),a
+	OS_YIELD
     jp nc,.dns_err_loop
 .exiterr1:
     ld hl,0
