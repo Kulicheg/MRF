@@ -1,3 +1,5 @@
+Moon Rabbit Fusion гофер-браузер для ZX-Spectrum совместимых машин. Базируется на основе кода Moon Rabbit.
+
 Релиз 16.02.2023 версия 1.7.4:
 - nedoNET: Увеличен еще немного буфер nedoNET (эффект должен быть только на эмуляторе, в реальности карта отдает за раз не больше чем MTU)
 - nedoNET: Между попытками отправки DNS запросов делаем небоьшие паузы.
@@ -80,3 +82,12 @@
 Для AY:       9600
 
 Для UNO:      Н/Д
+
+Основа кодовой базы : Nihirash
+Адоптация под nedoOS: DimkaM
+Драйвер TR-DOS      : izzx 
+MRF версия          : Kulich
+
+License
+I've licensed project by Nihirash's Coffeeware License.
+Please respect it - it isn't hard.
