@@ -84,7 +84,7 @@ Moon Rabbit Fusion гофер-браузер для ZX-Spectrum совмести
 Для UNO:      Н/Д
 
 Основа кодовой базы : Nihirash
-Адоптация под nedoOS: DimkaM
+Адаптация под nedoOS: DimkaM
 Драйвер TR-DOS      : izzx 
 MRF версия          : Kulich
 
