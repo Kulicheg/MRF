@@ -25,7 +25,7 @@ md ..\..\release\downloads
 "../../tools/dmimg.exe" ../../us/sd_nedo.vhd put data/auth.pwd /bin/browser/auth.pwd
 "../../tools/dmimg.exe" ../../us/sd_nedo.vhd put data/example.scr /bin/browser/example.scr
 
-del /Q *.lst
+rem del /Q *.lst
 del /Q mrf.com
 del /Q mrfua.com
 del /Q mrfue.com

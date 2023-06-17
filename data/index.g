@@ -25,6 +25,7 @@ i B - history back(currently work only few levels)	-	-	-
 i Backspace working in the same way as B	-	-	-
 i H - return to this page	-	-	-
 i M - toggle MOD playing(only for GS enabled versions)	-	-	-
+i G - toggle MOD save/play(only for GS enabled versions)	-	-	-
 i 	-	-	-
 iIf you like my software - support it via PayPal donation: 	-	-	-
 i anihirash@gmail.com	-	-	-

@@ -73,8 +73,14 @@ workLoop:
     IFDEF GS
     cp 'M' : call z, GeneralSound.toggleModule
     cp 'm' : call z, GeneralSound.toggleModule
+    cp 'g' : call z, GeneralSound.toggleDownload
+    cp 'G' : call z, GeneralSound.toggleDownload
+
     ENDIF
-    
+
+
+
+
     IFDEF TIMEX80
     cp 'T' : call z, TextMode.toggleColor
     cp 't' : call z, TextMode.toggleColor
