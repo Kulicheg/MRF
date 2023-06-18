@@ -31,7 +31,7 @@ init:
     outp MCR,     #0d	// Assert RTS
     outp IIR_FCR, #87	// Enable fifo 8 level, and clear it
     outp LCR,     #83	// 8n1, DLAB=1
-    outp RBR_THR, #03	// 115200 (divider 1-115200, 3 - 38400)
+    outp RBR_THR, #01	// 115200 (divider 1-115200, 3 - 38400)
     outp IER,     #00	// (divider 0). Divider is 16 bit, so we get (#0002 divider)
     outp LCR,     #03	// 8n1, DLAB=0
     outp IER,     #00	// Disable int
@@ -53,10 +53,26 @@ read:
     ld bc, #FDEF
 	in a, (c)
     rrca
-    jr nc, read
+    call nc,flashRTS
+readData:
     ld bc, #F8EF
 	in a, (c)
 	ei	
+    ret
+
+flashRTS:
+	ld bc,#FCEF
+    ld a, 2
+	out (c),a
+    call uart_delay4k
+    ld bc,#FCEF
+    ld a, 0
+	out (c),a
+  
+    ld bc, #FDEF
+	in a, (c)
+    rrca
+    jp nc,flashRTS
     ret
 
 ; A -> byte to send
@@ -75,5 +91,18 @@ write:
 	out (c),a	
 	ei
     ret
+uart_delay4k:
+		push de
+		ld e, 0xFA
+loop2:		
+		NOP
+        NOP
+;		NOP
+;		NOP
+ ;       NOP
+		dec e
+		jr nz,loop2
+		pop de
+		ret
 
     endmodule
