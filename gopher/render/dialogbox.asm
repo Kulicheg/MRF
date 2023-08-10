@@ -11,10 +11,7 @@ inputBox:
 .checkkey
     call Console.getC
     cp Console.BACKSPACE : jr z, .removeChar
-   
-  
-   cp CR : ret z
-       
+	cp CR : ret z
     cp SPACE : jr c, .checkkey
 .putC
     ld e, a
@@ -34,17 +31,17 @@ inputBox:
     dec hl : dec hl : ld (hl), a 
     jr .loop
 
-
+	IFNDEF MSX
 delayinput:
    ld b, 50
 .loop2
     halt
     djnz .loop2
     ret
-    IFDEF NEDOOS
-namedownload db "..",92,"downloads",92
-    ELSE
 namedownload
+    IFDEF NEDOOS
+		db "..",92,"downloads",92
+    ENDIF
     ENDIF
 inputBuffer ds 80
 
@@ -63,15 +60,17 @@ msgNoWait:
     jp TextMode.printZ
 
 drawBox:
-    ld h, #0a, a, BORDER_TOP    : call TextMode.fillLine
-    ld h, #0b, a, ' '           : call TextMode.fillLine
-    ld h, #0c, a, BORDER_BOTTOM : call TextMode.fillLine
-    
-    IFNDEF TIMEX80
-    ld a, #0a : call TextMode.highlightLine
-    ld a, #0c : call TextMode.highlightLine
-    ENDIF
-
-    ld de, #0B03 : call TextMode.gotoXY
+    ld h, #0a, a, BORDER_TOP
+    call TextMode.fillLine
+    ld h, #0b, a, ' '
+    call TextMode.fillLine
+    ld h, #0c, a, BORDER_BOTTOM
+    call TextMode.fillLine
+    ld a, #0a
+    call TextMode.highlightLine
+    ld a, #0c
+    call TextMode.highlightLine
+    ld de,#0B03
+    call TextMode.gotoXY 
     ret
     endmodule

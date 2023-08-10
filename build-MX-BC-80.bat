@@ -1,0 +1,1 @@
+"../../tools\mingw\make.exe" msx

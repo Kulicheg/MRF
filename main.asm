@@ -1,3 +1,16 @@
+    DEFINE TCP_BUF_SIZE 1024
+; Generate version string
+    LUA ALLPASS
+    v = tostring(sj.get_define("V"))
+    maj = string.sub(v, 1,1)
+    min = string.sub(v, 2,2)
+    sj.insert_define("VERSION_STRING", "\"" .. maj .. "." .. min .. "\"")
+
+    b = tostring(sj.get_define("BLD"))
+    sj.insert_define("BUILD_STRING", "\"" .. b .. "\"")
+    ENDLUA
+
+    IFNDEF MSX
     device	zxspectrum128
     IFDEF NEDOOS
 	DEFINE CRLF "\r\n"
@@ -10,19 +23,8 @@
         org 24576
     ENDIF
 asmOrg:
-    align 256 ;временно
+    align 256
     jp start
-; Generate version string
-    LUA ALLPASS
-    v = tostring(sj.get_define("V"))
-    maj = string.sub(v, 1,1)
-    min = string.sub(v, 2,2)
-    sj.insert_define("VERSION_STRING", "\"" .. maj .. "." .. min .. "\"")
-
-    b = tostring(sj.get_define("BLD"))
-    sj.insert_define("BUILD_STRING", "\"" .. b .. "\"")
-    ENDLUA
-
     include "vdp/index.asm"
     include "utils/index.asm"
     include "gopher/render/index.asm"
@@ -97,4 +99,54 @@ creds   db "browser/auth.pwd", 0
 	    	ENDIF        
     ENDIF
 outputBuffer2:
-    db  "ATE0", 0  
+    db  "ATE0", 0
+
+    ELSE
+;****************************** MSX ***********************************************
+    output "moonr.com"
+    org 100h
+    jp start
+    include "vdp/vdpdriver.asm"
+    include "utils/index.asm"
+    include "gopher/render/index.asm"
+    include "dos/msxdos.asm"
+    include "gopher/engine/history/index.asm"
+    include "gopher/engine/urlencoder.asm"
+    include "gopher/engine/fetcher.asm"
+    include "gopher/engine/media-processor.asm"
+    include "drivers/unapi/unapi.asm"
+    include "drivers/unapi/tcp.asm"
+    include "gopher/msxgopher.asm"
+    include "screen/msxscreen.asm"
+    include "player/vortex-processor.asm"
+fontName db "font.bin",0
+start:
+    ld hl,(0x0006)
+    ld bc,outputBuffer
+    sbc hl,bc 
+    ld bc, 0x100
+    sbc hl,bc 
+    ld (ramtop),hl
+  
+    call TcpIP.init : jp nc, noTcpIP ; No TCP/IP - no browser! Anyway you can use "useless tcp/ip driver"
+    ; Loading font
+    ld de, fontName, a, FMODE_NO_WRITE : call Dos.fopen
+    push bc
+        ld de, font, hl, 2048 :call Dos.fread
+    pop bc
+    call Dos.fclose
+
+    call TextMode.init
+    call History.home
+    jp exit
+noTcpIP:
+    ld hl, .err
+    call Console.putStringZ
+    rst 0
+.err db 13,10,"No TCP/IP implementation found!",13,10,0
+ramtop:
+    db 0x00, 0xD0
+outputBuffer:
+font:
+    display "ENDS: ", $
+    ENDIF

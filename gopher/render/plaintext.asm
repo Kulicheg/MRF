@@ -50,9 +50,12 @@ plainTextLoop:
     cp 'd' : jp z, inputHost
     cp 'D' : jp z, inputHost
 
-
     cp Console.BACKSPACE : jp z, History.back
- 
+    
+    IFDEF MSX
+    	cp ESC : jp z, exit
+    ENDIF
+     
     IFDEF GS
     cp 'M' : call z, GeneralSound.toggleModule
     cp 'm' : call z, GeneralSound.toggleModule
@@ -86,29 +89,3 @@ textUp:
     ld (page_offset), hl
     call renderPlainTextScreen
     jp plainTextLoop    
-    
-
-    /*
-    .loop
-    push bc
-    ld a, PER_PAGE : sub b
-    ld b, a
-    ld e, a
-    ld a, (page_offset)
-    add b
-    ld b, a
-    
-        ld c,b
-        ld b,0
-    push de
-    call Render.findLine
-    pop de
-    ld a, h : or l : jr z, .exit
-    ld a, e
-    add CURSOR_OFFSET : ld d, a, e, 1 : call TextMode.gotoXY
-    call print70Text
-    pop bc 
-    djnz .loop
-    ret
-.exit
-*/

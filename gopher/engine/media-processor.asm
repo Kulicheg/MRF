@@ -23,6 +23,4 @@ processPage:
     ld hl, Render.cursor_position
     inc (hl)
     jp Render.checkBorder
-
-
     ENDMODULE

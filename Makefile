@@ -20,6 +20,7 @@ all:
 	@echo "For making TR-DOS(ATM UART) version call: 'make atmtrdos'"
 	@echo "For making TR-DOS(AY+6912) version call: 'make aytrdos'"
 	@echo "For making TR-DOS(AY+TIMEX80) version call: 'make t80trdos'"
+	@echo "For making MSX VERSION(B.C.WiFi) version call: 'make msx'"
 	@echo ""
 	@echo "Before changing version call: 'make clean' for removing builded images"
 	
@@ -85,6 +86,12 @@ ayp3d64: $(SOURCES)
 	$(SJASMPLUS) main.asm -DP3DOS -DAY -DZXSCR -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
 	del TRD\MR-P3-AY-64.TRD
 	move MOONR.TRD TRD\MR-P3-AY-64.TRD
+
+msx: $(SOURCES)
+	$(SJASMPLUS) main.asm -DMSX --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
+	copy DATA\msxfont.bin MSX\font.bin
+	copy DATA\msxindex.gph MSX\index.gph
+	move moonr.com MSX\moonr.com
 
 clean:
 	rm $(BINARY) $(LST)

@@ -1,7 +1,13 @@
     MODULE Fetcher
 
 fetchFromNet:
-    call Gopher.makeRequest : jr c, .error
+	
+	IFDEF MSX
+    	call Gopher.makeRequest : jr nz, .error
+    ELSE
+    	call Gopher.makeRequest : jr c, .error
+    ENDIF
+        
     call Gopher.loadBuffer
     jp MediaProcessor.processResource
 .error
@@ -14,7 +20,19 @@ fetchFromNet:
 fetchFromFS:
     call UrlEncoder.extractPath
 loadFile
+	IFDEF MSX
+    ld de, nameBuffer, a, FMODE_NO_WRITE
+    call Dos.fopen
+    ld a, b, (.fp), a
+    ld de, outputBuffer, hl, (ramtop)
+    call Dos.fread
+    ld a, (.fp), b, a
+    call Dos.fclose
+    jp MediaProcessor.processResource
+.fp db 0
+	ELSE
     ld hl, nameBuffer
     call Dos.loadBuffer
     jp MediaProcessor.processResource
+	ENDIF
     ENDMODULE

@@ -27,60 +27,72 @@ extractRequest:
     inc hl : inc de
     jr .searchCopy
 .exit
+    ld a, CR : ld (de), a : inc de
+    ld a, LF : ld (de), a : inc de
     xor a
     ld (de), a
     ret
 
 
 makeRequest:
+    call TcpIP.closeAll
     call extractRequest
+    ld de, historyBlock.port
+    call atohl
+    ld (.port + 1), hl
 
     ld hl, historyBlock.host
-    ld de, historyBlock.port
-    call Wifi.openTCP
-    ret c
+    call TcpIP.resolveIp
+    jp nc, .error
+.port  
+    ld bc, #beaf
+    call TcpIP.openTcp
+    jp nz, .error
 
-    ld hl, requestbuffer
-    call Wifi.tcpSendZ
-    xor a : ld (Wifi.closed), a
+    ld a, b
+    ld (socket), a
+
+    ld de, requestbuffer
+    push de
+    call strlen
+    pop de
+    ld a, (socket)
+    call TcpIP.sendTCP
+    or a
     ret
-
+.error
+    scf
+    ret
 
 loadBuffer:
     ld hl, outputBuffer
-    ld (Wifi.buffer_pointer), hl
+    ld (.pointer), hl
 .loop
-    call Wifi.getPacket
-    ld a, (Wifi.closed) : and a : ret nz
-    call Wifi.continue
+    ld a, (socket)
+    call TcpIP.stateTcp
+    and a : ret nz ; If there some error
+    ld a, h : or l : jr nz, .getPacket ; if there some data
+    ld a, b : cp 4 : ret nz ; If there no established status
     jr .loop
-
-    ifdef GS
-loadMod:
-    xor a : call GeneralSound.init
-    ld hl, .progress : call DialogBox.msgNoWait
-    call makeRequest : jp c, Fetcher.fetchFromNet.error
-    call GeneralSound.loadModule
-.loop
-    ld hl, outputBuffer, (Wifi.buffer_pointer), hl
-    call Wifi.getPacket
-    ld a, (Wifi.closed) : and a : jr nz, .exit
-    ld hl, outputBuffer, bc, (Wifi.bytes_avail)
-.loadLoop
-    ld a, b : or c : and a : jr z, .nextFrame
-    ld a, (hl) : call GeneralSound.sendByte
-    dec bc
-    inc hl
-    jr .loadLoop
-.nextFrame
-    call pulsing
-    call Wifi.continue
-    jr .loop
-.exit
-    call GeneralSound.finishLoadingModule
-    jp History.back
-.progress db "MOD downloading directly to GS!", 0
-    endif
+.getPacket
+    ld hl, TCP_BUF_SIZE
+    ld a, (socket)
+    call TcpIP.recvTCP
+    push bc
+        ld hl, (.pointer)
+        add hl, bc : ld a, h : cp #c0 : jp nc, .skiploop
+        ld de, (.pointer), hl, TcpIP.tcpBuff
+        ldir
+    pop bc
+    ld hl, (.pointer)
+    add hl, bc
+    ld (.pointer), hl
+    jp .loop
+.skiploop
+    pop bc
+    call TcpIP.closeAll
+    jp .loop
+.pointer dw outputBuffer
 
 download:
     ld de, historyBlock.locator
@@ -102,42 +114,50 @@ download:
 .finishCopy
     ld (de), a
     call DialogBox.inputBox.noclear
-    ld a, (DialogBox.namedownload) : and a : jp z, History.back
+    ld a, (DialogBox.inputBuffer) : and a : jp z, History.back
     
     call makeRequest : jp c, Fetcher.fetchFromNet.error
 
-    ld b, Dos.FMODE_CREATE, hl, DialogBox.namedownload
-    call Dos.fopen
-    ld (.fp), a
-    
+    ld a, FMODE_NO_READ, b, ATTR_NOTHING, de, DialogBox.inputBuffer
+    call Dos.fcreate
+    and a : jr nz, .error
+    ld a, b : ld (.fp), a
     ld hl, .progress : call DialogBox.msgNoWait
 .loop
-    ld hl, outputBuffer, (Wifi.buffer_pointer), hl
-    call Wifi.getPacket
-    ld a, (Wifi.closed) : and a : jr nz, .exit
-    
-    ld a, (.fp), hl, outputBuffer, bc, (Wifi.bytes_avail)
-    call Dos.fwrite
-    call pulsing
-    call Wifi.continue
+    ld a, (socket)
+    call TcpIP.stateTcp
+    and a : jp nz, .exit ; If there some error
+    ld a, h : or l : jr nz, .getPacket ; if there some data
+    ld a, b : cp 4 : jp nz, .exit ; If there no established status
     jr .loop
+.getPacket
+    call pulsing
+    ld hl, 512
+    ld a, (socket)
+    call TcpIP.recvTCP
+    ld hl, bc, a, (.fp), b, a, de, TcpIP.tcpBuff
+    call Dos.fwrite
+    jp .loop
 .exit
-    ld a, (.fp)
+    ld a, (.fp), b, a
     call Dos.fclose
+    call TcpIP.closeAll
     jp History.back
 .error
-    ld a, (.fp)
+    ld a, (.fp), b, a
     call Dos.fclose
+    call TcpIP.closeAll
     ld hl, .err
     call DialogBox.msgBox
     jp History.back
-
 .err db "Operation failed! Sorry! Check filename or disk space!",0
 .progress db "Downloading in progress! Wait a bit!", 0
 .fp db 0
+
 socket db 0
 pulsator db " "
 pulsing
+    push de
     ld de, #0B01 : call TextMode.gotoXY
     ld a, (pulsator)
     cp '*'
@@ -146,12 +166,14 @@ pulsing
     ld (pulsator),a
     ld a,' '
     call TextMode.putC
+    pop de
     ret 
 printasterix
     ld a, ' '
     ld (pulsator),a
     ld a,'*'
     call TextMode.putC
+    pop de
     ret 
 
 requestbuffer ds #1ff

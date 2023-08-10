@@ -7,6 +7,10 @@ LINE_LIMIT = 79
     IFDEF TIMEX80
 LINE_LIMIT = 84
     ENDIF
+
+    IFDEF MSX
+LINE_LIMIT = 79
+    ENDIF
 ; HL - string pointer
 print70Text:
     ld b, LINE_LIMIT

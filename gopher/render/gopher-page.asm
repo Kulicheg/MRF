@@ -69,17 +69,17 @@ workLoop:
     cp 'D' : jp z, inputHost
 
     cp CR : jp z, navigate
+    
+    IFDEF MSX
+    	cp ESC : jp z, exit
+    ENDIF
 
     IFDEF GS
     cp 'M' : call z, GeneralSound.toggleModule
     cp 'm' : call z, GeneralSound.toggleModule
     cp 'g' : call z, GeneralSound.toggleDownload
     cp 'G' : call z, GeneralSound.toggleDownload
-
     ENDIF
-
-
-
 
     IFDEF TIMEX80
     cp 'T' : call z, TextMode.toggleColor
@@ -89,12 +89,12 @@ workLoop:
     jp workLoop
 
 navigate:
-    call Console.waitForKeyUp
-    xor a : ld (play_next), a
-    
+    IFNDEF MSX
+    	call Console.waitForKeyUp
+    ENDIF
+    	
+    xor a : ld (play_next), a 
     call hideCursor
-test001:
-;    ld a, (page_offset), b, a, a, (cursor_position) : add b : ld b, a : call Render.findLine
     ld bc, (page_offset)
     ld hl, (cursor_position)
     add hl,bc

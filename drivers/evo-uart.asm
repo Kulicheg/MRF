@@ -1,47 +1,59 @@
     module Uart
-; This driver works with 16c550 uart that's support AFE
-;AT+UART_CUR=38400,8,1,0,0
+;AT+UART_CUR=115200,8,1,0,3
 ;AT+CWMODE_DEF=1
 ;AT+CWJAP_DEF="Kulich","password"
 ;
 
 ; Internal port constants
-RBR_THR equ #F8
-IER		equ	#F9
-IIR_FCR	equ	#FA
-LCR		equ	#FB
-MCR		equ	#FC
-LSR		equ	#FD
-MSR		equ	#FE
-SR		equ	#FF
-
-    macro outp port, value
-	di
-	ld b, port
-	ld c, #EF
-    ld a, value
-	out (port), a
-	ei
-	endm
-
-
+RBR_THR equ 0xF8EF
+IER		equ	0xF9EF
+IIR_FCR	equ	0xFAEF
+LCR		equ	0xFBEF
+MCR		equ	0xFCEF
+LSR		equ	0xFDEF
+MSR		equ	0xFEEF
+SR		equ	0xFFEF
 
 init:
 	push bc
-    outp MCR,     #0d	// Assert RTS
-    outp IIR_FCR, #87	// Enable fifo 8 level, and clear it
-    outp LCR,     #83	// 8n1, DLAB=1
-    outp RBR_THR, #01	// 115200 (divider 1-115200, 3 - 38400)
-    outp IER,     #00	// (divider 0). Divider is 16 bit, so we get (#0002 divider)
-    outp LCR,     #03	// 8n1, DLAB=0
-    outp IER,     #00	// Disable int
-    outp MCR,     #2f	// Enable AFE
+
+	ld bc,MCR       // Assert RTS. In Evo only  bit #1 is used. For RTS control
+    ld a, 0x0d
+	out (c),a
+
+	ld bc,IIR_FCR   // Enable fifo 8 level, and clear it
+    ld a, 0x87
+	out (c),a
+
+	ld bc,LCR       // 8n1, DLAB=1
+    ld a, 0x83
+	out (c),a
+
+	ld bc,RBR_THR   // 115200 (divider 1-115200, 3 - 38400)
+    ld a, 0x01
+	out (c),a
+
+	ld bc,IER       // (divider 0). Divider is 16 bit, so we get (0x0002 divider)
+    ld a, 0x00
+	out (c),a
+
+	ld bc,LCR       // 8n1, DLAB=0
+    ld a, 0x03
+	out (c),a
+
+	ld bc,IER       // Disable int
+    ld a, 0x00
+	out (c),a
+
+	ld bc,MCR       // Enable AFE. Not implemented in EVO
+    ld a, 0x2f
+	out (c),a
 	pop bc
     ret
     
 ; Flag C <- Data available
 isAvailable:
-	ld bc, #FDEF
+	ld bc, LSR
 	in a, (c)
     rrca
     ret
@@ -49,57 +61,50 @@ isAvailable:
 ; Blocking read
 ; A <- Byte
 read:
-	di
-    ld bc, #FDEF
+	ld bc, LSR          // Test FIFO for data
 	in a, (c)
     rrca
-    call nc,flashRTS
+    call nc,flashRTS    // No data in FIFO let's set RTS for awile 
 readData:
-    ld bc, #F8EF
+    ld bc, RBR_THR      // Recieve data from FIFO
 	in a, (c)
-	ei	
-    ret
+	ret
 
 flashRTS:
-	ld bc,#FCEF
+	di
+	ld bc,MCR           // Open the gate
     ld a, 2
 	out (c),a
-    call uart_delay4k
-    ld bc,#FCEF
+    call uart_delay6k   // Wait while FIFO
+    ld bc,MCR           // Close the gate
     ld a, 0
 	out (c),a
-  
-    ld bc, #FDEF
+    ld bc, LSR          // Test FIFO for data
 	in a, (c)
     rrca
-    jp nc,flashRTS
-    ret
+    jp nc,flashRTS      // No data? Once more.
+    ei
+	ret
 
 ; A -> byte to send
 
 write:
-	di
-    push af
+	push af
 .wait
-    ld bc, #FDEF
+    ld bc, LSR      //FIFO is free?
 	in a, (c)
-    and #20
-    jr z, .wait
+    and 0x20
+    jr z, .wait     //No. Wait more.
     pop af
-
-	ld bc,#F8EF
+	ld bc,RBR_THR   //Write data to FIFO
 	out (c),a	
-	ei
     ret
-uart_delay4k:
+
+uart_delay6k:       // Determined delay. More then 1 byte to recieve, less then time for fullfill FIFO buffer
 		push de
 		ld e, 0xFA
 loop2:		
 		NOP
-        NOP
-;		NOP
-;		NOP
- ;       NOP
 		dec e
 		jr nz,loop2
 		pop de

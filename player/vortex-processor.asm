@@ -1,4 +1,27 @@
     MODULE VortexProcessor
+	IFDEF MSX
+play:
+    call Console.peekC : and a
+    jr nz, play
+
+    ld hl, message : call DialogBox.msgNoWait
+
+    ld hl, outputBuffer  : call VTPL.INIT
+.loop
+    halt : di : call VTPL.PLAY : ei
+    call Console.peekC : and a : jp nz, .stop
+    jr nc, .loop 
+.stop
+    call VTPL.MUTE
+.wlp
+    call Console.peekC : and a
+    jr nz, .wlp
+    ret
+
+message db "Press key to stop...", 0
+    ENDMODULE
+    include "msxplayer.asm"    
+	ELSE
 play:
     call Console.waitForKeyUp
 
@@ -8,9 +31,10 @@ play:
 
     
     ld a, 1, (Render.play_next), a
-    ifdef GS
+    
+    IFDEF GS
     call GeneralSound.stopModule
-    endif
+    ENDIF
 .loop
     halt : di : call VTPL.PLAY : ei
     xor a : in a, (#fe) : cpl : and 31 : jp nz, .stopKey
@@ -42,9 +66,8 @@ restoreAyState:
     ld bc, #fffd
     out (c), a
     ret
-    ENDIF 
-
+	ENDIF
 message db "Press key to stop...", 0
     ENDMODULE
     include "player.asm"
-    
+    ENDIF 

@@ -7,7 +7,13 @@ back:
 load:
     ld hl, .msg : call DialogBox.msgNoWait
     xor a : ld hl, outputBuffer, de, outputBuffer + 1
-    ld bc, #ffff - outputBuffer - 1
+	IFDEF MSX
+    	ld bc, (ramtop)
+    	dec bc
+	ELSE
+    	ld bc, #ffff - outputBuffer - 1	
+	ENDIF
+
     ld (hl), a 
     ldir
     
@@ -42,7 +48,15 @@ navigate:
     ld (de), a : inc de
     ld a, (hl) : push hl, de : call Render.getIcon : pop de, hl
     ld (de), a : inc de
-    ld a, 9, bc, #fff : cpir
+    ld a, 9
+    
+    IFDEF MSX
+    	ld bc, #ff
+    ELSE
+    	ld bc, #fff
+    ENDIF
+    
+    cpir
 .locatorCopy
     ld a, (hl) : cp 9 : jr z, 1f
     ld (de), a : inc hl, de
@@ -91,8 +105,13 @@ downMod2file
     endif
 
     jp load
-
-homePage:
-    db "1Home", TAB, "browser/index.gph"
-    db TAB, "file", TAB, "70", CR, LF, 0
+    
+homePage:    
+	IFDEF MSX
+    	db "1Home", TAB, "index.gph"
+    	db TAB, "file", TAB, "70", CR, LF, 0
+    ELSE
+    	db "1Home", TAB, "browser/index.gph"
+    	db TAB, "file", TAB, "70", CR, LF, 0
+    ENDIF   
     endmodule
