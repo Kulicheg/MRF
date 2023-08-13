@@ -32,3 +32,7 @@ i anihirash@gmail.com	-	-	-
 iI'll guaranty that browser will be always free for all users and your	-	-	-
 idonations only one way to cover my work	-	-	-
 i	-	-	-
+iOriginal version:  Nihirash	-	-	-
+inedoOS port:       DimkaM	-	-	-
+iTR-DOS driver:     izzx	-	-	-
+iSCR viewer:        KoD/SDM	-	-	-

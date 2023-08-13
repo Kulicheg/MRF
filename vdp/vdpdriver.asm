@@ -3,7 +3,6 @@ VDP_DATA_PORT    = #98
 VDP_COMMAND_PORT = #99
     module TextMode
 
-
     macro vdp_reg reg, value
     di
     ld a, value
@@ -186,6 +185,14 @@ gotoXY:
 
 coords dw 0
 
+loadFont:
+; Loading font
+    ld de, fontName, a, FMODE_NO_WRITE : call Dos.fopen
+    push bc
+    ld de, font, hl, 2048 :call Dos.fread
+    pop bc
+    call Dos.fclose
+    ret
     endmodule
 
 exit:

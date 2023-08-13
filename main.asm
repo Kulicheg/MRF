@@ -130,12 +130,12 @@ start:
   
     call TcpIP.init : jp nc, noTcpIP ; No TCP/IP - no browser! Anyway you can use "useless tcp/ip driver"
     ; Loading font
-    ld de, fontName, a, FMODE_NO_WRITE : call Dos.fopen
-    push bc
-        ld de, font, hl, 2048 :call Dos.fread
-    pop bc
-    call Dos.fclose
-
+    ;ld de, fontName, a, FMODE_NO_WRITE : call Dos.fopen
+    ;push bc
+    ;ld de, font, hl, 2048 :call Dos.fread
+    ;pop bc
+    ;call Dos.fclose
+    call TextMode.loadFont
     call TextMode.init
     call History.home
     jp exit
