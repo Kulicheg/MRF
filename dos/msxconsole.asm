@@ -31,4 +31,7 @@ putStringZ:
     inc hl
     jr putStringZ
 
+waitForKeyUp:
+    ret
+
     endmodule

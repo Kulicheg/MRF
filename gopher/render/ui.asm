@@ -26,9 +26,7 @@ prepareScreen:
     ret
 
 inputHost:
-	IFNDEF MSX
     	call Console.waitForKeyUp
-    ENDIF
 .loop
     ld de, #000A : call TextMode.gotoXY : ld hl, hostName : call TextMode.printZ
     ld a, MIME_INPUT : call TextMode.putC
@@ -71,11 +69,11 @@ domain db "nihirash.net"
     ds 64 - ($ - domain)
 
 	IFDEF MSX
-header db LEFT_TAB, " MRF"
+header db LEFT_TAB, "    MRF"
        db VERSION_STRING
        db "."
        db BUILD_STRING
-       db "  [MSX B.C.WiFi]",13, 0
+       db " [MSX UNAPI]",13, 0
 	ENDIF      
 
     IFDEF MB03

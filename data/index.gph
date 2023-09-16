@@ -4,6 +4,7 @@ i 	-	-	-
 9And listen some PT2/PT3 tracks	browser/example.pt3	file	-
 i 	-	-	-
 iSome links to start exploring gopherspace:	-	-	-
+1MRF gopher hole. Latest release & Some stuff	/	kulich.tplinkdns.com	70
 1Nihirash's gopher hole with lot of speccy stuff	/	nihirash.net	70
 1Virtual TR-DOS official gopher hole	/	vtrd.in	70
 1I-Logout.cz. Phlog aggregator and other stuff	/	i-logout.cz	70

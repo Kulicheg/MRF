@@ -4,7 +4,6 @@ renderGopherScreen:
 .loop
     push bc
     ld a, PER_PAGE : sub b
-    
     ld b, a
     ld e, a
     ld a, (page_offset)
@@ -89,10 +88,7 @@ workLoop:
     jp workLoop
 
 navigate:
-    IFNDEF MSX
-    	call Console.waitForKeyUp
-    ENDIF
-    	
+    call Console.waitForKeyUp
     xor a : ld (play_next), a 
     call hideCursor
     ld bc, (page_offset)
