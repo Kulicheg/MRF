@@ -3,20 +3,26 @@ renderGopherScreen:
     ld b, PER_PAGE
 .loop
     push bc
-    ld a, PER_PAGE : sub b
-    ld b, a
-    ld e, a
-    ld a, (page_offset)
-    add b
-    ld c, a
-    ld b,0
-    push de
-    call findLine
+    ld a, PER_PAGE
+    sub b
+    ld b,a
+    ld e,a
+
+        ld c,b
+        ld b,0
+
+        ld hl, (page_offset)
+        add hl,bc
+        ld bc,hl
+        push de
+    call Render.findLine
     pop de
-    
-    
-    ld a, h : or l : jr z, .exit
-    ld a, e : call renderRow
+
+    ld a, h
+    or l
+    jr z, .exit
+    ld a, e
+    call renderRow
 .exit
     pop bc 
     djnz .loop

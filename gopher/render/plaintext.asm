@@ -3,7 +3,8 @@ renderPlainTextScreen:
     ld b, PER_PAGE
 .loop
     push bc
-    ld a, PER_PAGE : sub b
+    ld a, PER_PAGE
+    sub b
     ld b,a
     ld e,a
     ld c,b

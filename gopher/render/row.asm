@@ -2,8 +2,10 @@
 ; HL - pointer to row
 renderRow:
     add CURSOR_OFFSET
-    ld d, a, e, 0 : call TextMode.gotoXY
-    ld a, (hl)
+    ld d,a
+    ld e,0
+    call TextMode.gotoXY
+    ld a,(hl)
     push hl
     call getIcon
     call TextMode.putC
