@@ -29,9 +29,9 @@ processPage:
     call Render.renderGopherScreen
     jp   Render.workLoop
 .playNext
+        call Render.renderGopherScreen
     ld hl, Render.cursor_position
     inc (hl)
     jp Render.checkBorder
-
 
     ENDMODULE
