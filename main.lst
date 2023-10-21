@@ -1023,7 +1023,7 @@
  107++64E5                  IFDEF NEDOOS
  108++64E5 ~            	IFNDEF NEDOOSATM
  109++64E5 ~            	IFNDEF NEDOOSEVO
- 110++64E5 ~                   db " [nedoNET]",13, 0
+ 110++64E5 ~                   db "  [nedoNET]",13, 0
  111++64E5 ~
  112++64E5 ~                ENDIF
  113++64E5 ~            	ENDIF
@@ -3310,12 +3310,11 @@
   29+ 8162 CD E5 64         call Render.renderGopherScreen
   30+ 8165 C3 23 65         jp   Render.workLoop
   31+ 8168              .playNext
-  32+ 8168 CD E5 64             call Render.renderGopherScreen
-  33+ 816B 21 8C 73         ld hl, Render.cursor_position
-  34+ 816E 34               inc (hl)
+  32+ 8168 21 8C 73         ld hl, Render.cursor_position
+  33+ 816B 34               inc (hl)
+  34+ 816C CD E5 64         call Render.renderGopherScreen
   35+ 816F C3 0D 65         jp Render.checkBorder
-  36+ 8172
-  37+ 8172                  ENDMODULE
+  36+ 8172                  ENDMODULE
 # file closed: gopher/engine/media-processor.asm
   36  8172                  include "gopher/gopher.asm"
 # file opened: gopher/gopher.asm

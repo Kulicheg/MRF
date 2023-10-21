@@ -107,7 +107,7 @@ header db LEFT_TAB, "MRF "
     IFDEF NEDOOS
 	IFNDEF NEDOOSATM
 	IFNDEF NEDOOSEVO
-       db " [nedoNET]",13, 0
+       db "  [nedoNET]",13, 0
        
     ENDIF
 	ENDIF
