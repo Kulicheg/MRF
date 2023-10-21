@@ -68,77 +68,45 @@ navRow db "1 ", TAB, "/", TAB
 domain db "nihirash.net" 
     ds 64 - ($ - domain)
 
-	IFDEF MSX
-header db LEFT_TAB, "    MRF"
+header db LEFT_TAB, "MRF "
        db VERSION_STRING
        db "."
        db BUILD_STRING
+	IFDEF MSX
        db " [MSX UNAPI]",13, 0
 	ENDIF      
 
     IFDEF MB03
-header db LEFT_TAB, "    MRF"
-       db VERSION_STRING
-       db "."
-       db BUILD_STRING
        db " [MB03+]",13, 0
        ENDIF
     
     IFDEF UNO
-header db LEFT_TAB, "MRF"
-       db VERSION_STRING
-       db "."
-       db BUILD_STRING
        db " [UNO UART]",13, 0
     ENDIF
 
     IFDEF AY
-header db LEFT_TAB, "  MRF"
-       db VERSION_STRING
-       db "."
-       db BUILD_STRING
        db " [AYWIFI]",13, 0
 	ENDIF
 
     IFDEF ZW
-header db LEFT_TAB, "  MRF"
-       db VERSION_STRING
-       db "."
-       db BUILD_STRING
        db " [ZXWiFi]",13, 0
     ENDIF	
  
      IFDEF NEDOOSATM
-header db LEFT_TAB, "MRF"
-       db VERSION_STRING
-       db "."
-       db BUILD_STRING
        db " [ATM UART]",13, 0
     ENDIF
 	
     IFDEF NEDOOSEVO
-header db LEFT_TAB, "MRF"
-       db VERSION_STRING
-       db "."
-       db BUILD_STRING
        db " [EVO UART]",13, 0
     ENDIF
 
     IFDEF UNOUART
-header db LEFT_TAB, "MRF"
-       db VERSION_STRING
-       db "."
-       db BUILD_STRING
        db " [UNO UART]",13, 0
     ENDIF
 
     IFDEF NEDOOS
 	IFNDEF NEDOOSATM
 	IFNDEF NEDOOSEVO
-header db LEFT_TAB, " MRF"
-       db VERSION_STRING
-       db "."
-       db BUILD_STRING
        db " [nedoNET]",13, 0
        
     ENDIF

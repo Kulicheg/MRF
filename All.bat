@@ -10,3 +10,4 @@ call build-TR-EU-64.bat
 call build-TR-ZW-64.bat
 call build-TR-UN-64.bat
 call build-MX-BC-80.bat
+call build-TR-GZ-80.bat

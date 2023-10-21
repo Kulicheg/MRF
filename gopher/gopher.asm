@@ -78,7 +78,8 @@ loadMod:
     jr .loop
 .exit
     call GeneralSound.finishLoadingModule
-    jp History.back
+    ;jp History.back
+	jp MediaProcessor.processResource
 .progress db "MOD downloading directly to GS!", 0
     endif
 

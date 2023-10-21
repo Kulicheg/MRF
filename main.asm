@@ -37,10 +37,12 @@ asmOrg:
     include "drivers/index.asm"
     IFNDEF NEDOOS
     include "player/vortex-processor.asm"
+    include "player/mod-processor.asm"
     include "screen/screen.asm"
 	ELSE
     include "screen/nedoscreen.asm"
     include "player/vortexnedoos.asm"
+    include "player/mod-processor.asm"
     ENDIF
 start:
 	IFNDEF NEDOOS
@@ -119,6 +121,7 @@ outputBuffer2:
     include "gopher/msxgopher.asm"
     include "screen/msxscreen.asm"
     include "player/vortex-processor.asm"
+    include "player/mod-processor.asm"
 fontName db "font.bin",0
 start:
     ld hl,(0x0006)

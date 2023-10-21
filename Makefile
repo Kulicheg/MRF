@@ -92,6 +92,11 @@ msx: $(SOURCES)
 	copy DATA\msxfont.bin MSX\font.bin
 	copy DATA\msxindex.gph MSX\index.gph
 	move moonr.com MSX\moonr.com
+godzilla: $(SOURCES)
+	copy data\Sample.trd MOONR.TRD
+	$(SJASMPLUS) main.asm -DTRDOS -DZW -DTIMEX80 -DAUTH -DGZ --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
+	del TRD\MR-TR-GZ-80.TRD
+	move MOONR.TRD TRD\MR-TR-GZ-80.TRD
 
 clean:
 	rm $(BINARY) $(LST)
