@@ -1,28 +1,33 @@
 ; BC - line count
-findLine:
+findLine
     ld hl, outputBuffer
+findLine2    
     ld a,b
     or c
     jp z, .checkEmpty
-.preloop
-    ld d,13
 .loop
-    ld a, (hl) : and a : jp z, .nope 
-    cp d : inc hl : jp z, .checkLF  ;13
+    ld a, (hl)
+    and a
+    jp z, .nope 
+    inc hl
+    cp 13
+    jp z, .checkLF  ;13
     cp 10 : jp z, .nextCheck     ;10
     jp .loop
 .nextCheck
-    and a : jp z, .nope
+    and a
+    jp z, .nope
     dec bc
-    ld e,a
+    ld d,a
     ld a,b
     or c
-    ld a,e
+    ld a,d
     jp nz, .loop
     ret
 .checkLF
     ld a, (hl)
-    cp 10 : jp nz, .nextCheck    ;10
+    cp 10
+    jp nz, .nextCheck    ;10
     inc hl
     jp  .nextCheck
 .checkEmpty

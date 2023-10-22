@@ -1,33 +1,43 @@
 renderGopherScreen:
-    call Render.prepareScreen
-    ld b, PER_PAGE
     ld a, 255
     ld (oldminutes), a
+    call Render.prepareScreen
+   
+    ld hl, (page_offset)        ; HL - offset to 0 Row on screen
+    ld bc,hl                    ; BC - offset to C Row on screen
+    call Render.findLine        ;BC - Search this line  HL - Return pointer to page with offset 
+    ld a, h
+    or l
+    jr z, .exit2
+    ld a, e
+    xor a
+    push hl
+    call renderRow
+    pop hl
+
+    ld b, PER_PAGE-1
+ 
 .loop
     push bc
     ld a, PER_PAGE
     sub b
-    ld b,a
     ld e,a
 
-        ld c,b
-        ld b,0
+    ld bc, 1
 
-        ld hl, (page_offset)
-        add hl,bc
-        ld bc,hl
-        push de
-    call Render.findLine
-    pop de
+    call Render.findLine2   ;BC - Search this line  HL - Return pointer to page with offset 
 
     ld a, h
     or l
     jr z, .exit
     ld a, e
+    push hl
     call renderRow
+    pop hl
 .exit
     pop bc 
     djnz .loop
+.exit2
     call showCursor
     ret
 
@@ -173,6 +183,3 @@ pageDn:
     add hl,de
     ld (page_offset), hl
     jp pageUp.exit
-
-
-

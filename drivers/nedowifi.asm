@@ -70,11 +70,13 @@ tcpSendZ
 .rn defb "\r\n"	
 	
 getPacket
-
+;if A = op8 then the C flag is reset, and Z is set.
+;If A < op8, C is set and Z is reset. 
+;If A > op8 then both C and Z are reset
     ld de,(buffer_pointer)
 	ld a,0xfb
 	cp d
-	jp nz, letsgo
+	jp nc, letsgo
 	ld hl, .errMem : call DialogBox.msgBox
 	ld a,1
 	ld (closed),a
@@ -85,7 +87,7 @@ getPacket
 	db "Out of memory. Page loading error.",0
 letsgo:
     ld de,(buffer_pointer)
-    ld hl,4096
+    ld hl,TCP_BUF_SIZE
     ld a,(sock_fd)
 	OS_WIZNETREAD
     BIT 7,H

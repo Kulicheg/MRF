@@ -41,13 +41,13 @@
    4++6003              init:
    5++6003 21 C8 61 06      ld hl, font_file, b, Dos.FMODE_READ
    5++6007 01
-   6++6008 CD D0 69         call Dos.fopen
+   6++6008 CD EF 69         call Dos.fopen
    7++600B F5               push af
    8++600C 01 00 08 21      ld bc, 2048, hl, font
    8++6010 00 40
-   9++6012 CD BD 6A         call Dos.fread
+   9++6012 CD DC 6A         call Dos.fread
   10++6015 F1               pop af
-  11++6016 CD A9 6A         call Dos.fclose
+  11++6016 CD C8 6A         call Dos.fclose
   12++6019
   13++6019                  IFDEF UNO
   14++6019 ~                ;; Force turbo mode
@@ -813,179 +813,178 @@
    5+ 6385                  include "buffer.asm"
 # file opened: gopher/render/buffer.asm
    1++6385              ; BC - line count
-   2++6385              findLine:
+   2++6385              findLine
    3++6385 21 08 95         ld hl, outputBuffer
-   4++6388 78               ld a,b
-   5++6389 B1               or c
-   6++638A CA B8 63         jp z, .checkEmpty
-   7++638D              .preloop
-   8++638D 16 0D            ld d,13
-   9++638F              .loop
-  10++638F 7E               ld a, (hl)
-  10++6390 A7             and a
-  10++6391 CA BB 63       jp z, .nope
-  11++6394 BA               cp d
-  11++6395 23             inc hl
-  11++6396 CA AE 63       jp z, .checkLF  ;13
-  12++6399 FE 0A            cp 10
-  12++639B CA A1 63       jp z, .nextCheck     ;10
-  13++639E C3 8F 63         jp .loop
-  14++63A1              .nextCheck
-  15++63A1 A7               and a
-  15++63A2 CA BB 63       jp z, .nope
-  16++63A5 0B               dec bc
-  17++63A6 5F               ld e,a
-  18++63A7 78               ld a,b
-  19++63A8 B1               or c
-  20++63A9 7B               ld a,e
-  21++63AA C2 8F 63         jp nz, .loop
-  22++63AD C9               ret
-  23++63AE              .checkLF
-  24++63AE 7E               ld a, (hl)
-  25++63AF FE 0A            cp 10
-  25++63B1 C2 A1 63       jp nz, .nextCheck    ;10
-  26++63B4 23               inc hl
-  27++63B5 C3 A1 63         jp  .nextCheck
-  28++63B8              .checkEmpty
-  29++63B8 7E               ld a, (hl)
-  29++63B9 A7             and a
-  29++63BA C0             ret nz
-  30++63BB              .nope
-  31++63BB 21 00 00         ld hl, 0
-  31++63BE C9             ret
-  32++63BF
+   4++6388              findLine2
+   5++6388 78               ld a,b
+   6++6389 B1               or c
+   7++638A CA B7 63         jp z, .checkEmpty
+   8++638D              .loop
+   9++638D 7E               ld a, (hl)
+  10++638E A7               and a
+  11++638F CA BA 63         jp z, .nope
+  12++6392 23               inc hl
+  13++6393 FE 0D            cp 13
+  14++6395 CA AD 63         jp z, .checkLF  ;13
+  15++6398 FE 0A            cp 10
+  15++639A CA A0 63       jp z, .nextCheck     ;10
+  16++639D C3 8D 63         jp .loop
+  17++63A0              .nextCheck
+  18++63A0 A7               and a
+  19++63A1 CA BA 63         jp z, .nope
+  20++63A4 0B               dec bc
+  21++63A5 57               ld d,a
+  22++63A6 78               ld a,b
+  23++63A7 B1               or c
+  24++63A8 7A               ld a,d
+  25++63A9 C2 8D 63         jp nz, .loop
+  26++63AC C9               ret
+  27++63AD              .checkLF
+  28++63AD 7E               ld a, (hl)
+  29++63AE FE 0A            cp 10
+  30++63B0 C2 A0 63         jp nz, .nextCheck    ;10
+  31++63B3 23               inc hl
+  32++63B4 C3 A0 63         jp  .nextCheck
+  33++63B7              .checkEmpty
+  34++63B7 7E               ld a, (hl)
+  34++63B8 A7             and a
+  34++63B9 C0             ret nz
+  35++63BA              .nope
+  36++63BA 21 00 00         ld hl, 0
+  36++63BD C9             ret
+  37++63BE
 # file closed: gopher/render/buffer.asm
-   6+ 63BF                  include "ui.asm"
+   6+ 63BE                  include "ui.asm"
 # file opened: gopher/render/ui.asm
-   1++63BF                  IFDEF ZXSCR
-   2++63BF ~                DEFINE LEFT_TAB "[D]omain:                                  "
-   3++63BF                  ENDIF
-   4++63BF
-   5++63BF                  IFDEF TIMEX     ;UNKNOWM fallback to 64
-   6++63BF ~                DEFINE LEFT_TAB "[D]omain:                                  "
-   7++63BF                  ENDIF
-   8++63BF
-   9++63BF                  IFDEF TIMEX80
-  10++63BF                  DEFINE LEFT_TAB "[D]omain:                                                      "
-  11++63BF                  ENDIF
-  12++63BF
-  13++63BF                  IFDEF NEDOOS
-  14++63BF ~                DEFINE LEFT_TAB "[D]omain:                                                  "
-  15++63BF                  ENDIF
-  16++63BF
-  17++63BF                  IFDEF MSX
-  18++63BF ~                DEFINE LEFT_TAB "[D]omain:                                              "
-  19++63BF                  ENDIF
-  20++63BF              prepareScreen:
-  21++63BF CD 19 60         call TextMode.cls
-  22++63C2 21 92 64         ld hl, header
-  22++63C5 CD 83 60       call TextMode.printZ
-  23++63C8 11 0A 00         ld de, #000A
-  23++63CB CD 88 61       call TextMode.gotoXY
-  24++63CE 21 A0 80         ld hl, hostName
-  24++63D1 CD 83 60       call TextMode.printZ
-  25++63D4 AF               xor a
-  25++63D5 CD 61 60       call TextMode.highlightLine
-  26++63D8 C9               ret
-  27++63D9
-  28++63D9              inputHost:
-  29++63D9 CD 29 68         	call Console.waitForKeyUp
-  30++63DC              .loop
-  31++63DC 11 0A 00         ld de, #000A
-  31++63DF CD 88 61       call TextMode.gotoXY
-  31++63E2 21 A0 80       ld hl, hostName
-  31++63E5 CD 83 60       call TextMode.printZ
-  32++63E8 3E B3            ld a, MIME_INPUT
-  32++63EA CD 8E 60       call TextMode.putC
-  33++63ED 3E 20            ld a, ' '
-  33++63EF CD 8E 60       call TextMode.putC
-  34++63F2              .wait
-  35++63F2 CD 36 68         call Console.getC
-  36++63F5 5F               ld e, a
-  37++63F6 FE 0C            cp Console.BACKSPACE
-  37++63F8 28 17          jr z, .removeChar
-  38++63FA FE 0D            cp CR
-  38++63FC CA 1F 64       jp z, inputNavigate
-  39++63FF FE 20            cp 32
-  39++6401 38 EF          jr c, .wait
-  40++6403              .putC
-  41++6403 AF               xor a
-  41++6404 21 A0 80 01    ld hl, hostName, bc, 48
-  41++6408 30 00
-  41++640A ED B1          cpir
-  42++640C 77               ld (hl), a
-  42++640D 2B             dec hl
-  42++640E 73             ld (hl), e
-  43++640F 18 CB            jr .loop
-  44++6411              .removeChar
-  45++6411 AF               xor a
-  46++6412 21 A0 80 01      ld hl, hostName, bc, 48
-  46++6416 30 00
-  46++6418 ED B1          cpir
-  47++641A 2B               dec hl
-  47++641B 2B             dec hl
-  47++641C 77             ld (hl), a
-  48++641D 18 BD            jr .loop
-  49++641F
-  50++641F              inputNavigate:
-  51++641F 21 A0 80 11      ld hl, hostName, de, domain
-  51++6423 52 64
-  52++6425 7E               ld a,(hl)
-  53++6426 A7               and a
-  54++6427 CA 17 70         jp z, History.load
-  55++642A              .loop
-  56++642A 7E               ld a, (hl)
-  56++642B A7             and a
-  56++642C 28 05          jr z, .complete
-  57++642E 12               ld (de), a
-  57++642F 23 13          inc hl, de
-  58++6431 18 F7            jr .loop
-  59++6433              .complete
-  60++6433 3E 09            ld a, TAB
-  60++6435 12             ld (de), a
-  60++6436 13             inc de
-  61++6437 3E 37            ld a, '7'
-  61++6439 12             ld (de), a
-  61++643A 13             inc de
-  62++643B 3E 30            ld a, '0'
-  62++643D 12             ld (de), a
-  62++643E 13             inc de
-  63++643F 3E 0D            ld a, CR
-  63++6441 12             ld (de), a
-  63++6442 13             inc de
-  64++6443 3E 0A            ld a, LF
-  64++6445 12             ld (de), a
-  64++6446 13             inc de
-  65++6447 21 4D 64         ld hl, navRow
-  65++644A C3 70 70       jp History.navigate
-  66++644D
-  67++644D 31 20 09 2F  navRow db "1 ", TAB, "/", TAB
-  67++6451 09
-  68++6452 6E 69 68 69  domain db "nihirash.net"
-  68++6456 72 61 73 68
-  68++645A 2E 6E 65 74
-  69++645E 00 00 00...      ds 64 - ($ - domain)
-  70++6492
-  71++6492 5B 44 5D 6F  header db "[D]omain:                                                      ", "MRF "
-  71++6496 6D 61 69 6E
-  71++649A 3A 20 20 20
-  71++649E 20 20 20 20
-  71++64A2 20 20 20 20
-  71++64A6 20 20 20 20
-  71++64AA 20 20 20 20
-  71++64AE 20 20 20 20
-  71++64B2 20 20 20 20
-  71++64B6 20 20 20 20
-  71++64BA 20 20 20 20
-  71++64BE 20 20 20 20
-  71++64C2 20 20 20 20
-  71++64C6 20 20 20 20
-  71++64CA 20 20 20 20
-  71++64CE 20 20 20 4D
-  71++64D2 52 46 20
-  72++64D5 31 2E 37            db "1.7"
-  73++64D8 2E                  db "."
-  74++64D9 39                  db "9"
+   1++63BE                  IFDEF ZXSCR
+   2++63BE ~                DEFINE LEFT_TAB "[D]omain:                                  "
+   3++63BE                  ENDIF
+   4++63BE
+   5++63BE                  IFDEF TIMEX     ;UNKNOWM fallback to 64
+   6++63BE ~                DEFINE LEFT_TAB "[D]omain:                                  "
+   7++63BE                  ENDIF
+   8++63BE
+   9++63BE                  IFDEF TIMEX80
+  10++63BE                  DEFINE LEFT_TAB "[D]omain:                                                      "
+  11++63BE                  ENDIF
+  12++63BE
+  13++63BE                  IFDEF NEDOOS
+  14++63BE ~                DEFINE LEFT_TAB "[D]omain:                                                  "
+  15++63BE                  ENDIF
+  16++63BE
+  17++63BE                  IFDEF MSX
+  18++63BE ~                DEFINE LEFT_TAB "[D]omain:                                              "
+  19++63BE                  ENDIF
+  20++63BE              prepareScreen:
+  21++63BE CD 19 60         call TextMode.cls
+  22++63C1 21 91 64         ld hl, header
+  22++63C4 CD 83 60       call TextMode.printZ
+  23++63C7 11 0A 00         ld de, #000A
+  23++63CA CD 88 61       call TextMode.gotoXY
+  24++63CD 21 A0 80         ld hl, hostName
+  24++63D0 CD 83 60       call TextMode.printZ
+  25++63D3 AF               xor a
+  25++63D4 CD 61 60       call TextMode.highlightLine
+  26++63D7 C9               ret
+  27++63D8
+  28++63D8              inputHost:
+  29++63D8 CD 48 68         	call Console.waitForKeyUp
+  30++63DB              .loop
+  31++63DB 11 0A 00         ld de, #000A
+  31++63DE CD 88 61       call TextMode.gotoXY
+  31++63E1 21 A0 80       ld hl, hostName
+  31++63E4 CD 83 60       call TextMode.printZ
+  32++63E7 3E B3            ld a, MIME_INPUT
+  32++63E9 CD 8E 60       call TextMode.putC
+  33++63EC 3E 20            ld a, ' '
+  33++63EE CD 8E 60       call TextMode.putC
+  34++63F1              .wait
+  35++63F1 CD 55 68         call Console.getC
+  36++63F4 5F               ld e, a
+  37++63F5 FE 0C            cp Console.BACKSPACE
+  37++63F7 28 17          jr z, .removeChar
+  38++63F9 FE 0D            cp CR
+  38++63FB CA 1E 64       jp z, inputNavigate
+  39++63FE FE 20            cp 32
+  39++6400 38 EF          jr c, .wait
+  40++6402              .putC
+  41++6402 AF               xor a
+  41++6403 21 A0 80 01    ld hl, hostName, bc, 48
+  41++6407 30 00
+  41++6409 ED B1          cpir
+  42++640B 77               ld (hl), a
+  42++640C 2B             dec hl
+  42++640D 73             ld (hl), e
+  43++640E 18 CB            jr .loop
+  44++6410              .removeChar
+  45++6410 AF               xor a
+  46++6411 21 A0 80 01      ld hl, hostName, bc, 48
+  46++6415 30 00
+  46++6417 ED B1          cpir
+  47++6419 2B               dec hl
+  47++641A 2B             dec hl
+  47++641B 77             ld (hl), a
+  48++641C 18 BD            jr .loop
+  49++641E
+  50++641E              inputNavigate:
+  51++641E 21 A0 80 11      ld hl, hostName, de, domain
+  51++6422 51 64
+  52++6424 7E               ld a,(hl)
+  53++6425 A7               and a
+  54++6426 CA 17 70         jp z, History.load
+  55++6429              .loop
+  56++6429 7E               ld a, (hl)
+  56++642A A7             and a
+  56++642B 28 05          jr z, .complete
+  57++642D 12               ld (de), a
+  57++642E 23 13          inc hl, de
+  58++6430 18 F7            jr .loop
+  59++6432              .complete
+  60++6432 3E 09            ld a, TAB
+  60++6434 12             ld (de), a
+  60++6435 13             inc de
+  61++6436 3E 37            ld a, '7'
+  61++6438 12             ld (de), a
+  61++6439 13             inc de
+  62++643A 3E 30            ld a, '0'
+  62++643C 12             ld (de), a
+  62++643D 13             inc de
+  63++643E 3E 0D            ld a, CR
+  63++6440 12             ld (de), a
+  63++6441 13             inc de
+  64++6442 3E 0A            ld a, LF
+  64++6444 12             ld (de), a
+  64++6445 13             inc de
+  65++6446 21 4C 64         ld hl, navRow
+  65++6449 C3 70 70       jp History.navigate
+  66++644C
+  67++644C 31 20 09 2F  navRow db "1 ", TAB, "/", TAB
+  67++6450 09
+  68++6451 6E 69 68 69  domain db "nihirash.net"
+  68++6455 72 61 73 68
+  68++6459 2E 6E 65 74
+  69++645D 00 00 00...      ds 64 - ($ - domain)
+  70++6491
+  71++6491 5B 44 5D 6F  header db "[D]omain:                                                      ", "MRF "
+  71++6495 6D 61 69 6E
+  71++6499 3A 20 20 20
+  71++649D 20 20 20 20
+  71++64A1 20 20 20 20
+  71++64A5 20 20 20 20
+  71++64A9 20 20 20 20
+  71++64AD 20 20 20 20
+  71++64B1 20 20 20 20
+  71++64B5 20 20 20 20
+  71++64B9 20 20 20 20
+  71++64BD 20 20 20 20
+  71++64C1 20 20 20 20
+  71++64C5 20 20 20 20
+  71++64C9 20 20 20 20
+  71++64CD 20 20 20 4D
+  71++64D1 52 46 20
+  72++64D4 31 2E 37            db "1.7"
+  73++64D7 2E                  db "."
+  74++64D8 31 30               db "10"
   75++64DA              	IFDEF MSX
   76++64DA ~                   db " [MSX UNAPI]",13, 0
   77++64DA              	ENDIF
@@ -1033,1836 +1032,1851 @@
    7+ 64E5                  include "gopher-page.asm"
 # file opened: gopher/render/gopher-page.asm
    1++64E5              renderGopherScreen:
-   2++64E5 CD BF 63         call Render.prepareScreen
-   3++64E8 06 16            ld b, PER_PAGE
-   4++64EA 3E FF            ld a, 255
-   5++64EC 32 94 88         ld (oldminutes), a
-   6++64EF              .loop
-   7++64EF C5               push bc
-   8++64F0 3E 16            ld a, PER_PAGE
-   9++64F2 90               sub b
-  10++64F3 47               ld b,a
-  11++64F4 5F               ld e,a
-  12++64F5
-  13++64F5 48                   ld c,b
-  14++64F6 06 00                ld b,0
-  15++64F8
-  16++64F8 2A 8E 73             ld hl, (page_offset)
-  17++64FB 09                   add hl,bc
-  18++64FC 44 4D                ld bc,hl
-  19++64FE D5                   push de
-  20++64FF CD 85 63         call Render.findLine
-  21++6502 D1               pop de
-  22++6503
-  23++6503 7C               ld a, h
-  24++6504 B5               or l
-  25++6505 28 04            jr z, .exit
-  26++6507 7B               ld a, e
-  27++6508 CD AE 62         call renderRow
-  28++650B              .exit
-  29++650B C1               pop bc
-  30++650C 10 E1            djnz .loop
-  31++650E CD 0E 66         call showCursor
-  32++6511 C9               ret
-  33++6512
-  34++6512              checkBorder:
-  35++6512 3A 8C 73         ld a, (cursor_position)
-  35++6515 FE FF          cp #ff
-  35++6517 CA 32 66       jp z, pageUp
-  36++651A 3A 8C 73         ld a, (cursor_position)
-  36++651D FE 16          cp PER_PAGE
-  36++651F CA 65 66       jp z, pageDn
-  37++6522 CD 0E 66         call showCursor
-  38++6525 C3 28 65         jp workLoop
-  39++6528
-  40++6528              workLoop:
-  41++6528 3A 45 67         ld a, (play_next)
-  41++652B A7             and a
-  41++652C C2 C3 65       jp nz, navigate
-  42++652F
-  43++652F                  dup 4
-  44++652F 76          >    halt
-  44++6530 76          >    halt
-  44++6531 76          >    halt
-  44++6532 76          >    halt
-  45++6533                  edup
-  46++6533              .nothing
-  47++6533
-  48++6533 76               halt
-  49++6534 CD 8D 88         call printRTC
-  50++6537
-  51++6537 CD 47 68         call Console.peekC
-  52++653A A7               and a
-  52++653B CA 33 65       jp z, .nothing
-  53++653E
-  54++653E FE 31            cp '1'
-  54++6540 CA 00 70       jp z, History.back
-  55++6543 FE 32            cp '2'
-  55++6545 CA C3 65       jp z, navigate
-  56++6548 FE 33            cp '3'
-  56++654A CA 1E 66       jp z, cursorDown
-  57++654D FE 34            cp '4'
-  57++654F CA 28 66       jp z, cursorUp
-  58++6552 FE 35            cp '5'
-  58++6554 CA 32 66       jp z, pageUp
-  59++6557 FE 38            cp '8'
-  59++6559 CA 65 66       jp z, pageDn
-  60++655C FE 36            cp '6'
-  60++655E CA 1E 66       jp z, cursorDown
-  61++6561 FE 37            cp '7'
-  61++6563 CA 28 66       jp z, cursorUp
-  62++6566
-  63++6566 FE 0A            cp Console.KEY_DN
-  63++6568 CA 1E 66       jp z, cursorDown
-  64++656B FE 61            cp 'a'
-  64++656D CA 1E 66       jp z, cursorDown
-  65++6570 FE 0B            cp Console.KEY_UP
-  65++6572 CA 28 66       jp z, cursorUp
-  66++6575 FE 71            cp 'q'
-  66++6577 CA 28 66       jp z, cursorUp
-  67++657A FE 08            cp Console.KEY_LT
-  67++657C CA 32 66       jp z, pageUp
-  68++657F FE 6F            cp 'o'
-  68++6581 CA 32 66       jp z, pageUp
-  69++6584 FE 09            cp Console.KEY_RT
-  69++6586 CA 65 66       jp z, pageDn
-  70++6589 FE 70            cp 'p'
-  70++658B CA 65 66       jp z, pageDn
-  71++658E
-  72++658E FE 68            cp 'h'
-  72++6590 CA 6D 70       jp z, History.home
-  73++6593 FE 48            cp 'H'
-  73++6595 CA 6D 70       jp z, History.home
-  74++6598
-  75++6598 FE 62            cp 'b'
-  75++659A CA 00 70       jp z, History.back
-  76++659D FE 42            cp 'B'
-  76++659F CA 00 70       jp z, History.back
-  77++65A2 FE 0C            cp Console.BACKSPACE
-  77++65A4 CA 00 70       jp z, History.back
-  78++65A7
-  79++65A7 FE 64            cp 'd'
-  79++65A9 CA D9 63       jp z, inputHost
-  80++65AC FE 44            cp 'D'
-  80++65AE CA D9 63       jp z, inputHost
-  81++65B1
-  82++65B1 FE 0D            cp CR
-  82++65B3 CA C3 65       jp z, navigate
-  83++65B6
-  84++65B6                  IFDEF MSX
-  85++65B6 ~                	cp ESC
-  85++65B6 ~              jp z, exit
-  86++65B6                  ENDIF
-  87++65B6
-  88++65B6                  IFDEF GS
-  89++65B6 ~                cp 'M'
-  89++65B6 ~              call z, GeneralSound.toggleModule
-  90++65B6 ~                cp 'm'
-  90++65B6 ~              call z, GeneralSound.toggleModule
-  91++65B6 ~                cp 'g'
-  91++65B6 ~              call z, GeneralSound.toggleDownload
-  92++65B6 ~                cp 'G'
-  92++65B6 ~              call z, GeneralSound.toggleDownload
-  93++65B6                  ENDIF
-  94++65B6
-  95++65B6                  IFDEF TIMEX80
-  96++65B6 FE 54            cp 'T'
-  96++65B8 CC A5 61       call z, TextMode.toggleColor
-  97++65BB FE 74            cp 't'
-  97++65BD CC A5 61       call z, TextMode.toggleColor
-  98++65C0                  ENDIF
-  99++65C0
- 100++65C0 C3 28 65         jp workLoop
- 101++65C3
- 102++65C3              navigate:
- 103++65C3 CD 29 68         call Console.waitForKeyUp
- 104++65C6 AF               xor a
- 104++65C7 32 45 67       ld (play_next), a
- 105++65CA CD 16 66         call hideCursor
- 106++65CD ED 4B 8E 73      ld bc, (page_offset)
- 107++65D1 2A 8C 73         ld hl, (cursor_position)
- 108++65D4 09               add hl,bc
- 109++65D5 44               ld b, h ;HHHHH
- 110++65D6 4D               ld c, l ;LLLLL
- 111++65D7 D5               push de
- 112++65D8 CD 85 63         call Render.findLine
- 113++65DB D1               pop de
- 114++65DC 7E               ld a, (hl)
- 115++65DD FE 31            cp '1'
- 115++65DF CA F7 65       jp z, .load
- 116++65E2 FE 30            cp '0'
- 116++65E4 CA F7 65       jp z, .load
- 117++65E7 FE 39            cp '9'
- 117++65E9 CA F7 65       jp z, .load
- 118++65EC FE 37            cp '7'
- 118++65EE CA FF 65       jp z, .input
- 119++65F1 CD 0E 66         call showCursor
- 120++65F4 C3 28 65         jp workLoop
- 121++65F7              .load
- 122++65F7 E5               push hl
- 123++65F8 CD C3 62         call getIcon
- 124++65FB E1               pop hl
- 125++65FC C3 70 70         jp History.navigate
- 126++65FF              .input
- 127++65FF E5               push hl
- 128++6600 CD 46 67         call DialogBox.inputBox
- 129++6603 E1               pop hl
- 130++6604 3A A1 67         ld a, (DialogBox.inputBuffer)
- 130++6607 A7             and a
- 130++6608 CA 17 70       jp z, History.load
- 131++660B C3 F7 65         jp .load
- 132++660E
- 133++660E              showCursor:
- 134++660E 3A 8C 73         ld a, (cursor_position)
- 134++6611 C6 02          add CURSOR_OFFSET
- 135++6613 C3 61 60         jp TextMode.highlightLine
- 136++6616
- 137++6616              hideCursor:
- 138++6616 3A 8C 73         ld a, (cursor_position)
- 138++6619 C6 02          add CURSOR_OFFSET
- 139++661B C3 5E 60         jp TextMode.usualLine
- 140++661E
- 141++661E              cursorDown:
- 142++661E CD 16 66         call hideCursor
- 143++6621 21 8C 73         ld hl, cursor_position
- 144++6624 34               inc (hl)
- 145++6625 C3 12 65         jp checkBorder
- 146++6628
- 147++6628              cursorUp:
- 148++6628 CD 16 66         call hideCursor
- 149++662B 21 8C 73         ld hl, cursor_position
- 150++662E 35               dec (hl)
- 151++662F C3 12 65         jp checkBorder
- 152++6632
- 153++6632              pageUp:
- 154++6632 3A 8E 73         ld a, (page_offset)
- 154++6635 FE 00          cp 0
- 154++6637 C2 45 66       jp nz, .pageUp2
- 155++663A 3A 8F 73         ld a, (page_offset + 1)
- 155++663D FE 00          cp 0
- 155++663F C2 45 66       jp nz, .pageUp2
- 156++6642 C3 5B 66         jp .skip
- 157++6645              .pageUp2:
- 158++6645 3E 15            ld a, PER_PAGE - 1
- 158++6647 32 8C 73       ld (cursor_position), a
- 159++664A 2A 8E 73         ld hl, (page_offset)
- 160++664D 11 16 00         ld de,PER_PAGE
- 161++6650 ED 52            sbc hl,de
- 162++6652 22 8E 73         ld (page_offset), hl
- 163++6655              .exit
- 164++6655 CD E5 64         call renderGopherScreen
- 165++6658 C3 28 65         jp workLoop
- 166++665B              .skip
- 167++665B AF               xor a
- 167++665C 32 8C 73       ld (cursor_position), a
- 167++665F CD E5 64       call renderGopherScreen
- 167++6662 C3 28 65       jp workLoop
- 168++6665
- 169++6665              pageDn:
- 170++6665 AF                xor a
- 170++6666 32 8C 73       ld (cursor_position), a
- 171++6669 2A 8E 73         ld hl,(page_offset)
- 172++666C 11 16 00         ld de,PER_PAGE
- 173++666F 19               add hl,de
- 174++6670 22 8E 73         ld (page_offset), hl
- 175++6673 C3 55 66         jp pageUp.exit
- 176++6676
- 177++6676
- 178++6676
+   2++64E5 3E FF            ld a, 255
+   3++64E7 32 94 88         ld (oldminutes), a
+   4++64EA CD BE 63         call Render.prepareScreen
+   5++64ED
+   6++64ED 2A 8E 73         ld hl, (page_offset)        ; HL - offset to 0 Row on screen
+   7++64F0 44 4D            ld bc,hl                    ; BC - offset to C Row on screen
+   8++64F2 CD 85 63         call Render.findLine        ;BC - Search this line  HL - Return pointer to page with offset
+   9++64F5 7C               ld a, h
+  10++64F6 B5               or l
+  11++64F7 28 21            jr z, .exit2
+  12++64F9 7B               ld a, e
+  13++64FA AF               xor a
+  14++64FB E5               push hl
+  15++64FC CD AE 62         call renderRow
+  16++64FF E1               pop hl
+  17++6500
+  18++6500 06 15            ld b, PER_PAGE-1
+  19++6502
+  20++6502              .loop
+  21++6502 C5               push bc
+  22++6503 3E 16            ld a, PER_PAGE
+  23++6505 90               sub b
+  24++6506 5F               ld e,a
+  25++6507
+  26++6507 01 01 00         ld bc, 1
+  27++650A
+  28++650A CD 88 63         call Render.findLine2   ;BC - Search this line  HL - Return pointer to page with offset
+  29++650D
+  30++650D 7C               ld a, h
+  31++650E B5               or l
+  32++650F 28 06            jr z, .exit
+  33++6511 7B               ld a, e
+  34++6512 E5               push hl
+  35++6513 CD AE 62         call renderRow
+  36++6516 E1               pop hl
+  37++6517              .exit
+  38++6517 C1               pop bc
+  39++6518 10 E8            djnz .loop
+  40++651A              .exit2
+  41++651A CD 1A 66         call showCursor
+  42++651D C9               ret
+  43++651E
+  44++651E              checkBorder:
+  45++651E 3A 8C 73         ld a, (cursor_position)
+  45++6521 FE FF          cp #ff
+  45++6523 CA 3E 66       jp z, pageUp
+  46++6526 3A 8C 73         ld a, (cursor_position)
+  46++6529 FE 16          cp PER_PAGE
+  46++652B CA 71 66       jp z, pageDn
+  47++652E CD 1A 66         call showCursor
+  48++6531 C3 34 65         jp workLoop
+  49++6534
+  50++6534              workLoop:
+  51++6534 3A 64 67         ld a, (play_next)
+  51++6537 A7             and a
+  51++6538 C2 CF 65       jp nz, navigate
+  52++653B
+  53++653B                  dup 4
+  54++653B 76          >    halt
+  54++653C 76          >    halt
+  54++653D 76          >    halt
+  54++653E 76          >    halt
+  55++653F                  edup
+  56++653F              .nothing
+  57++653F
+  58++653F 76               halt
+  59++6540 CD 8D 88         call printRTC
+  60++6543
+  61++6543 CD 66 68         call Console.peekC
+  62++6546 A7               and a
+  62++6547 CA 3F 65       jp z, .nothing
+  63++654A
+  64++654A FE 31            cp '1'
+  64++654C CA 00 70       jp z, History.back
+  65++654F FE 32            cp '2'
+  65++6551 CA CF 65       jp z, navigate
+  66++6554 FE 33            cp '3'
+  66++6556 CA 2A 66       jp z, cursorDown
+  67++6559 FE 34            cp '4'
+  67++655B CA 34 66       jp z, cursorUp
+  68++655E FE 35            cp '5'
+  68++6560 CA 3E 66       jp z, pageUp
+  69++6563 FE 38            cp '8'
+  69++6565 CA 71 66       jp z, pageDn
+  70++6568 FE 36            cp '6'
+  70++656A CA 2A 66       jp z, cursorDown
+  71++656D FE 37            cp '7'
+  71++656F CA 34 66       jp z, cursorUp
+  72++6572
+  73++6572 FE 0A            cp Console.KEY_DN
+  73++6574 CA 2A 66       jp z, cursorDown
+  74++6577 FE 61            cp 'a'
+  74++6579 CA 2A 66       jp z, cursorDown
+  75++657C FE 0B            cp Console.KEY_UP
+  75++657E CA 34 66       jp z, cursorUp
+  76++6581 FE 71            cp 'q'
+  76++6583 CA 34 66       jp z, cursorUp
+  77++6586 FE 08            cp Console.KEY_LT
+  77++6588 CA 3E 66       jp z, pageUp
+  78++658B FE 6F            cp 'o'
+  78++658D CA 3E 66       jp z, pageUp
+  79++6590 FE 09            cp Console.KEY_RT
+  79++6592 CA 71 66       jp z, pageDn
+  80++6595 FE 70            cp 'p'
+  80++6597 CA 71 66       jp z, pageDn
+  81++659A
+  82++659A FE 68            cp 'h'
+  82++659C CA 6D 70       jp z, History.home
+  83++659F FE 48            cp 'H'
+  83++65A1 CA 6D 70       jp z, History.home
+  84++65A4
+  85++65A4 FE 62            cp 'b'
+  85++65A6 CA 00 70       jp z, History.back
+  86++65A9 FE 42            cp 'B'
+  86++65AB CA 00 70       jp z, History.back
+  87++65AE FE 0C            cp Console.BACKSPACE
+  87++65B0 CA 00 70       jp z, History.back
+  88++65B3
+  89++65B3 FE 64            cp 'd'
+  89++65B5 CA D8 63       jp z, inputHost
+  90++65B8 FE 44            cp 'D'
+  90++65BA CA D8 63       jp z, inputHost
+  91++65BD
+  92++65BD FE 0D            cp CR
+  92++65BF CA CF 65       jp z, navigate
+  93++65C2
+  94++65C2                  IFDEF MSX
+  95++65C2 ~                	cp ESC
+  95++65C2 ~              jp z, exit
+  96++65C2                  ENDIF
+  97++65C2
+  98++65C2                  IFDEF GS
+  99++65C2 ~                cp 'M'
+  99++65C2 ~              call z, GeneralSound.toggleModule
+ 100++65C2 ~                cp 'm'
+ 100++65C2 ~              call z, GeneralSound.toggleModule
+ 101++65C2 ~                cp 'g'
+ 101++65C2 ~              call z, GeneralSound.toggleDownload
+ 102++65C2 ~                cp 'G'
+ 102++65C2 ~              call z, GeneralSound.toggleDownload
+ 103++65C2                  ENDIF
+ 104++65C2
+ 105++65C2                  IFDEF TIMEX80
+ 106++65C2 FE 54            cp 'T'
+ 106++65C4 CC A5 61       call z, TextMode.toggleColor
+ 107++65C7 FE 74            cp 't'
+ 107++65C9 CC A5 61       call z, TextMode.toggleColor
+ 108++65CC                  ENDIF
+ 109++65CC
+ 110++65CC C3 34 65         jp workLoop
+ 111++65CF
+ 112++65CF              navigate:
+ 113++65CF CD 48 68         call Console.waitForKeyUp
+ 114++65D2 AF               xor a
+ 114++65D3 32 64 67       ld (play_next), a
+ 115++65D6 CD 22 66         call hideCursor
+ 116++65D9 ED 4B 8E 73      ld bc, (page_offset)
+ 117++65DD 2A 8C 73         ld hl, (cursor_position)
+ 118++65E0 09               add hl,bc
+ 119++65E1 44               ld b, h ;HHHHH
+ 120++65E2 4D               ld c, l ;LLLLL
+ 121++65E3 D5               push de
+ 122++65E4 CD 85 63         call Render.findLine
+ 123++65E7 D1               pop de
+ 124++65E8 7E               ld a, (hl)
+ 125++65E9 FE 31            cp '1'
+ 125++65EB CA 03 66       jp z, .load
+ 126++65EE FE 30            cp '0'
+ 126++65F0 CA 03 66       jp z, .load
+ 127++65F3 FE 39            cp '9'
+ 127++65F5 CA 03 66       jp z, .load
+ 128++65F8 FE 37            cp '7'
+ 128++65FA CA 0B 66       jp z, .input
+ 129++65FD CD 1A 66         call showCursor
+ 130++6600 C3 34 65         jp workLoop
+ 131++6603              .load
+ 132++6603 E5               push hl
+ 133++6604 CD C3 62         call getIcon
+ 134++6607 E1               pop hl
+ 135++6608 C3 70 70         jp History.navigate
+ 136++660B              .input
+ 137++660B E5               push hl
+ 138++660C CD 65 67         call DialogBox.inputBox
+ 139++660F E1               pop hl
+ 140++6610 3A C0 67         ld a, (DialogBox.inputBuffer)
+ 140++6613 A7             and a
+ 140++6614 CA 17 70       jp z, History.load
+ 141++6617 C3 03 66         jp .load
+ 142++661A
+ 143++661A              showCursor:
+ 144++661A 3A 8C 73         ld a, (cursor_position)
+ 144++661D C6 02          add CURSOR_OFFSET
+ 145++661F C3 61 60         jp TextMode.highlightLine
+ 146++6622
+ 147++6622              hideCursor:
+ 148++6622 3A 8C 73         ld a, (cursor_position)
+ 148++6625 C6 02          add CURSOR_OFFSET
+ 149++6627 C3 5E 60         jp TextMode.usualLine
+ 150++662A
+ 151++662A              cursorDown:
+ 152++662A CD 22 66         call hideCursor
+ 153++662D 21 8C 73         ld hl, cursor_position
+ 154++6630 34               inc (hl)
+ 155++6631 C3 1E 65         jp checkBorder
+ 156++6634
+ 157++6634              cursorUp:
+ 158++6634 CD 22 66         call hideCursor
+ 159++6637 21 8C 73         ld hl, cursor_position
+ 160++663A 35               dec (hl)
+ 161++663B C3 1E 65         jp checkBorder
+ 162++663E
+ 163++663E              pageUp:
+ 164++663E 3A 8E 73         ld a, (page_offset)
+ 164++6641 FE 00          cp 0
+ 164++6643 C2 51 66       jp nz, .pageUp2
+ 165++6646 3A 8F 73         ld a, (page_offset + 1)
+ 165++6649 FE 00          cp 0
+ 165++664B C2 51 66       jp nz, .pageUp2
+ 166++664E C3 67 66         jp .skip
+ 167++6651              .pageUp2:
+ 168++6651 3E 15            ld a, PER_PAGE - 1
+ 168++6653 32 8C 73       ld (cursor_position), a
+ 169++6656 2A 8E 73         ld hl, (page_offset)
+ 170++6659 11 16 00         ld de,PER_PAGE
+ 171++665C ED 52            sbc hl,de
+ 172++665E 22 8E 73         ld (page_offset), hl
+ 173++6661              .exit
+ 174++6661 CD E5 64         call renderGopherScreen
+ 175++6664 C3 34 65         jp workLoop
+ 176++6667              .skip
+ 177++6667 AF               xor a
+ 177++6668 32 8C 73       ld (cursor_position), a
+ 177++666B CD E5 64       call renderGopherScreen
+ 177++666E C3 34 65       jp workLoop
+ 178++6671
+ 179++6671              pageDn:
+ 180++6671 AF                xor a
+ 180++6672 32 8C 73       ld (cursor_position), a
+ 181++6675 2A 8E 73         ld hl,(page_offset)
+ 182++6678 11 16 00         ld de,PER_PAGE
+ 183++667B 19               add hl,de
+ 184++667C 22 8E 73         ld (page_offset), hl
+ 185++667F C3 61 66         jp pageUp.exit
+ 186++6682
 # file closed: gopher/render/gopher-page.asm
-   8+ 6676                  include "plaintext.asm"
+   8+ 6682                  include "plaintext.asm"
 # file opened: gopher/render/plaintext.asm
-   1++6676              renderPlainTextScreen:
-   2++6676 CD BF 63         call prepareScreen
-   3++6679 06 16            ld b, PER_PAGE
-   4++667B 3E FF            ld a, 255
-   5++667D 32 94 88         ld (oldminutes), a
-   6++6680              .loop
-   7++6680 C5               push bc
-   8++6681 3E 16            ld a, PER_PAGE
-   9++6683 90               sub b
-  10++6684 47               ld b,a
-  11++6685 5F               ld e,a
-  12++6686 48               ld c,b
-  13++6687 06 00            ld b,0
-  14++6689 2A 8E 73         ld hl, (page_offset)
-  15++668C 09               add hl,bc
-  16++668D 44 4D            ld bc,hl
-  17++668F D5               push de
-  18++6690 CD 85 63         call Render.findLine
-  19++6693 D1               pop de
-  20++6694 7C               ld a, h
-  20++6695 B5             or l
-  20++6696 CA A9 66       jp z, .exit
-  21++6699 7B               ld a, e
-  22++669A C6 02            add CURSOR_OFFSET
-  22++669C 57 1E 01       ld d, a, e, 1
-  22++669F CD 88 61       call TextMode.gotoXY
-  23++66A2 CD 7D 62         call print70Text
-  24++66A5 C1               pop bc
-  25++66A6 10 D8            djnz .loop
-  26++66A8 C9               ret
-  27++66A9              .exit
-  28++66A9 C1               pop bc
-  29++66AA C9               ret
-  30++66AB
-  31++66AB              plainTextLoop:
-  32++66AB CD 8D 88         call printRTC
-  33++66AE CD 36 68         call Console.getC
-  34++66B1
-  35++66B1 FE 31            cp '1'
-  35++66B3 CA 00 70       jp z, History.back
-  36++66B6 FE 32            cp '2'
-  36++66B8 CA C3 65       jp z, navigate
-  37++66BB FE 35            cp '5'
-  37++66BD CA 23 67       jp z, textUp
-  38++66C0 FE 38            cp '8'
-  38++66C2 CA 13 67       jp z, textDown
-  39++66C5 FE 08            cp Console.KEY_LT
-  39++66C7 CA 23 67       jp z, textUp
-  40++66CA FE 09            cp Console.KEY_RT
-  40++66CC CA 13 67       jp z, textDown
-  41++66CF
-  42++66CF FE 0A            cp Console.KEY_DN
-  42++66D1 CA 13 67       jp z, textDown
-  43++66D4 FE 61            cp 'a'
-  43++66D6 CA 13 67       jp z, textDown
-  44++66D9
-  45++66D9 FE 0B            cp Console.KEY_UP
-  45++66DB CA 23 67       jp z, textUp
-  46++66DE FE 71            cp 'q'
-  46++66E0 CA 23 67       jp z, textUp
-  47++66E3
-  48++66E3 FE 68            cp 'h'
-  48++66E5 CA 6D 70       jp z, History.home
-  49++66E8 FE 48            cp 'H'
-  49++66EA CA 6D 70       jp z, History.home
-  50++66ED
-  51++66ED FE 62            cp 'b'
-  51++66EF CA 00 70       jp z, History.back
-  52++66F2 FE 42            cp 'B'
-  52++66F4 CA 00 70       jp z, History.back
-  53++66F7
-  54++66F7 FE 64            cp 'd'
-  54++66F9 CA D9 63       jp z, inputHost
-  55++66FC FE 44            cp 'D'
-  55++66FE CA D9 63       jp z, inputHost
-  56++6701
-  57++6701 FE 0C            cp Console.BACKSPACE
-  57++6703 CA 00 70       jp z, History.back
-  58++6706
-  59++6706                  IFDEF MSX
-  60++6706 ~                	cp ESC
-  60++6706 ~              jp z, exit
-  61++6706                  ENDIF
-  62++6706
-  63++6706                  IFDEF GS
-  64++6706 ~                cp 'M'
-  64++6706 ~              call z, GeneralSound.toggleModule
-  65++6706 ~                cp 'm'
-  65++6706 ~              call z, GeneralSound.toggleModule
-  66++6706                  ENDIF
-  67++6706
-  68++6706                  IFDEF TIMEX80
-  69++6706 FE 54            cp 'T'
-  69++6708 CC A5 61       call z, TextMode.toggleColor
-  70++670B FE 74            cp 't'
-  70++670D CC A5 61       call z, TextMode.toggleColor
-  71++6710                  ENDIF
-  72++6710
-  73++6710 C3 AB 66         jp plainTextLoop
-  74++6713
-  75++6713
-  76++6713              textDown:
-  77++6713 2A 8E 73         ld hl,(page_offset)
-  78++6716 11 16 00         ld de,PER_PAGE
-  79++6719 19               add hl,de
-  80++671A 22 8E 73         ld (page_offset), hl
-  81++671D CD 76 66         call renderPlainTextScreen
-  82++6720 C3 AB 66         jp plainTextLoop
-  83++6723
-  84++6723              textUp:
-  85++6723 3A 8E 73         ld a, (page_offset)
-  85++6726 FE 00          cp 0
-  85++6728 20 0A          jr nz, .textUp2
-  86++672A 3A 8F 73         ld a, (page_offset + 1)
-  86++672D FE 00          cp 0
-  86++672F 20 03          jr nz, .textUp2
-  87++6731 C3 AB 66         jp plainTextLoop
-  88++6734
-  89++6734              .textUp2:
-  90++6734 2A 8E 73         ld hl,(page_offset)
-  91++6737 11 16 00         ld de,PER_PAGE
-  92++673A ED 52            sbc hl,de
-  93++673C 22 8E 73         ld (page_offset), hl
-  94++673F CD 76 66         call renderPlainTextScreen
-  95++6742 C3 AB 66         jp plainTextLoop
-  96++6745
+   1++6682              renderPlainTextScreen:
+   2++6682 3E FF            ld a, 255
+   3++6684 32 94 88         ld (oldminutes), a
+   4++6687 CD BE 63         call prepareScreen
+   5++668A
+   6++668A 2A 8E 73         ld hl, (page_offset)        ; HL - offset to 0 Row on screen
+   7++668D 44 4D            ld bc,hl                    ; BC - offset to C Row on screen
+   8++668F CD 85 63         call Render.findLine        ;BC - Search this line  HL - Return pointer to page with offset
+   9++6692 7C               ld a, h
+  10++6693 B5               or l
+  11++6694 28 30            jr z, .exit2
+  12++6696 AF               xor a
+  13++6697 C6 02            add CURSOR_OFFSET
+  13++6699 57 1E 01       ld d, a, e, 1
+  13++669C CD 88 61       call TextMode.gotoXY
+  14++669F CD 7D 62         call print70Text
+  15++66A2 06 15            ld b, PER_PAGE -1
+  16++66A4              .loop
+  17++66A4 C5               push bc
+  18++66A5 3E 16            ld a, PER_PAGE
+  19++66A7 90               sub b
+  20++66A8 5F               ld e,a
+  21++66A9 01 01 00         ld bc, 1
+  22++66AC CD 88 63         call Render.findLine2   ;BC - Search this line  HL - Return pointer to page with offset
+  23++66AF 7C               ld a, h
+  24++66B0 B5               or l
+  25++66B1 28 10            jr z, .exit
+  26++66B3 7B               ld a, e
+  27++66B4 C6 02            add CURSOR_OFFSET
+  27++66B6 57 1E 01       ld d, a, e, 1
+  27++66B9 CD 88 61       call TextMode.gotoXY
+  28++66BC CD 7D 62         call print70Text
+  29++66BF C1               pop bc
+  30++66C0 10 E2            djnz .loop
+  31++66C2 C9               ret
+  32++66C3              .exit
+  33++66C3 C1               pop bc
+  34++66C4 10 DE            djnz .loop
+  35++66C6              .exit2
+  36++66C6 CD 1A 66         call showCursor
+  37++66C9 C9               ret
+  38++66CA              plainTextLoop:
+  39++66CA CD 8D 88         call printRTC
+  40++66CD CD 55 68         call Console.getC
+  41++66D0
+  42++66D0 FE 31            cp '1'
+  42++66D2 CA 00 70       jp z, History.back
+  43++66D5 FE 32            cp '2'
+  43++66D7 CA CF 65       jp z, navigate
+  44++66DA FE 35            cp '5'
+  44++66DC CA 42 67       jp z, textUp
+  45++66DF FE 38            cp '8'
+  45++66E1 CA 32 67       jp z, textDown
+  46++66E4 FE 08            cp Console.KEY_LT
+  46++66E6 CA 42 67       jp z, textUp
+  47++66E9 FE 09            cp Console.KEY_RT
+  47++66EB CA 32 67       jp z, textDown
+  48++66EE
+  49++66EE FE 0A            cp Console.KEY_DN
+  49++66F0 CA 32 67       jp z, textDown
+  50++66F3 FE 61            cp 'a'
+  50++66F5 CA 32 67       jp z, textDown
+  51++66F8
+  52++66F8 FE 0B            cp Console.KEY_UP
+  52++66FA CA 42 67       jp z, textUp
+  53++66FD FE 71            cp 'q'
+  53++66FF CA 42 67       jp z, textUp
+  54++6702
+  55++6702 FE 68            cp 'h'
+  55++6704 CA 6D 70       jp z, History.home
+  56++6707 FE 48            cp 'H'
+  56++6709 CA 6D 70       jp z, History.home
+  57++670C
+  58++670C FE 62            cp 'b'
+  58++670E CA 00 70       jp z, History.back
+  59++6711 FE 42            cp 'B'
+  59++6713 CA 00 70       jp z, History.back
+  60++6716
+  61++6716 FE 64            cp 'd'
+  61++6718 CA D8 63       jp z, inputHost
+  62++671B FE 44            cp 'D'
+  62++671D CA D8 63       jp z, inputHost
+  63++6720
+  64++6720 FE 0C            cp Console.BACKSPACE
+  64++6722 CA 00 70       jp z, History.back
+  65++6725
+  66++6725                  IFDEF MSX
+  67++6725 ~                	cp ESC
+  67++6725 ~              jp z, exit
+  68++6725                  ENDIF
+  69++6725
+  70++6725                  IFDEF GS
+  71++6725 ~                cp 'M'
+  71++6725 ~              call z, GeneralSound.toggleModule
+  72++6725 ~                cp 'm'
+  72++6725 ~              call z, GeneralSound.toggleModule
+  73++6725                  ENDIF
+  74++6725
+  75++6725                  IFDEF TIMEX80
+  76++6725 FE 54            cp 'T'
+  76++6727 CC A5 61       call z, TextMode.toggleColor
+  77++672A FE 74            cp 't'
+  77++672C CC A5 61       call z, TextMode.toggleColor
+  78++672F                  ENDIF
+  79++672F
+  80++672F C3 CA 66         jp plainTextLoop
+  81++6732
+  82++6732
+  83++6732              textDown:
+  84++6732 2A 8E 73         ld hl,(page_offset)
+  85++6735 11 16 00         ld de,PER_PAGE
+  86++6738 19               add hl,de
+  87++6739 22 8E 73         ld (page_offset), hl
+  88++673C CD 82 66         call renderPlainTextScreen
+  89++673F C3 CA 66         jp plainTextLoop
+  90++6742
+  91++6742              textUp:
+  92++6742 3A 8E 73         ld a, (page_offset)
+  92++6745 FE 00          cp 0
+  92++6747 20 0A          jr nz, .textUp2
+  93++6749 3A 8F 73         ld a, (page_offset + 1)
+  93++674C FE 00          cp 0
+  93++674E 20 03          jr nz, .textUp2
+  94++6750 C3 CA 66         jp plainTextLoop
+  95++6753
+  96++6753              .textUp2:
+  97++6753 2A 8E 73         ld hl,(page_offset)
+  98++6756 11 16 00         ld de,PER_PAGE
+  99++6759 ED 52            sbc hl,de
+ 100++675B 22 8E 73         ld (page_offset), hl
+ 101++675E CD 82 66         call renderPlainTextScreen
+ 102++6761 C3 CA 66         jp plainTextLoop
+ 103++6764
 # file closed: gopher/render/plaintext.asm
-   9+ 6745
-  10+ 6745 00           play_next       db  0
-  11+ 6746              position        EQU historyBlock.position
-  12+ 6746              cursor_position EQU position + 2
-  13+ 6746              page_offset     EQU position + 4
-  14+ 6746
-  15+ 6746                  ENDMODULE
-  16+ 6746
-  17+ 6746                  include "dialogbox.asm"
+   9+ 6764
+  10+ 6764 00           play_next       db  0
+  11+ 6765              position        EQU historyBlock.position
+  12+ 6765              cursor_position EQU position + 2
+  13+ 6765              page_offset     EQU position + 4
+  14+ 6765
+  15+ 6765                  ENDMODULE
+  16+ 6765
+  17+ 6765                  include "dialogbox.asm"
 # file opened: gopher/render/dialogbox.asm
-   1++6746                  module DialogBox
-   2++6746
-   3++6746              inputBox:
-   4++6746 AF               xor a
-   4++6747 32 A1 67       ld (inputBuffer), a
-   5++674A              .noclear
-   6++674A CD 02 68         call drawBox
-   7++674D              .loop
-   8++674D 11 05 0B         ld de, #0B05
-   8++6750 CD 88 61       call TextMode.gotoXY
-   9++6753 21 A1 67         ld hl, inputBuffer
-   9++6756 CD 83 60       call TextMode.printZ
-  10++6759 3E B3            ld a, MIME_INPUT
-  10++675B CD 8E 60       call TextMode.putC
-  10++675E 3E 20          ld a, ' '
-  10++6760 CD 8E 60       call TextMode.putC
-  11++6763              .checkkey
-  12++6763 CD 36 68         call Console.getC
-  13++6766 FE 0C            cp Console.BACKSPACE
-  13++6768 28 16          jr z, .removeChar
-  14++676A FE 0D        	cp CR
-  14++676C C8             ret z
-  15++676D FE 20            cp SPACE
-  15++676F 38 F2          jr c, .checkkey
-  16++6771              .putC
-  17++6771 5F               ld e, a
-  18++6772 AF               xor a
-  18++6773 21 A1 67 01    ld hl, inputBuffer, bc, #ff
-  18++6777 FF 00
-  18++6779 ED B1          cpir
-  19++677B 77               ld (hl), a
-  19++677C 2B             dec hl
-  19++677D 73             ld (hl), e
-  20++677E 18 CD            jr .loop
-  21++6780              .removeChar
-  22++6780 AF               xor a
-  23++6781 21 A1 67 01      ld hl, inputBuffer, bc, #ff
-  23++6785 FF 00
-  23++6787 ED B1          cpir
-  24++6789 E5               push hl
-  25++678A 11 A2 67             ld de, inputBuffer + 1
-  26++678D B7                   or a
-  26++678E ED 52          sbc hl, de
-  27++6790 7C                   ld a, h
-  27++6791 B5             or l
-  28++6792 E1               pop hl
-  29++6793 28 B8            jr z, .loop
-  30++6795 AF               xor a
-  31++6796 2B               dec hl
-  31++6797 2B             dec hl
-  31++6798 77             ld (hl), a
-  32++6799 18 B2            jr .loop
-  33++679B
-  34++679B              	IFNDEF MSX
-  35++679B              delayinput:
-  36++679B 06 32           ld b, 50
-  37++679D              .loop2
-  38++679D 76               halt
-  39++679E 10 FD            djnz .loop2
-  40++67A0 C9               ret
-  41++67A1              namedownload
-  42++67A1                  IFDEF NEDOOS
-  43++67A1 ~            		db "..",92,"downloads",92
-  44++67A1                  ENDIF
-  45++67A1                  ENDIF
-  46++67A1 00 00 00...  inputBuffer ds 80
-  47++67F1
-  48++67F1              msgBox:
-  49++67F1 CD FA 67         call msgNoWait
-  50++67F4 06 96            ld b, 150
-  51++67F6              .loop
-  52++67F6 76               halt
-  53++67F7 10 FD            djnz .loop
-  54++67F9 C9               ret
-  55++67FA
-  56++67FA              msgNoWait:
-  57++67FA E5               push hl
-  58++67FB CD 02 68         call drawBox
-  59++67FE E1               pop hl
-  60++67FF C3 83 60         jp TextMode.printZ
-  61++6802
-  62++6802              drawBox:
-  63++6802 26 0A 3E B2      ld h, #0a, a, BORDER_TOP
-  64++6806 CD 76 61         call TextMode.fillLine
-  65++6809 26 0B 3E 20      ld h, #0b, a, ' '
-  66++680D CD 76 61         call TextMode.fillLine
-  67++6810 26 0C 3E B1      ld h, #0c, a, BORDER_BOTTOM
-  68++6814 CD 76 61         call TextMode.fillLine
-  69++6817 3E 0A            ld a, #0a
-  70++6819 CD 61 60         call TextMode.highlightLine
-  71++681C 3E 0C            ld a, #0c
-  72++681E CD 61 60         call TextMode.highlightLine
-  73++6821 11 03 0B         ld de,#0B03
-  74++6824 CD 88 61         call TextMode.gotoXY
-  75++6827 C9               ret
-  76++6828                  endmodule
-  77++6828
+   1++6765                  module DialogBox
+   2++6765
+   3++6765              inputBox:
+   4++6765 AF               xor a
+   4++6766 32 C0 67       ld (inputBuffer), a
+   5++6769              .noclear
+   6++6769 CD 21 68         call drawBox
+   7++676C              .loop
+   8++676C 11 05 0B         ld de, #0B05
+   8++676F CD 88 61       call TextMode.gotoXY
+   9++6772 21 C0 67         ld hl, inputBuffer
+   9++6775 CD 83 60       call TextMode.printZ
+  10++6778 3E B3            ld a, MIME_INPUT
+  10++677A CD 8E 60       call TextMode.putC
+  10++677D 3E 20          ld a, ' '
+  10++677F CD 8E 60       call TextMode.putC
+  11++6782              .checkkey
+  12++6782 CD 55 68         call Console.getC
+  13++6785 FE 0C            cp Console.BACKSPACE
+  13++6787 28 16          jr z, .removeChar
+  14++6789 FE 0D        	cp CR
+  14++678B C8             ret z
+  15++678C FE 20            cp SPACE
+  15++678E 38 F2          jr c, .checkkey
+  16++6790              .putC
+  17++6790 5F               ld e, a
+  18++6791 AF               xor a
+  18++6792 21 C0 67 01    ld hl, inputBuffer, bc, #ff
+  18++6796 FF 00
+  18++6798 ED B1          cpir
+  19++679A 77               ld (hl), a
+  19++679B 2B             dec hl
+  19++679C 73             ld (hl), e
+  20++679D 18 CD            jr .loop
+  21++679F              .removeChar
+  22++679F AF               xor a
+  23++67A0 21 C0 67 01      ld hl, inputBuffer, bc, #ff
+  23++67A4 FF 00
+  23++67A6 ED B1          cpir
+  24++67A8 E5               push hl
+  25++67A9 11 C1 67             ld de, inputBuffer + 1
+  26++67AC B7                   or a
+  26++67AD ED 52          sbc hl, de
+  27++67AF 7C                   ld a, h
+  27++67B0 B5             or l
+  28++67B1 E1               pop hl
+  29++67B2 28 B8            jr z, .loop
+  30++67B4 AF               xor a
+  31++67B5 2B               dec hl
+  31++67B6 2B             dec hl
+  31++67B7 77             ld (hl), a
+  32++67B8 18 B2            jr .loop
+  33++67BA
+  34++67BA              	IFNDEF MSX
+  35++67BA              delayinput:
+  36++67BA 06 32           ld b, 50
+  37++67BC              .loop2
+  38++67BC 76               halt
+  39++67BD 10 FD            djnz .loop2
+  40++67BF C9               ret
+  41++67C0              namedownload
+  42++67C0                  IFDEF NEDOOS
+  43++67C0 ~            		db "..",92,"downloads",92
+  44++67C0                  ENDIF
+  45++67C0                  ENDIF
+  46++67C0 00 00 00...  inputBuffer ds 80
+  47++6810
+  48++6810              msgBox:
+  49++6810 CD 19 68         call msgNoWait
+  50++6813 06 96            ld b, 150
+  51++6815              .loop
+  52++6815 76               halt
+  53++6816 10 FD            djnz .loop
+  54++6818 C9               ret
+  55++6819
+  56++6819              msgNoWait:
+  57++6819 E5               push hl
+  58++681A CD 21 68         call drawBox
+  59++681D E1               pop hl
+  60++681E C3 83 60         jp TextMode.printZ
+  61++6821
+  62++6821              drawBox:
+  63++6821 26 0A 3E B2      ld h, #0a, a, BORDER_TOP
+  64++6825 CD 76 61         call TextMode.fillLine
+  65++6828 26 0B 3E 20      ld h, #0b, a, ' '
+  66++682C CD 76 61         call TextMode.fillLine
+  67++682F 26 0C 3E B1      ld h, #0c, a, BORDER_BOTTOM
+  68++6833 CD 76 61         call TextMode.fillLine
+  69++6836 3E 0A            ld a, #0a
+  70++6838 CD 61 60         call TextMode.highlightLine
+  71++683B 3E 0C            ld a, #0c
+  72++683D CD 61 60         call TextMode.highlightLine
+  73++6840 11 03 0B         ld de,#0B03
+  74++6843 CD 88 61         call TextMode.gotoXY
+  75++6846 C9               ret
+  76++6847                  endmodule
+  77++6847
 # file closed: gopher/render/dialogbox.asm
 # file closed: gopher/render/index.asm
-  31  6828                  include "dos/index.asm"
+  31  6847                  include "dos/index.asm"
 # file opened: dos/index.asm
-   1+ 6828              	IFDEF NEDOOS
-   2+ 6828 ~            	    include "nedoconsole.asm"
-   3+ 6828 ~            		include "nedoos.asm"
-   4+ 6828              	ENDIF
-   5+ 6828
-   6+ 6828              	IFDEF TRDOS
-   7+ 6828                  	include "console.asm"
+   1+ 6847              	IFDEF NEDOOS
+   2+ 6847 ~            	    include "nedoconsole.asm"
+   3+ 6847 ~            		include "nedoos.asm"
+   4+ 6847              	ENDIF
+   5+ 6847
+   6+ 6847              	IFDEF TRDOS
+   7+ 6847                  	include "console.asm"
 # file opened: dos/console.asm
-   1++6828                  module Console
-   2++6828              KEY_UP = 11
-   3++6828              KEY_DN = 10
-   4++6828              KEY_LT = 8
-   5++6828              KEY_RT = 9
-   6++6828              BACKSPACE = 12
-   7++6828 00           keyCode db 0
-   8++6829
-   9++6829              BASIC_KEY = #5C08
-  10++6829
-  11++6829              waitForKeyUp:
-  12++6829 76           	halt
-  13++682A AF              xor a
-  13++682B DB FE          in a, (#fe)
-  13++682D 2F             cpl
-  13++682E E6 1F          and 31
-  13++6830 20 F7          jr nz, waitForKeyUp
-  14++6832 32 08 5C        ld (BASIC_KEY), a
-  15++6835 C9              ret
-  16++6836
-  17++6836              getC:
-  18++6836 AF              xor a
-  19++6837 32 08 5C        ld (BASIC_KEY),a
-  20++683A              getC2:
-  21++683A 3A 08 5C        ld a,(BASIC_KEY)
-  22++683D A7              and a
-  22++683E 28 FA          jr z, getC2
-  23++6840 47              ld b,a
-  24++6841 AF              xor a
-  24++6842 32 08 5C       ld (BASIC_KEY), a
-  25++6845 78              ld a, b
-  26++6846 C9              ret
-  27++6847
-  28++6847              peekC:
-  29++6847 AF               xor a
-  29++6848 32 08 5C       ld (BASIC_KEY),a
-  30++684B CD 4F 68         call inkey
-  31++684E C9               ret
-  32++684F
-  33++684F              inkey:
-  34++684F 11 00 00        ld de,0
-  35++6852 01 FE FE        ld bc,$fefe
-  36++6855 ED 78           in a,(c)
-  37++6857 F6 E1           or $e1
-  38++6859 FE FF           cp $ff
-  39++685B 20 57           jr nz, .keyhitA
-  40++685D
-  41++685D 1E 05           ld e,5
-  42++685F 06 FD           ld b,$fd
-  43++6861 ED 78           in a,(c)
-  44++6863 F6 E0           or $e0
-  45++6865 FE FF           cp $ff
-  46++6867 20 4B           jr nz, .keyhitA
-  47++6869
-  48++6869 1E 0A           ld e,10
-  49++686B 06 FB           ld b,$fb
-  50++686D ED 78           in a,(c)
-  51++686F F6 E0           or $e0
-  52++6871 FE FF           cp $ff
-  53++6873 20 3F           jr nz, .keyhitA
-  54++6875
-  55++6875 1E 0F           ld e,15
-  56++6877 06 F7           ld b,$f7
-  57++6879 ED 78           in a,(c)
-  58++687B F6 E0           or $e0
-  59++687D FE FF           cp $ff
-  60++687F 20 33           jr nz, .keyhitA
-  61++6881
-  62++6881 1E 14           ld e,20
-  63++6883 06 EF           ld b,$ef
-  64++6885 ED 78           in a,(c)
-  65++6887 F6 E0           or $e0
-  66++6889 FE FF           cp $ff
-  67++688B 20 27           jr nz, .keyhitA
-  68++688D
-  69++688D 1E 19           ld e,25
-  70++688F 06 DF           ld b,$df
-  71++6891 ED 78           in a,(c)
-  72++6893 F6 E0           or $e0
-  73++6895 FE FF           cp $ff
-  74++6897 20 1B           jr nz, .keyhitA
-  75++6899
-  76++6899 1E 1E           ld e,30
-  77++689B 06 BF           ld b,$bf
-  78++689D ED 78           in a,(c)
-  79++689F F6 E0           or $e0
-  80++68A1 FE FF           cp $ff
-  81++68A3 20 0F           jr nz, .keyhitA
-  82++68A5
-  83++68A5 1E 23           ld e,35
-  84++68A7 06 7F           ld b,$7f
-  85++68A9 ED 78           in a,(c)
-  86++68AB F6 E2           or $e2
-  87++68AD FE FF           cp $ff
-  88++68AF 4F              ld c,a
-  89++68B0 20 19           jr nz, .keyhitB
-  90++68B2
-  91++68B2              .nokey
-  92++68B2 AF              xor a
-  93++68B3 C9              ret
-  94++68B4
-  95++68B4              .keyhitA
-  96++68B4
-  97++68B4 4F              ld c,a
-  98++68B5
-  99++68B5 78              ld a,b
- 100++68B6 2F              cpl
- 101++68B7 F6 81           or $81
- 102++68B9 DB FE           in a,($fe)
- 103++68BB F6 E0           or $e0
- 104++68BD FE FF           cp $ff
- 105++68BF 20 F1           jr nz, .nokey
- 106++68C1
- 107++68C1 3E 7F           ld a,$7f
- 108++68C3 DB FE           in a,($fe)
- 109++68C5 F6 E2           or $e2
- 110++68C7 FE FF           cp $ff
- 111++68C9 20 E7           jr nz, .nokey
- 112++68CB
- 113++68CB              .keyhitB
- 114++68CB
- 115++68CB 06 00           ld b,0
- 116++68CD 21 14 68        ld hl,.rowtbl-$e0
- 117++68D0 09              add hl,bc
- 118++68D1 7E              ld a,(hl)
- 119++68D2 FE 05           cp 5
- 120++68D4 30 DC           jr nc, .nokey
- 121++68D6 83              add a,e
- 122++68D7 5F              ld e,a
- 123++68D8
- 124++68D8 21 14 69        ld hl,.table
- 125++68DB 19              add hl,de
- 126++68DC
- 127++68DC 3E FE           ld a,$fe
- 128++68DE DB FE           in a,($fe)
- 129++68E0 E6 01           and $01
- 130++68E2 20 03           jr nz, .nocaps
- 131++68E4 1E 28           ld e,40
- 132++68E6 19              add hl,de
- 133++68E7
- 134++68E7              .nocaps
- 135++68E7
- 136++68E7 3E 7F           ld a,$7f
- 137++68E9 DB FE           in a,($fe)
- 138++68EB E6 02           and $02
- 139++68ED 20 03           jr nz, .nosym
- 140++68EF 1E 50           ld e,80
- 141++68F1 19              add hl,de
- 142++68F2
- 143++68F2              .nosym
- 144++68F2
- 145++68F2 7E              ld a,(hl)
- 146++68F3 C9              ret
- 147++68F4
- 148++68F4              .rowtbl
- 149++68F4 FF FF FF FF     defb 255,255,255,255,255,255,255
- 149++68F8 FF FF FF
- 150++68FB FF FF FF FF     defb 255,255,255,255,255,255,255,255
- 150++68FF FF FF FF FF
- 151++6903 04 FF FF FF     defb 4,255,255,255,255,255,255
- 151++6907 FF FF FF
- 152++690A FF 03 FF FF     defb 255,3,255,255,255,2,255,1
- 152++690E FF 02 FF 01
- 153++6912 00 FF           defb 0,255
- 154++6914
- 155++6914              .table
- 156++6914 00 7A 78 63     db 0,'z','x','c','v'      ; CAPS SHIFT, Z, X, C, V
- 156++6918 76
- 157++6919 61 73 64 66     db 'a','s','d','f','g'      ; A, S, D, F, G
- 157++691D 67
- 158++691E 71 77 65 72     db 'q','w','e','r','t'      ; Q, W, E, R, T
- 158++6922 74
- 159++6923 31 32 33 34     db '1','2','3','4','5'      ; 1, 2, 3, 4, 5
- 159++6927 35
- 160++6928 30 39 38 37     db '0','9','8','7','6'      ; 0, 9, 8, 7, 6
- 160++692C 36
- 161++692D 70 6F 69 75     db 'p','o','i','u','y'      ; P, O, I, U, Y
- 161++6931 79
- 162++6932 0D 6C 6B 6A     db 13,'l','k','j','h'       ; ENTER, L, K, J, H
- 162++6936 68
- 163++6937 20 00 6D 6E     db ' ',0,'m','n','b'      ; SPACE, SYM SHIFT, M, N, B
- 163++693B 62
- 164++693C
- 165++693C                 ; the following are CAPS SHIFTed
- 166++693C
- 167++693C 00 5A 58 43     db 0,'Z','X','C','V'      ; CAPS SHIFT, Z, X, C, V
- 167++6940 56
- 168++6941 41 53 44 46     db 'A','S','D','F','G'      ; A, S, D, F, G
- 168++6945 47
- 169++6946 51 57 45 52     db 'Q','W','E','R','T'      ; Q, W, E, R, T
- 169++694A 54
- 170++694B 07 06 80 81     db 7,6,128,129,8            ; 1, 2, 3, 4, 5
- 170++694F 08
- 171++6950 0C 00 09 0B     db 12,0,9,11,10             ; 0, 9, 8, 7, 6
- 171++6954 0A
- 172++6955 50 4F 49 55     db 'P','O','I','U','Y'      ; P, O, I, U, Y
- 172++6959 59
- 173++695A 0D 4C 4B 4A     db 13,'L','K','J','H'       ; ENTER, L, K, J, H
- 173++695E 48
- 174++695F 20 00 4D 4E     db ' ',0,'M','N','B'      ; SPACE, SYM SHIFT, M, N, B
- 174++6963 42
- 175++6964
- 176++6964                 ; the following are SYM SHIFTed
- 177++6964
- 178++6964 00 3A 60 3F     db 0,':',96,'?','/'       ; CAPS SHIFT, Z, X, C, V
- 178++6968 2F
- 179++6969 7E 7C 5C 7B     db '~','|',92,'{','}'       ; A, S, D, F, G
- 179++696D 7D
- 180++696E 83 84 85 3C     db 131,132,133,'<','>'      ; Q, W, E, R, T
- 180++6972 3E
- 181++6973 21 40 23 24     db '!','@','#','$','%'      ; 1, 2, 3, 4, 5
- 181++6977 25
- 182++6978 5F 29 28 27     db '_',')','(',39,'&'       ; 0, 9, 8, 7, 6
- 182++697C 26
- 183++697D 22 3B 82 5D     db 34,';',130,']','['       ; P, O, I, U, Y
- 183++6981 5B
- 184++6982 0D 3D 2B 2D     db 13,'=','+','-','^'       ; ENTER, L, K, J, H
- 184++6986 5E
- 185++6987 20 00 2E 2C     db ' ',0,'.',',','*'      ; SPACE, SYM SHIFT, M, N, B
- 185++698B 2A
- 186++698C
- 187++698C                 ; the following are CAPS SHIFTed and SYM SHIFTed ("CTRL" key)
- 188++698C
- 189++698C 00 1A 18 03     db 0,26,24,3,22           ; CAPS SHIFT, Z, X, C, V
- 189++6990 16
- 190++6991 01 13 04 06     db 1,19,4,6,7               ; A, S, D, F, G
- 190++6995 07
- 191++6996 11 17 05 12     db 17,23,5,18,20            ; Q, W, E, R, T
- 191++699A 14
- 192++699B 1B 1C 1D 1E     db 27,28,29,30,31           ; 1, 2, 3, 4, 5
- 192++699F 1F
- 193++69A0 7F 00 86 60     db 127,0,134,'`',135      ; 0, 9, 8, 7, 6
- 193++69A4 87
- 194++69A5 10 0F 09 15     db 16,15,9,21,25            ; P, O, I, U, Y
- 194++69A9 19
- 195++69AA 0D 0C 0B 0A     db 13,12,11,10,8            ; ENTER, L, K, J, H
- 195++69AE 08
- 196++69AF 20 00 0D 0E     db ' ',0,13,14,2          ; SPACE, SYM SHIFT, M, N, B
- 196++69B3 02
- 197++69B4
- 198++69B4                  endmodule
+   1++6847                  module Console
+   2++6847              KEY_UP = 11
+   3++6847              KEY_DN = 10
+   4++6847              KEY_LT = 8
+   5++6847              KEY_RT = 9
+   6++6847              BACKSPACE = 12
+   7++6847 00           keyCode db 0
+   8++6848
+   9++6848              BASIC_KEY = #5C08
+  10++6848
+  11++6848              waitForKeyUp:
+  12++6848 76           	halt
+  13++6849 AF              xor a
+  13++684A DB FE          in a, (#fe)
+  13++684C 2F             cpl
+  13++684D E6 1F          and 31
+  13++684F 20 F7          jr nz, waitForKeyUp
+  14++6851 32 08 5C        ld (BASIC_KEY), a
+  15++6854 C9              ret
+  16++6855
+  17++6855              getC:
+  18++6855 AF              xor a
+  19++6856 32 08 5C        ld (BASIC_KEY),a
+  20++6859              getC2:
+  21++6859 3A 08 5C        ld a,(BASIC_KEY)
+  22++685C A7              and a
+  22++685D 28 FA          jr z, getC2
+  23++685F 47              ld b,a
+  24++6860 AF              xor a
+  24++6861 32 08 5C       ld (BASIC_KEY), a
+  25++6864 78              ld a, b
+  26++6865 C9              ret
+  27++6866
+  28++6866              peekC:
+  29++6866 AF               xor a
+  29++6867 32 08 5C       ld (BASIC_KEY),a
+  30++686A CD 6E 68         call inkey
+  31++686D C9               ret
+  32++686E
+  33++686E              inkey:
+  34++686E 11 00 00        ld de,0
+  35++6871 01 FE FE        ld bc,$fefe
+  36++6874 ED 78           in a,(c)
+  37++6876 F6 E1           or $e1
+  38++6878 FE FF           cp $ff
+  39++687A 20 57           jr nz, .keyhitA
+  40++687C
+  41++687C 1E 05           ld e,5
+  42++687E 06 FD           ld b,$fd
+  43++6880 ED 78           in a,(c)
+  44++6882 F6 E0           or $e0
+  45++6884 FE FF           cp $ff
+  46++6886 20 4B           jr nz, .keyhitA
+  47++6888
+  48++6888 1E 0A           ld e,10
+  49++688A 06 FB           ld b,$fb
+  50++688C ED 78           in a,(c)
+  51++688E F6 E0           or $e0
+  52++6890 FE FF           cp $ff
+  53++6892 20 3F           jr nz, .keyhitA
+  54++6894
+  55++6894 1E 0F           ld e,15
+  56++6896 06 F7           ld b,$f7
+  57++6898 ED 78           in a,(c)
+  58++689A F6 E0           or $e0
+  59++689C FE FF           cp $ff
+  60++689E 20 33           jr nz, .keyhitA
+  61++68A0
+  62++68A0 1E 14           ld e,20
+  63++68A2 06 EF           ld b,$ef
+  64++68A4 ED 78           in a,(c)
+  65++68A6 F6 E0           or $e0
+  66++68A8 FE FF           cp $ff
+  67++68AA 20 27           jr nz, .keyhitA
+  68++68AC
+  69++68AC 1E 19           ld e,25
+  70++68AE 06 DF           ld b,$df
+  71++68B0 ED 78           in a,(c)
+  72++68B2 F6 E0           or $e0
+  73++68B4 FE FF           cp $ff
+  74++68B6 20 1B           jr nz, .keyhitA
+  75++68B8
+  76++68B8 1E 1E           ld e,30
+  77++68BA 06 BF           ld b,$bf
+  78++68BC ED 78           in a,(c)
+  79++68BE F6 E0           or $e0
+  80++68C0 FE FF           cp $ff
+  81++68C2 20 0F           jr nz, .keyhitA
+  82++68C4
+  83++68C4 1E 23           ld e,35
+  84++68C6 06 7F           ld b,$7f
+  85++68C8 ED 78           in a,(c)
+  86++68CA F6 E2           or $e2
+  87++68CC FE FF           cp $ff
+  88++68CE 4F              ld c,a
+  89++68CF 20 19           jr nz, .keyhitB
+  90++68D1
+  91++68D1              .nokey
+  92++68D1 AF              xor a
+  93++68D2 C9              ret
+  94++68D3
+  95++68D3              .keyhitA
+  96++68D3
+  97++68D3 4F              ld c,a
+  98++68D4
+  99++68D4 78              ld a,b
+ 100++68D5 2F              cpl
+ 101++68D6 F6 81           or $81
+ 102++68D8 DB FE           in a,($fe)
+ 103++68DA F6 E0           or $e0
+ 104++68DC FE FF           cp $ff
+ 105++68DE 20 F1           jr nz, .nokey
+ 106++68E0
+ 107++68E0 3E 7F           ld a,$7f
+ 108++68E2 DB FE           in a,($fe)
+ 109++68E4 F6 E2           or $e2
+ 110++68E6 FE FF           cp $ff
+ 111++68E8 20 E7           jr nz, .nokey
+ 112++68EA
+ 113++68EA              .keyhitB
+ 114++68EA
+ 115++68EA 06 00           ld b,0
+ 116++68EC 21 33 68        ld hl,.rowtbl-$e0
+ 117++68EF 09              add hl,bc
+ 118++68F0 7E              ld a,(hl)
+ 119++68F1 FE 05           cp 5
+ 120++68F3 30 DC           jr nc, .nokey
+ 121++68F5 83              add a,e
+ 122++68F6 5F              ld e,a
+ 123++68F7
+ 124++68F7 21 33 69        ld hl,.table
+ 125++68FA 19              add hl,de
+ 126++68FB
+ 127++68FB 3E FE           ld a,$fe
+ 128++68FD DB FE           in a,($fe)
+ 129++68FF E6 01           and $01
+ 130++6901 20 03           jr nz, .nocaps
+ 131++6903 1E 28           ld e,40
+ 132++6905 19              add hl,de
+ 133++6906
+ 134++6906              .nocaps
+ 135++6906
+ 136++6906 3E 7F           ld a,$7f
+ 137++6908 DB FE           in a,($fe)
+ 138++690A E6 02           and $02
+ 139++690C 20 03           jr nz, .nosym
+ 140++690E 1E 50           ld e,80
+ 141++6910 19              add hl,de
+ 142++6911
+ 143++6911              .nosym
+ 144++6911
+ 145++6911 7E              ld a,(hl)
+ 146++6912 C9              ret
+ 147++6913
+ 148++6913              .rowtbl
+ 149++6913 FF FF FF FF     defb 255,255,255,255,255,255,255
+ 149++6917 FF FF FF
+ 150++691A FF FF FF FF     defb 255,255,255,255,255,255,255,255
+ 150++691E FF FF FF FF
+ 151++6922 04 FF FF FF     defb 4,255,255,255,255,255,255
+ 151++6926 FF FF FF
+ 152++6929 FF 03 FF FF     defb 255,3,255,255,255,2,255,1
+ 152++692D FF 02 FF 01
+ 153++6931 00 FF           defb 0,255
+ 154++6933
+ 155++6933              .table
+ 156++6933 00 7A 78 63     db 0,'z','x','c','v'      ; CAPS SHIFT, Z, X, C, V
+ 156++6937 76
+ 157++6938 61 73 64 66     db 'a','s','d','f','g'      ; A, S, D, F, G
+ 157++693C 67
+ 158++693D 71 77 65 72     db 'q','w','e','r','t'      ; Q, W, E, R, T
+ 158++6941 74
+ 159++6942 31 32 33 34     db '1','2','3','4','5'      ; 1, 2, 3, 4, 5
+ 159++6946 35
+ 160++6947 30 39 38 37     db '0','9','8','7','6'      ; 0, 9, 8, 7, 6
+ 160++694B 36
+ 161++694C 70 6F 69 75     db 'p','o','i','u','y'      ; P, O, I, U, Y
+ 161++6950 79
+ 162++6951 0D 6C 6B 6A     db 13,'l','k','j','h'       ; ENTER, L, K, J, H
+ 162++6955 68
+ 163++6956 20 00 6D 6E     db ' ',0,'m','n','b'      ; SPACE, SYM SHIFT, M, N, B
+ 163++695A 62
+ 164++695B
+ 165++695B                 ; the following are CAPS SHIFTed
+ 166++695B
+ 167++695B 00 5A 58 43     db 0,'Z','X','C','V'      ; CAPS SHIFT, Z, X, C, V
+ 167++695F 56
+ 168++6960 41 53 44 46     db 'A','S','D','F','G'      ; A, S, D, F, G
+ 168++6964 47
+ 169++6965 51 57 45 52     db 'Q','W','E','R','T'      ; Q, W, E, R, T
+ 169++6969 54
+ 170++696A 07 06 80 81     db 7,6,128,129,8            ; 1, 2, 3, 4, 5
+ 170++696E 08
+ 171++696F 0C 00 09 0B     db 12,0,9,11,10             ; 0, 9, 8, 7, 6
+ 171++6973 0A
+ 172++6974 50 4F 49 55     db 'P','O','I','U','Y'      ; P, O, I, U, Y
+ 172++6978 59
+ 173++6979 0D 4C 4B 4A     db 13,'L','K','J','H'       ; ENTER, L, K, J, H
+ 173++697D 48
+ 174++697E 20 00 4D 4E     db ' ',0,'M','N','B'      ; SPACE, SYM SHIFT, M, N, B
+ 174++6982 42
+ 175++6983
+ 176++6983                 ; the following are SYM SHIFTed
+ 177++6983
+ 178++6983 00 3A 60 3F     db 0,':',96,'?','/'       ; CAPS SHIFT, Z, X, C, V
+ 178++6987 2F
+ 179++6988 7E 7C 5C 7B     db '~','|',92,'{','}'       ; A, S, D, F, G
+ 179++698C 7D
+ 180++698D 83 84 85 3C     db 131,132,133,'<','>'      ; Q, W, E, R, T
+ 180++6991 3E
+ 181++6992 21 40 23 24     db '!','@','#','$','%'      ; 1, 2, 3, 4, 5
+ 181++6996 25
+ 182++6997 5F 29 28 27     db '_',')','(',39,'&'       ; 0, 9, 8, 7, 6
+ 182++699B 26
+ 183++699C 22 3B 82 5D     db 34,';',130,']','['       ; P, O, I, U, Y
+ 183++69A0 5B
+ 184++69A1 0D 3D 2B 2D     db 13,'=','+','-','^'       ; ENTER, L, K, J, H
+ 184++69A5 5E
+ 185++69A6 20 00 2E 2C     db ' ',0,'.',',','*'      ; SPACE, SYM SHIFT, M, N, B
+ 185++69AA 2A
+ 186++69AB
+ 187++69AB                 ; the following are CAPS SHIFTed and SYM SHIFTed ("CTRL" key)
+ 188++69AB
+ 189++69AB 00 1A 18 03     db 0,26,24,3,22           ; CAPS SHIFT, Z, X, C, V
+ 189++69AF 16
+ 190++69B0 01 13 04 06     db 1,19,4,6,7               ; A, S, D, F, G
+ 190++69B4 07
+ 191++69B5 11 17 05 12     db 17,23,5,18,20            ; Q, W, E, R, T
+ 191++69B9 14
+ 192++69BA 1B 1C 1D 1E     db 27,28,29,30,31           ; 1, 2, 3, 4, 5
+ 192++69BE 1F
+ 193++69BF 7F 00 86 60     db 127,0,134,'`',135      ; 0, 9, 8, 7, 6
+ 193++69C3 87
+ 194++69C4 10 0F 09 15     db 16,15,9,21,25            ; P, O, I, U, Y
+ 194++69C8 19
+ 195++69C9 0D 0C 0B 0A     db 13,12,11,10,8            ; ENTER, L, K, J, H
+ 195++69CD 08
+ 196++69CE 20 00 0D 0E     db ' ',0,13,14,2          ; SPACE, SYM SHIFT, M, N, B
+ 196++69D2 02
+ 197++69D3
+ 198++69D3                  endmodule
 # file closed: dos/console.asm
-   8+ 69B4              		include "trdos.asm"
+   8+ 69D3              		include "trdos.asm"
 # file opened: dos/trdos.asm
-   1++69B4              ;trdos driver (izzx)
-   2++69B4                  MODULE Dos
-   3++69B4              ; API methods
-   4++69B4              ESX_GETSETDRV = #89
-   5++69B4              ESX_FOPEN = #9A
-   6++69B4              ESX_FCLOSE = #9B
-   7++69B4              ESX_FSYNC = #9C
-   8++69B4              ESX_FREAD = #9D
-   9++69B4              ESX_FWRITE = #9E
-  10++69B4
-  11++69B4              ; File modes
-  12++69B4              FMODE_READ = #01
-  13++69B4              FMODE_WRITE = #06
-  14++69B4              FMODE_CREATE = #0E
-  15++69B4
-  16++69B4                  ; MACRO esxCall func
-  17++69B4                  ; rst #8 : db func
-  18++69B4                  ; ENDM
-  19++69B4
-  20++69B4              ;id = 0 файл не открыт
-  21++69B4              ;id = 1 файл для чтения
-  22++69B4              ;id = 2 файл для записи
-  23++69B4              ;id = 3 файл для записи тип TRD
-  24++69B4              ;id = 4 файл для записи тип SCL
-  25++69B4
-  26++69B4              ; HL - filename in ASCIIZ
-  27++69B4              loadBuffer:
-  28++69B4 06 01            ld b, Dos.FMODE_READ
-  28++69B6 CD D0 69       call Dos.fopen
-  29++69B9 F5               push af
-  30++69BA 21 08 95 01          ld hl, outputBuffer, bc, #ffff - outputBuffer
-  30++69BE F7 6A
-  30++69C0 CD BD 6A       call Dos.fread
-  31++69C3 21 08 95             ld hl, outputBuffer
-  31++69C6 09             add hl, bc
-  31++69C7 AF             xor a
-  31++69C8 77             ld (hl), a
-  31++69C9 23             inc hl
-  31++69CA 77             ld (hl), a
-  32++69CB F1               pop af
-  33++69CC CD A9 6A         call Dos.fclose
-  34++69CF C9               ret
-  35++69D0
-  36++69D0
-  37++69D0              ; Returns:
-  38++69D0              ;  A - current drive
-  39++69D0              ; getDefaultDrive: ;нигде не используется
-  40++69D0                  ; ld a, 0 : esxCall ESX_GETSETDRV
-  41++69D0                  ; ret
-  42++69D0
-  43++69D0
-  44++69D0
-  45++69D0              ; Opens file on default drive
-  46++69D0              ; B - File mode
-  47++69D0              ; HL - File name
-  48++69D0              ; Returns:
-  49++69D0              ;  A - file stream id
-  50++69D0              fopen:
-  51++69D0                  ; push bc : push hl
-  52++69D0                  ; call getDefaultDrive
-  53++69D0                  ; pop ix : pop bc
-  54++69D0                  ; esxCall ESX_FOPEN
-  55++69D0                  ; ret
-  56++69D0 78           	ld a,b
-  57++69D1 FE 01        	cp FMODE_READ ;если режим открытие файла
-  58++69D3 28 06        	jr z,fopen_r
-  59++69D5 FE 0E        	cp FMODE_CREATE
-  60++69D7 28 39        	jr z,fopen_c ;если режим создание файла
-  61++69D9 18 34        	jr fopen_err ;иначе выход
-  62++69DB
-  63++69DB              fopen_r	;открытие существующего файла на чтение (id=1)
-  64++69DB CD 40 6E     			call format_name ;
-  65++69DE 0E 13        			ld      c,#13 ;move file info to syst var
-  66++69E0 CD 13 3D                 call    #3d13
-  67++69E3 0E 0A                    ld      c,#0a ;find file
-  68++69E5 CD 13 3D                 call    #3d13
-  69++69E8 79                       ld      a,c
-  70++69E9 FE FF        			cp 		#ff
-  71++69EB 28 22        			jr 		z,fopen_err ;если не нашли файла
-  72++69ED 0E 08                    ld      c,#08 ;read file title
-  73++69EF CD 13 3D                 call    #3d13
-  74++69F2                          ;ld      hl,loadadr ;куда
-  75++69F2 ED 5B EB 5C              ld      de,(#5ceb) ;начало файла сектор дорожка
-  76++69F6 ED 53 EC 6E              ld      (f_r_cur_trk),de
-  77++69FA
-  78++69FA 3A EA 5C                 ld      a,(#5cea)
-  79++69FD 32 EE 6E                 ld      (f_r_len_sec),a ;длина в секторах
-  80++6A00                          ;or      a
-  81++6A00                          ;ret     z    ;выход если пустой
-  82++6A00
-  83++6A00 ED 5B E8 5C  			ld de,(#5CE8) ; длина файла или программной части для BASIC
-  84++6A04 ED 53 EF 6E  			ld      (f_r_len),de
-  85++6A08
-  86++6A08                          ; ld      de,(fcurtrk) ;текущие сектор дорожка
-  87++6A08                          ; ld      (#5cf4),de ;восстановим
-  88++6A08 AF           			xor a
-  89++6A09 3E 01        			ld 		a,1
-  90++6A0B 32 F1 6E     			ld (f_r_flag),a ;флаг что файл для чтения открыт
-  91++6A0E              			;id канала будет 1
-  92++6A0E C9           	ret
-  93++6A0F
-  94++6A0F              fopen_err
-  95++6A0F AF           	xor a ;если никакой файл не открыли, то id = 0
-  96++6A10 37           	scf ;флаг ошибки
-  97++6A11 C9           	ret
-  98++6A12
-  99++6A12
- 100++6A12              fopen_c	;создание нового файла (id=2-4)
- 101++6A12 CD 40 6E     	call format_name ;
- 102++6A15              	;выясним, не образ ли это для разворачивания
- 103++6A15 21 CF 6E         ld hl, trdExt1
- 103++6A18 CD 27 62       call CompareBuff.search
- 103++6A1B A7             and a
- 103++6A1C 20 1D          jr nz, fopen_c_trd
- 104++6A1E 21 D4 6E         ld hl, trdExt2
- 104++6A21 CD 27 62       call CompareBuff.search
- 104++6A24 A7             and a
- 104++6A25 20 14          jr nz, fopen_c_trd
- 105++6A27 21 D9 6E     	ld hl, sclExt1
- 105++6A2A CD 27 62       call CompareBuff.search
- 105++6A2D A7             and a
- 105++6A2E 20 3A          jr nz, fopen_c_scl
- 106++6A30 21 DE 6E         ld hl, sclExt2
- 106++6A33 CD 27 62       call CompareBuff.search
- 106++6A36 A7             and a
- 106++6A37 20 31          jr nz, fopen_c_scl
- 107++6A39
- 108++6A39
- 109++6A39              fopen_c_2	;создание произвольного файла
- 110++6A39 18 D4        	jr 		fopen_err ;пока отключено
- 111++6A3B
- 112++6A3B              	; ld      c,#13 ;move file info to syst var
- 113++6A3B                  ; call    #3d13
- 114++6A3B              	; ld de,256 ;запишем пока 1 сектор
- 115++6A3B              	; ld hl,#4000 ;возьмём случайные данные из экрана
- 116++6A3B                  ; ld      c,#0b ;запись файла CODE
- 117++6A3B                  ; call    #3d13
- 118++6A3B                  ; ld      a,c
- 119++6A3B              	; cp 		#ff
- 120++6A3B              	; jr 		z,fopen_err ;если ошибка
- 121++6A3B
- 122++6A3B                  ; ld      de,(#5ceb) ;начало файла сектор дорожка
- 123++6A3B                  ; ld      (f_w_cur_trk),de
- 124++6A3B                  ; ld      a,(#5cea)
- 125++6A3B                  ; ld      (f_w_len_sec),a ;длина в секторах
- 126++6A3B              	; xor a ;id канала будет 2
- 127++6A3B              	; ld a,2
- 128++6A3B              	; ld (f_w_flag),a ;флаг что файл для записи открыт
- 129++6A3B              	; ret
- 130++6A3B
- 131++6A3B
- 132++6A3B
- 133++6A3B
- 134++6A3B
- 135++6A3B              fopen_c_trd	;открытие файла для разворачивания образа trd (id=3)
- 136++6A3B 3A 19 5D     	ld a,(#5D19) ;номер дисковода по умолчанию
- 137++6A3E C6 41        	add a,"A"
- 138++6A40 32 B5 6E     	ld (write_ima_d),a ;подставим букву в запросе
- 139++6A43 21 A0 6E         ld hl, write_ima
- 140++6A46 CD F1 67         call DialogBox.msgBox ;предуреждение
- 141++6A49              WAITKEY_trd
- 142++6A49 3A 04 5C     	ld 		a,(23556)
- 143++6A4C FE FF        	cp 255
- 144++6A4E 28 F9        	JR Z,WAITKEY_trd	;ждём любую клавишу
- 145++6A50
- 146++6A50 11 00 00     	ld      de,0 ;начало сектор дорожка
- 147++6A53 ED 53 F4 5C      ld      (#5cf4),de
- 148++6A57 AF           	xor a
- 149++6A58 32 01 6F     	ld (sec_shift),a ;переменная
- 150++6A5B 21 00 00     	ld hl,0
- 151++6A5E 22 F6 6E     	ld (f_w_len+0),hl
- 152++6A61 22 F8 6E     	ld (f_w_len+2),hl
- 153++6A64 3E 03        	ld a,3 ;id канала
- 154++6A66 32 F5 6E     	ld (f_w_flag),a ;флаг что trd для записи открыт
- 155++6A69 C9           	ret
- 156++6A6A
- 157++6A6A
- 158++6A6A
- 159++6A6A
- 160++6A6A              fopen_c_scl	;открытие файла для разворачивания образа scl (id=4)
- 161++6A6A 3A 19 5D     	ld a,(#5D19) ;номер дисковода по умолчанию
- 162++6A6D C6 41        	add a,"A"
- 163++6A6F 32 B5 6E     	ld (write_ima_d),a ;подставим букву в запросе
- 164++6A72 21 A0 6E         ld hl, write_ima
- 165++6A75 CD F1 67         call DialogBox.msgBox ;предуреждение
- 166++6A78              WAITKEY_scl
- 167++6A78 3A 04 5C     	ld 		a,(23556)
- 168++6A7B FE FF        	cp 255
- 169++6A7D 28 F9        	JR Z,WAITKEY_scl	;ждём любую клавишу
- 170++6A7F
- 171++6A7F 11 00 00     	ld      de,0 ;начало сектор дорожка
- 172++6A82 ED 53 F4 5C      ld      (#5cf4),de
- 173++6A86
- 174++6A86 21 00 48     	ld hl,cat_buf ;очистить место для каталога дискеты
- 175++6A89 11 01 48     	ld de,cat_buf+1
- 176++6A8C 36 00        	ld (hl),0
- 177++6A8E 01 FF 08     	ld bc,9*256-1
- 178++6A91 ED B0        	ldir
- 179++6A93
- 180++6A93 CD B5 6C     	call scl_parse ;запуск цикла сборки образа
- 181++6A96
- 182++6A96 AF           	xor a
- 183++6A97 32 01 6F     	ld (sec_shift),a ;переменная
- 184++6A9A              	;ld (scl_que),a
- 185++6A9A 21 00 00     	ld hl,0
- 186++6A9D 22 F6 6E     	ld (f_w_len+0),hl
- 187++6AA0 22 F8 6E     	ld (f_w_len+2),hl
- 188++6AA3 3E 04        	ld a,4 ;id канала
- 189++6AA5 32 F5 6E     	ld (f_w_flag),a ;флаг что scl для записи открыт
- 190++6AA8 C9           	ret
- 191++6AA9
- 192++6AA9
- 193++6AA9
- 194++6AA9              ; A - file stream id
- 195++6AA9              fclose:
- 196++6AA9                  ;esxCall ESX_FCLOSE
- 197++6AA9              	; push af
- 198++6AA9              ; WAITKEY2	XOR A:IN A,(#FE):CPL:AND #1F:JR Z,WAITKEY2
- 199++6AA9              	; pop af
- 200++6AA9 FE 04        	cp 4 ;если scl
- 201++6AAB 20 08        	jr nz,fclose2
- 202++6AAD 21 00 51     	ld hl,sec_buf ;
- 203++6AB0 06 01        	ld b,1
- 204++6AB2 CD 94 6C     	call scl_write_buf ;допишем остаток scl, если есть
- 205++6AB5
- 206++6AB5              fclose2
- 207++6AB5 AF           	xor a ;как бы закрываем все файлы
- 208++6AB6 32 F1 6E     	ld (f_r_flag),a
- 209++6AB9 32 F5 6E     	ld (f_w_flag),a
- 210++6ABC C9               ret
- 211++6ABD
- 212++6ABD
- 213++6ABD
- 214++6ABD
- 215++6ABD              ; A - file stream id
- 216++6ABD              ; BC - length
- 217++6ABD              ; HL - buffer
- 218++6ABD              ; Returns
- 219++6ABD              ;  BC - length(how much was actually read)
- 220++6ABD              fread: ;(id=1)
- 221++6ABD                  ; push hl : pop ix
- 222++6ABD                  ; esxCall ESX_FREAD
- 223++6ABD              	; push af
- 224++6ABD              	; ld a,4
- 225++6ABD              	; out (254),a
- 226++6ABD              ; WAITKEY	XOR A:IN A,(#FE):CPL:AND #1F:JR Z,WAITKEY
- 227++6ABD              	; xor a
- 228++6ABD              	; out (254),a
- 229++6ABD              	; pop af
- 230++6ABD
- 231++6ABD FE 01        	cp 1 ;id = 1?
- 232++6ABF 20 06        	jr nz,fread_no_chek ;выход если номер потока не = 1
- 233++6AC1 3A F1 6E     	ld a,(f_r_flag)
- 234++6AC4 B7           	or a
- 235++6AC5 20 06        	jr nz,fread_chek ;файл уже открыт?
- 236++6AC7              fread_no_chek ;выход с ошибкой
- 237++6AC7 AF           	xor a
- 238++6AC8 37           	scf ;флаг ошибки
- 239++6AC9 01 00 00     	ld bc,0 ;ничего мы не считали
- 240++6ACC C9           	ret
- 241++6ACD
- 242++6ACD              fread_chek
- 243++6ACD ED 4B ED 6E  	ld bc,(f_r_len_sec-1) ;загружаем файл целиком, не смотря на то, сколько байт было запрошено
- 244++6AD1 0E 05            ld      c,5 ;read читаем целыми секторами
- 245++6AD3 ED 5B EC 6E  	ld de,(f_r_cur_trk)
- 246++6AD7 CD 13 3D         call    #3d13
- 247++6ADA ED 4B EF 6E  	ld bc,(f_r_len) ;возвратим сколько считали байт (длину файла)
- 248++6ADE AF           	xor a ;флаги сбросим
- 249++6ADF C9               ret
- 250++6AE0
- 251++6AE0              ; A - file stream id
- 252++6AE0              ; BC - length
- 253++6AE0              ; HL - buffer
- 254++6AE0              ; Returns:
- 255++6AE0              ;   BC - actually written bytes
- 256++6AE0              fwrite: ;
- 257++6AE0                  ; push hl : pop ix
- 258++6AE0                  ; esxCall ESX_FWRITE
- 259++6AE0
- 260++6AE0              	; push af
- 261++6AE0              	; ld a,2
- 262++6AE0              	; out (254),a
- 263++6AE0              ; WAITKEY1	XOR A:IN A,(#FE):CPL:AND #1F:JR Z,WAITKEY1
- 264++6AE0              	; xor a
- 265++6AE0              	; out (254),a
- 266++6AE0              	; pop af
- 267++6AE0
- 268++6AE0 FE 02        	cp 2 ;id = 2?
- 269++6AE2 28 0F        	jr z,fwrite_chek ;проверка id потока
- 270++6AE4 FE 03        	cp 3 ;id = 3?
- 271++6AE6 28 0D        	jr z,fwrite_chek_trd ;проверка id потока
- 272++6AE8 FE 04        	cp 4 ;id = 4?
- 273++6AEA CA CF 6B     	jp z,fwrite_chek_scl ;проверка id потока
- 274++6AED
- 275++6AED
- 276++6AED              fwrite_no_chek ;выход с ошибкой
- 277++6AED AF           	xor a
- 278++6AEE 37           	scf ;флаг ошибки
- 279++6AEF 01 00 00     	ld bc,0 ;ничего мы не записали
- 280++6AF2 C9           	ret
- 281++6AF3
- 282++6AF3              fwrite_chek ;запись произвольного типа файла
- 283++6AF3 18 F8        	jr fwrite_no_chek ;пока отключено
- 284++6AF5              	; ld a,(f_w_flag)
- 285++6AF5              	; or a
- 286++6AF5              	; jr z,fwrite_no_chek ;файл уже открыт?
- 287++6AF5              	; ld (temp_bc),bc
- 288++6AF5              	; ;ld bc,(f_r_len_sec-1) ;
- 289++6AF5                  ; ld      c,6 ;пишем целыми секторами
- 290++6AF5              	; ld de,(f_w_cur_trk)
- 291++6AF5                  ; call    #3d13
- 292++6AF5              	; ld bc,(temp_bc) ;возвратим, что сколько запрашивали, столько и считали байт
- 293++6AF5              	; xor a ;флаги сбросим
- 294++6AF5                  ; ret
- 295++6AF5
- 296++6AF5
- 297++6AF5
- 298++6AF5
- 299++6AF5
- 300++6AF5              fwrite_chek_trd ;запись trd файла (разворачивание образа)
- 301++6AF5              	; ld a,2
- 302++6AF5              	; out (254),a
- 303++6AF5              ; WAITKEY_t	XOR A:IN A,(#FE):CPL:AND #1F:JR Z,WAITKEY_t
- 304++6AF5              	; xor a
- 305++6AF5              	; out (254),a
- 306++6AF5 3A F5 6E     	ld a,(f_w_flag)
- 307++6AF8 B7           	or a
- 308++6AF9 28 F2        	jr z,fwrite_no_chek ;файл уже открыт?
- 309++6AFB ED 43 FB 6E  	ld (temp_bc),bc ;длина
- 310++6AFF 22 FD 6E     	ld (temp_hl),hl ;адрес данных
- 311++6B02 78           	ld a,b
- 312++6B03 B1           	or c
- 313++6B04 28 E7        	jr z,fwrite_no_chek ; если длина 0, то выход
- 314++6B06
- 315++6B06              	; ld a,b
- 316++6B06              	; or a
- 317++6B06              	; jr nz,testt1
- 318++6B06              	; nop
- 319++6B06
- 320++6B06              ; testt1
- 321++6B06
- 322++6B06 AF           	xor a
- 323++6B07 32 03 6F     	ld (sec_part),a ;обнулить переменные
- 324++6B0A 32 02 6F     	ld (sec_shift2),a
- 325++6B0D 32 03 6F     	ld (sec_shift2+1),a
- 326++6B10 32 04 6F     	ld (sec_shift_flag),a
- 327++6B13 32 FA 6E     	ld (write_end_flag),a ;
- 328++6B16
- 329++6B16
- 330++6B16 3A 01 6F     	ld a,(sec_shift)
- 331++6B19 B7           	or a
- 332++6B1A 28 43        	jr z,fwrite_trd3 ;если смещения нет, то первую часть пропустим
- 333++6B1C
- 334++6B1C
- 335++6B1C 4F           	ld c,a
- 336++6B1D 06 00        	ld b,0
- 337++6B1F 2A FB 6E     	ld hl,(temp_bc) ;проверка заполнится ли целый сектор
- 338++6B22 09           	add hl,bc
- 339++6B23
- 340++6B23 3E 01        	ld a,1
- 341++6B25 32 FA 6E     	ld (write_end_flag),a ;флаг что не нужно дописывать остаток
- 342++6B28
- 343++6B28 7C           	ld a,h
- 344++6B29 B7           	or a
- 345++6B2A 20 05        	jr nz,fwrite_trd4
- 346++6B2C 3E 01        	ld a,1
- 347++6B2E 32 04 6F     	ld (sec_shift_flag),a ;флаг что не заполнен сектор
- 348++6B31
- 349++6B31              fwrite_trd4
- 350++6B31 21 00 51     	ld hl,sec_buf ;буфер последнего сектора
- 351++6B34 09           	add hl,bc ;на этой точке остановились
- 352++6B35 EB           	ex de,hl
- 353++6B36 2A FD 6E     	ld hl,(temp_hl) ;присоединим начало данных в конец предыдущих
- 354++6B39              	; ld a,c
- 355++6B39              	; or a
- 356++6B39              	; jr nz,fwrite_trd2
- 357++6B39              	; inc b ;коррекция
- 358++6B39              ; fwrite_trd2
- 359++6B39              	; ld c,a
- 360++6B39 AF           	xor a
- 361++6B3A 91           	sub c
- 362++6B3B 4F           	ld c,a ;сколько осталось перенести до заполнения сектора
- 363++6B3C ED 43 02 6F  	ld (sec_shift2),bc ;сохраним сколько добавили байт
- 364++6B40 ED B0        	ldir
- 365++6B42
- 366++6B42 3A 04 6F     	ld a,(sec_shift_flag)
- 367++6B45 B7           	or a
- 368++6B46 20 17        	jr nz,fwrite_trd3 ;если сектор ещё не заполнен писать не будем
- 369++6B48
- 370++6B48 21 00 51     	ld hl,sec_buf
- 371++6B4B ED 5B F4 5C  	ld de,(#5cf4)
- 372++6B4F              	;ld (f_w_cur_trk),de	;запомним позицию
- 373++6B4F 01 06 01         ld      bc,#0106 ;пишем 1 сектор из буфера
- 374++6B52 CD 13 3D         call    #3d13
- 375++6B55 79           	ld a,c
- 376++6B56 FE FF        	cp 255
- 377++6B58 CA ED 6A     	jp z,fwrite_no_chek ;выход если ошибка
- 378++6B5B
- 379++6B5B AF           	xor a
- 380++6B5C 32 FA 6E     	ld (write_end_flag),a ;флаг что нужно дописывать остаток
- 381++6B5F              	; ld de,(f_w_cur_trk) ;если сектор ещё не заполнен, останемся на старой позиции
- 382++6B5F              	; ld (#5cf4),de
- 383++6B5F              	; ld b,1 ;на сектор вперёд
- 384++6B5F              	; ld de,(f_w_cur_trk)
- 385++6B5F              	; call calc_next_pos
- 386++6B5F              	; ld (f_w_cur_trk),de
- 387++6B5F
- 388++6B5F              fwrite_trd3
- 389++6B5F 2A FD 6E     	ld hl,(temp_hl) ;запишем остаток данных
- 390++6B62              	;ld a,(sec_shift)
- 391++6B62              	;ld c,a
- 392++6B62              	;ld b,0
- 393++6B62 ED 4B 02 6F  	ld bc,(sec_shift2)
- 394++6B66 09           	add hl,bc ;с этой точки пишем
- 395++6B67 22 FF 6E     	ld (temp_hl2),hl ;сохраним начало записи второго сектора
- 396++6B6A
- 397++6B6A 2A FB 6E     	ld hl,(temp_bc) ;вычисление на чём остановимся в этот раз
- 398++6B6D A7           	and a
- 399++6B6E ED 42        	sbc hl,bc ;вычтем то, что добавили к первому сектору
- 400++6B70 4D           	ld c,l
- 401++6B71 44           	ld b,h
- 402++6B72 30 02        	jr nc,fwrite_trd5
- 403++6B74 06 00        	ld b,0 ;коррекция если вышел минус
- 404++6B76              fwrite_trd5
- 405++6B76 2A FD 6E     	ld hl,(temp_hl)
- 406++6B79 09           	add hl,bc
- 407++6B7A
- 408++6B7A 11 08 95     	ld de,outputBuffer
- 409++6B7D A7           	and a
- 410++6B7E ED 52        	sbc hl,de
- 411++6B80
- 412++6B80 7D           	ld a,l
- 413++6B81 32 01 6F     	ld (sec_shift),a ;смещение на следующий раз
- 414++6B84              	;ld hl,(temp_hl)
- 415++6B84
- 416++6B84
- 417++6B84              	; or a
- 418++6B84              	; jr z,fwrite_trd1
- 419++6B84              	; inc b  ;коррекция количества секторов
- 420++6B84
- 421++6B84 78           	ld a,b ;нужна проверка на количество секторов!!!
- 422++6B85 32 03 6F     	ld (sec_part),a ;запомним сколько секторов во второй части
- 423++6B88
- 424++6B88              	;ld a,b
- 425++6B88 B7           	or a
- 426++6B89 28 16        	jr z,fwrite_trd1 ;если размер данных меньше сектора, то пропустим запись
- 427++6B8B
- 428++6B8B 2A FF 6E     	ld hl,(temp_hl2)
- 429++6B8E              	;push bc
- 430++6B8E ED 5B F4 5C  	ld de,(#5cf4)
- 431++6B92 0E 06            ld      c,6 ;пишем целыми секторами
- 432++6B94 CD 13 3D         call    #3d13
- 433++6B97 79           	ld a,c
- 434++6B98              	;pop bc
- 435++6B98 FE FF        	cp 255
- 436++6B9A CA ED 6A     	jp z,fwrite_no_chek ;выход если ошибка
- 437++6B9D              	; ld de,(f_w_cur_trk)
- 438++6B9D              	; call calc_next_pos
- 439++6B9D              	; ld (f_w_cur_trk),de
- 440++6B9D
- 441++6B9D AF           	xor a
- 442++6B9E 32 FA 6E     	ld (write_end_flag),a ;флаг что нужно дописывать остаток
- 443++6BA1
- 444++6BA1              fwrite_trd1
- 445++6BA1 3A FA 6E     	ld a,(write_end_flag) ;нужно записывать остаток?
- 446++6BA4 B7           	or a
- 447++6BA5 20 12        	jr nz,fwrite_trd_ex ;не нужно
- 448++6BA7
- 449++6BA7 2A FF 6E     	ld hl,(temp_hl2) ;сохраним незаписанный остаток
- 450++6BAA 3A 03 6F     	ld a,(sec_part)
- 451++6BAD 47           	ld b,a
- 452++6BAE 0E 00        	ld c,0
- 453++6BB0 09           	add hl,bc
- 454++6BB1 11 00 51     	ld de,sec_buf
- 455++6BB4 01 00 01     	ld bc,256
- 456++6BB7 ED B0        	ldir
- 457++6BB9              ;fwrite_trd2
- 458++6BB9
- 459++6BB9
- 460++6BB9              fwrite_trd_ex
- 461++6BB9 ED 4B FB 6E  	ld bc,(temp_bc) ;возвратим, что сколько запрашивали, столько и записали байт
- 462++6BBD              	;посчитаем общую длину записанного
- 463++6BBD 2A F6 6E     	ld hl,(f_w_len)
- 464++6BC0 09           	add hl,bc
- 465++6BC1 22 F6 6E     	ld (f_w_len),hl
- 466++6BC4 30 07        	jr nc,fwrite_trd_ex1
- 467++6BC6 2A F8 6E     	ld hl,(f_w_len+2)
- 468++6BC9 23           	inc hl
- 469++6BCA 22 F8 6E     	ld (f_w_len+2),hl
- 470++6BCD
- 471++6BCD              fwrite_trd_ex1
- 472++6BCD AF           	xor a ;флаги сбросим
- 473++6BCE C9               ret
- 474++6BCF
- 475++6BCF
- 476++6BCF
- 477++6BCF
- 478++6BCF
- 479++6BCF              ;------------------scl----------------------
- 480++6BCF              fwrite_chek_scl ;запись scl файла (разворачивание образа)
- 481++6BCF              	; ld a,2
- 482++6BCF              	; out (254),a
- 483++6BCF              ; WAITKEY_t	XOR A:IN A,(#FE):CPL:AND #1F:JR Z,WAITKEY_t
- 484++6BCF              	; xor a
- 485++6BCF              	; out (254),a
- 486++6BCF 3A F5 6E     	ld a,(f_w_flag)
- 487++6BD2 B7           	or a
- 488++6BD3 CA ED 6A     	jp z,fwrite_no_chek ;файл уже открыт?
- 489++6BD6 ED 43 FB 6E  	ld (temp_bc),bc ;длина
- 490++6BDA 22 FD 6E     	ld (temp_hl),hl ;адрес данных
- 491++6BDD 78           	ld a,b
- 492++6BDE B1           	or c
- 493++6BDF CA ED 6A     	jp z,fwrite_no_chek ; если длина 0, то выход
- 494++6BE2
- 495++6BE2              	; ld a,b
- 496++6BE2              	; or a
- 497++6BE2              	; jr nz,testt1
- 498++6BE2              	; nop
- 499++6BE2
- 500++6BE2              ; testt1
- 501++6BE2
- 502++6BE2 AF           	xor a
- 503++6BE3 32 03 6F     	ld (sec_part),a ;обнулить переменные
- 504++6BE6 32 02 6F     	ld (sec_shift2),a
- 505++6BE9 32 03 6F     	ld (sec_shift2+1),a
- 506++6BEC 32 04 6F     	ld (sec_shift_flag),a
- 507++6BEF 32 FA 6E     	ld (write_end_flag),a ;
- 508++6BF2
- 509++6BF2
- 510++6BF2 3A 01 6F     	ld a,(sec_shift)
- 511++6BF5 B7           	or a
- 512++6BF6 28 38        	jr z,fwrite_scl3 ;если смещения нет, то первую часть пропустим
- 513++6BF8
- 514++6BF8
- 515++6BF8 4F           	ld c,a
- 516++6BF9 06 00        	ld b,0
- 517++6BFB 2A FB 6E     	ld hl,(temp_bc) ;проверка заполнится ли целый сектор
- 518++6BFE 09           	add hl,bc
- 519++6BFF
- 520++6BFF 3E 01        	ld a,1
- 521++6C01 32 FA 6E     	ld (write_end_flag),a ;флаг что не нужно дописывать остаток
- 522++6C04
- 523++6C04 7C           	ld a,h
- 524++6C05 B7           	or a
- 525++6C06 20 05        	jr nz,fwrite_scl4
- 526++6C08 3E 01        	ld a,1
- 527++6C0A 32 04 6F     	ld (sec_shift_flag),a ;флаг что не заполнен сектор
- 528++6C0D
- 529++6C0D              fwrite_scl4
- 530++6C0D 21 00 51     	ld hl,sec_buf ;буфер последнего сектора
- 531++6C10 09           	add hl,bc ;на этой точке остановились
- 532++6C11 EB           	ex de,hl
- 533++6C12 2A FD 6E     	ld hl,(temp_hl) ;присоединим начало данных в конец предыдущих
- 534++6C15              	; ld a,c
- 535++6C15              	; or a
- 536++6C15              	; jr nz,fwrite_scl2
- 537++6C15              	; inc b ;коррекция
- 538++6C15              ; fwrite_scl2
- 539++6C15              	; ld c,a
- 540++6C15 AF           	xor a
- 541++6C16 91           	sub c
- 542++6C17 4F           	ld c,a ;сколько осталось перенести до заполнения сектора
- 543++6C18 ED 43 02 6F  	ld (sec_shift2),bc ;сохраним сколько добавили байт
- 544++6C1C ED B0        	ldir
- 545++6C1E
- 546++6C1E 3A 04 6F     	ld a,(sec_shift_flag)
- 547++6C21 B7           	or a
- 548++6C22 20 0C        	jr nz,fwrite_scl3 ;если сектор ещё не заполнен писать не будем
- 549++6C24
- 550++6C24 21 00 51     	ld hl,sec_buf
- 551++6C27              	;ld de,(#5cf4)
- 552++6C27              	;ld (f_w_cur_trk),de	;запомним позицию
- 553++6C27 06 01            ld      b,#01 ;пишем 1 сектор из буфера
- 554++6C29 CD 94 6C         call    scl_write_buf
- 555++6C2C              	; ld a,c
- 556++6C2C              	; cp 255
- 557++6C2C              	; jp z,fwrite_no_chek ;выход если ошибка
- 558++6C2C
- 559++6C2C AF           	xor a
- 560++6C2D 32 FA 6E     	ld (write_end_flag),a ;флаг что нужно дописывать остаток
- 561++6C30              	; ld de,(f_w_cur_trk) ;если сектор ещё не заполнен, останемся на старой позиции
- 562++6C30              	; ld (#5cf4),de
- 563++6C30              	; ld b,1 ;на сектор вперёд
- 564++6C30              	; ld de,(f_w_cur_trk)
- 565++6C30              	; call calc_next_pos
- 566++6C30              	; ld (f_w_cur_trk),de
- 567++6C30
- 568++6C30              fwrite_scl3
- 569++6C30 2A FD 6E     	ld hl,(temp_hl) ;запишем остаток данных
- 570++6C33              	;ld a,(sec_shift)
- 571++6C33              	;ld c,a
- 572++6C33              	;ld b,0
- 573++6C33 ED 4B 02 6F  	ld bc,(sec_shift2)
- 574++6C37 09           	add hl,bc ;с этой точки пишем
- 575++6C38 22 FF 6E     	ld (temp_hl2),hl ;сохраним начало записи второго сектора
- 576++6C3B
- 577++6C3B 2A FB 6E     	ld hl,(temp_bc) ;вычисление на чём остановимся в этот раз
- 578++6C3E A7           	and a
- 579++6C3F ED 42        	sbc hl,bc ;вычтем то, что добавили к первому сектору
- 580++6C41 4D           	ld c,l
- 581++6C42 44           	ld b,h
- 582++6C43 30 02        	jr nc,fwrite_scl5
- 583++6C45 06 00        	ld b,0 ;коррекция если вышел минус
- 584++6C47              fwrite_scl5
- 585++6C47 2A FD 6E     	ld hl,(temp_hl)
- 586++6C4A 09           	add hl,bc
- 587++6C4B
- 588++6C4B 11 08 95     	ld de,outputBuffer
- 589++6C4E A7           	and a
- 590++6C4F ED 52        	sbc hl,de
- 591++6C51
- 592++6C51 7D           	ld a,l
- 593++6C52 32 01 6F     	ld (sec_shift),a ;смещение на следующий раз
- 594++6C55              	;ld hl,(temp_hl)
- 595++6C55
- 596++6C55
- 597++6C55              	; or a
- 598++6C55              	; jr z,fwrite_scl1
- 599++6C55              	; inc b  ;коррекция количества секторов
- 600++6C55
- 601++6C55 78           	ld a,b ;нужна проверка на количество секторов!!!
- 602++6C56 32 03 6F     	ld (sec_part),a ;запомним сколько секторов во второй части
- 603++6C59
- 604++6C59              	;ld a,b
- 605++6C59 B7           	or a
- 606++6C5A 28 0A        	jr z,fwrite_scl1 ;если размер данных меньше сектора, то пропустим запись
- 607++6C5C
- 608++6C5C 2A FF 6E     	ld hl,(temp_hl2)
- 609++6C5F              	;push bc
- 610++6C5F              	;ld de,(#5cf4)
- 611++6C5F                  ;ld      c,6 ;пишем целыми секторами
- 612++6C5F CD 94 6C         call    scl_write_buf
- 613++6C62              	;ld a,c
- 614++6C62              	;pop bc
- 615++6C62              	; cp 255
- 616++6C62              	; jp z,fwrite_no_chek ;выход если ошибка
- 617++6C62              	; ld de,(f_w_cur_trk)
- 618++6C62              	; call calc_next_pos
- 619++6C62              	; ld (f_w_cur_trk),de
- 620++6C62
- 621++6C62 AF           	xor a
- 622++6C63 32 FA 6E     	ld (write_end_flag),a ;флаг что нужно дописывать остаток
- 623++6C66
- 624++6C66              fwrite_scl1
- 625++6C66 3A FA 6E     	ld a,(write_end_flag) ;нужно записывать остаток?
- 626++6C69 B7           	or a
- 627++6C6A 20 12        	jr nz,fwrite_scl_ex ;не нужно
- 628++6C6C
- 629++6C6C 2A FF 6E     	ld hl,(temp_hl2) ;сохраним незаписанный остаток
- 630++6C6F 3A 03 6F     	ld a,(sec_part)
- 631++6C72 47           	ld b,a
- 632++6C73 0E 00        	ld c,0
- 633++6C75 09           	add hl,bc
- 634++6C76 11 00 51     	ld de,sec_buf
- 635++6C79 01 00 01     	ld bc,256
- 636++6C7C ED B0        	ldir
- 637++6C7E              ;fwrite_scl2
- 638++6C7E
- 639++6C7E
- 640++6C7E              fwrite_scl_ex
- 641++6C7E ED 4B FB 6E  	ld bc,(temp_bc) ;возвратим, что сколько запрашивали, столько и записали байт
- 642++6C82              	;посчитаем общую длину записанного
- 643++6C82 2A F6 6E     	ld hl,(f_w_len)
- 644++6C85 09           	add hl,bc
- 645++6C86 22 F6 6E     	ld (f_w_len),hl
- 646++6C89 30 07        	jr nc,fwrite_scl_ex1
- 647++6C8B 2A F8 6E     	ld hl,(f_w_len+2)
- 648++6C8E 23           	inc hl
- 649++6C8F 22 F8 6E     	ld (f_w_len+2),hl
- 650++6C92
- 651++6C92              fwrite_scl_ex1
- 652++6C92 AF           	xor a ;флаги сбросим
- 653++6C93 C9               ret
- 654++6C94
- 655++6C94
- 656++6C94
- 657++6C94
- 658++6C94
- 659++6C94
- 660++6C94              scl_write_buf ;заполнение промежуточного буфера
- 661++6C94 C5           	push bc ;сколько пакетов указано в b
- 662++6C95 11 00 53     	ld de,scl_buf ;перенесём сектор во временный буфер
- 663++6C98 01 00 01     	ld bc,256
- 664++6C9B ED B0        	ldir
- 665++6C9D 22 25 6F     	ld (scl_temp_hl2),hl ;сохраним адрес данных
- 666++6CA0 3A 0D 6F     	ld a,(scl_que) ;проверим флаг что нужны данные
- 667++6CA3 B7           	or a
- 668++6CA4 28 08        	jr z,scl_write_buf_ret ;не будем вызывать парсер если не нужны
- 669++6CA6 21 AE 6C     	ld hl,scl_write_buf_ret ;адрес возврата
- 670++6CA9 E5           	push hl
- 671++6CAA 2A 1F 6F     	ld hl,(scl_parse_ret_adr) ;адрес для продолжения основного цикла сборки
- 672++6CAD E9           	jp (hl) ;отдадим пакет 256 байт парсеру
- 673++6CAE              scl_write_buf_ret
- 674++6CAE 2A 25 6F     	ld hl,(scl_temp_hl2)
- 675++6CB1 C1           	pop bc
- 676++6CB2 10 E0        	djnz scl_write_buf
- 677++6CB4
- 678++6CB4 C9           	ret
- 679++6CB5
- 680++6CB5
- 681++6CB5
- 682++6CB5              scl_parse ;разбор образа scl в trd, основной цикл
- 683++6CB5              	;получить первый сектор
- 684++6CB5              ;запрос порции данных по 256 байт
- 685++6CB5 22 23 6F     	ld (scl_temp_hl),hl
- 686++6CB8 ED 53 27 6F  	ld (scl_temp_de),de
- 687++6CBC ED 43 29 6F  	ld (scl_temp_bc),bc
- 688++6CC0 3E 01        	ld a,1
- 689++6CC2 32 0D 6F     	ld (scl_que),a ;включим флаг что нужны данные
- 690++6CC5 21 CC 6C     	ld hl,scl_parse_ret ;сохраним адрес возврата
- 691++6CC8 22 1F 6F     	ld (scl_parse_ret_adr),hl
- 692++6CCB C9           	ret ;вернёмся для ожидания данных
- 693++6CCC              scl_parse_ret
- 694++6CCC AF           	xor a
- 695++6CCD 32 0D 6F     	ld (scl_que),a
- 696++6CD0 2A 23 6F     	ld hl,(scl_temp_hl)
- 697++6CD3 ED 5B 27 6F  	ld de,(scl_temp_de)
- 698++6CD7 ED 4B 29 6F  	ld bc,(scl_temp_bc)
- 699++6CDB
- 700++6CDB 11 00 53     	ld de,scl_buf ;проверка метки образа
- 701++6CDE 21 05 6F     	ld hl,scl_sign
- 702++6CE1 06 08        	ld b,8
- 703++6CE3              scl_parse_chk
- 704++6CE3 1A           	ld a,(de)
- 705++6CE4 BE           	cp (hl)
- 706++6CE5 20 06        	jr nz,scl_parse_chk_no
- 707++6CE7 23           	inc hl
- 708++6CE8 13           	inc de
- 709++6CE9 10 F8        	djnz scl_parse_chk
- 710++6CEB 18 10        	jr scl_parse_chk_ok
- 711++6CED              scl_parse_chk_no ;если не совпало, значит плохой образ
- 712++6CED 21 0E 6F         ld hl, scl_err
- 713++6CF0 CD F1 67         call DialogBox.msgBox ;предуреждение
- 714++6CF3 AF           	xor a
- 715++6CF4 32 0D 6F     	ld (scl_que),a ;выключим флаг что нужны данные
- 716++6CF7 3E 04        	ld a,4 ;закроем файл
- 717++6CF9 CD A9 6A     	call fclose
- 718++6CFC C9           	ret
- 719++6CFD              scl_parse_chk_ok ;сигнатура правильная
- 720++6CFD
- 721++6CFD              ;формирование каталога
- 722++6CFD 3A 08 53     	ld a,(scl_buf+8)
- 723++6D00 32 22 6F     	ld (scl_files),a ;всего файлов
- 724++6D03 32 21 6F     	ld (scl_cat_cycl),a ;цикл
- 725++6D06 21 09 53     	ld hl,scl_buf+9 ;адрес первого заголовка
- 726++6D09 11 00 48     	ld de,cat_buf ;адрес формируемого каталога trd
- 727++6D0C              scl_parse_cat2
- 728++6D0C 06 0E        	ld b,14 ;14 байт одна запись
- 729++6D0E              scl_parse_cat
- 730++6D0E 7E           	ld a,(hl)
- 731++6D0F 12           	ld (de),a
- 732++6D10 13           	inc de
- 733++6D11 2C           	inc l ;адрес увеличиваем только в пределах младшего регистра
- 734++6D12 20 26        	jr nz,scl_parse_cat1
- 735++6D14              	;тут пора запросить следующий сектор
- 736++6D14              ;запрос порции данных по 256 байт
- 737++6D14 22 23 6F     	ld (scl_temp_hl),hl
- 738++6D17 ED 53 27 6F  	ld (scl_temp_de),de
- 739++6D1B ED 43 29 6F  	ld (scl_temp_bc),bc
- 740++6D1F 3E 01        	ld a,1
- 741++6D21 32 0D 6F     	ld (scl_que),a ;включим флаг что нужны данные
- 742++6D24 21 2B 6D     	ld hl,scl_parse_ret1 ;сохраним адрес возврата
- 743++6D27 22 1F 6F     	ld (scl_parse_ret_adr),hl
- 744++6D2A C9           	ret ;вернёмся для ожидания данных
- 745++6D2B              scl_parse_ret1
- 746++6D2B AF           	xor a
- 747++6D2C 32 0D 6F     	ld (scl_que),a
- 748++6D2F 2A 23 6F     	ld hl,(scl_temp_hl)
- 749++6D32 ED 5B 27 6F  	ld de,(scl_temp_de)
- 750++6D36 ED 4B 29 6F  	ld bc,(scl_temp_bc)
- 751++6D3A
- 752++6D3A              scl_parse_cat1
- 753++6D3A 10 D2        	djnz scl_parse_cat
- 754++6D3C 13           	inc de
- 755++6D3D 13           	inc de
- 756++6D3E 3A 21 6F     	ld a,(scl_cat_cycl)
- 757++6D41 3D           	dec a
- 758++6D42 32 21 6F     	ld (scl_cat_cycl),a
- 759++6D45 20 C5        	jr nz,scl_parse_cat2
- 760++6D47
- 761++6D47 22 23 6F     	ld (scl_temp_hl),hl ;запомнить где остановились
- 762++6D4A
- 763++6D4A              ;подсчёт секторов и дорожек
- 764++6D4A DD E5        	push ix
- 765++6D4C 3A 22 6F     	ld a,(scl_files)
- 766++6D4F 11 00 01     	ld de,#0100 ;данные с первой дорожки
- 767++6D52 DD 21 00 48  	ld ix,cat_buf
- 768++6D56 DD 73 0E     	ld (ix+14),e
- 769++6D59 DD 72 0F     	ld (ix+15),d
- 770++6D5C 21 00 00     	ld hl,0 ;общее количество секторов
- 771++6D5F              scl_cacl
- 772++6D5F 32 21 6F     	ld (scl_cat_cycl),a ;цикл
- 773++6D62 DD 7E 0D     	ld a,(ix+13) ;длина файла в секторах
- 774++6D65 4F           	ld c,a
- 775++6D66 06 00        	ld b,0
- 776++6D68 09           	add hl,bc ;секторов
- 777++6D69
- 778++6D69 01 10 00     	ld bc,16
- 779++6D6C DD 09        	add ix,bc
- 780++6D6E 47           	ld b,a
- 781++6D6F CD 94 6E     	call calc_next_pos
- 782++6D72 3A 21 6F     	ld a,(scl_cat_cycl)
- 783++6D75 FE 01        	cp 1
- 784++6D77 28 06        	jr z,scl_cacl2 ;в последний раз пропусим
- 785++6D79 DD 73 0E     	ld (ix+14),e
- 786++6D7C DD 72 0F     	ld (ix+15),d
- 787++6D7F              scl_cacl2
- 788++6D7F 3D           	dec a
- 789++6D80 20 DD        	jr nz,scl_cacl
- 790++6D82              	;теперь узнаем первый свободный сектор
- 791++6D82 DD 7E 0D     	ld a,(ix+13) ;длина файла в секторах
- 792++6D85 4F           	ld c,a
- 793++6D86 06 00        	ld b,0
- 794++6D88 09           	add hl,bc
- 795++6D89              	; ld b,a
- 796++6D89              	; call calc_next_pos
- 797++6D89 ED 53 E1 50  	ld (cat_buf+8*256+#e1),de ;Первый свободный сектор и дорожка на дискете
- 798++6D8D 11 F0 09     	ld de,16*159
- 799++6D90 EB           	ex de,hl
- 800++6D91 A7           	and a
- 801++6D92 ED 52        	sbc hl,de
- 802++6D94 22 E5 50     	ld (cat_buf+8*256+#e5),hl ;Число свободных секторов на диске
- 803++6D97 DD E1        	pop ix
- 804++6D99
- 805++6D99
- 806++6D99
- 807++6D99              ;запись содержимого файлов
- 808++6D99 3A 22 6F     	ld a,(scl_files) ;всего файлов
- 809++6D9C 32 21 6F     	ld (scl_cat_cycl),a ;цикл
- 810++6D9F 21 0D 48     	ld hl,cat_buf+13 ;адрес размер секторов файла
- 811++6DA2 22 2B 6F     	ld (cat_cur_adr),hl
- 812++6DA5
- 813++6DA5 21 00 01     	ld hl,#0100 ;начиная с первой дорожки
- 814++6DA8 22 F4 5C     	ld (#5cf4),hl
- 815++6DAB              scl_parse_file2
- 816++6DAB 2A 23 6F     	ld hl,(scl_temp_hl) ;адрес данных
- 817++6DAE ED 5B 2B 6F  	ld de,(cat_cur_adr) ;адрес сектор дорожка файла
- 818++6DB2              	;dec de
- 819++6DB2 1A           	ld a,(de) ;количество секторов, цикл
- 820++6DB3 4F           	ld c,a
- 821++6DB4              scl_parse_file3
- 822++6DB4 11 00 55     	ld de,scl_buf2 ;адрес ещё одного буфера
- 823++6DB7 06 00        	ld b,0 ;256 байт один сектор, цикл
- 824++6DB9              scl_parse_file
- 825++6DB9 7E           	ld a,(hl)
- 826++6DBA 12           	ld (de),a
- 827++6DBB 13           	inc de
- 828++6DBC 2C           	inc l ;адрес увеличиваем только в пределах младшего регистра
- 829++6DBD 20 26        	jr nz,scl_parse_file1
- 830++6DBF              	;тут пора запросить следующий сектор
- 831++6DBF              ;запрос порции данных по 256 байт
- 832++6DBF 22 23 6F     	ld (scl_temp_hl),hl
- 833++6DC2 ED 53 27 6F  	ld (scl_temp_de),de
- 834++6DC6 ED 43 29 6F  	ld (scl_temp_bc),bc
- 835++6DCA 3E 01        	ld a,1
- 836++6DCC 32 0D 6F     	ld (scl_que),a ;включим флаг что нужны данные
- 837++6DCF 21 D6 6D     	ld hl,scl_parse_ret2 ;сохраним адрес возврата
- 838++6DD2 22 1F 6F     	ld (scl_parse_ret_adr),hl
- 839++6DD5 C9           	ret ;вернёмся для ожидания данных
- 840++6DD6              scl_parse_ret2
- 841++6DD6 AF           	xor a
- 842++6DD7 32 0D 6F     	ld (scl_que),a
- 843++6DDA 2A 23 6F     	ld hl,(scl_temp_hl)
- 844++6DDD ED 5B 27 6F  	ld de,(scl_temp_de)
- 845++6DE1 ED 4B 29 6F  	ld bc,(scl_temp_bc)
- 846++6DE5
- 847++6DE5              scl_parse_file1
- 848++6DE5 10 D2        	djnz scl_parse_file
- 849++6DE7 22 23 6F     	ld (scl_temp_hl),hl
- 850++6DEA ED 43 29 6F  	ld (scl_temp_bc),bc
- 851++6DEE
- 852++6DEE 21 00 55     	ld hl,scl_buf2 ;;запишем один сектор
- 853++6DF1 ED 5B F4 5C  	ld  de,(#5cf4)
- 854++6DF5 01 06 01         ld      bc,#0106 ;
- 855++6DF8 CD 13 3D         call    #3d13
- 856++6DFB              	; ld a,c
- 857++6DFB              	; cp 255
- 858++6DFB              	; jp z,fwrite_no_chek ;выход если ошибка
- 859++6DFB 2A 23 6F     	ld hl,(scl_temp_hl)
- 860++6DFE ED 4B 29 6F  	ld bc,(scl_temp_bc)
- 861++6E02
- 862++6E02 0D           	dec c
- 863++6E03 20 AF        	jr nz,scl_parse_file3
- 864++6E05
- 865++6E05 2A 2B 6F     	ld hl,(cat_cur_adr) ;адрес сектор дорожка файла
- 866++6E08              	; ld e,(hl)
- 867++6E08              	; inc hl
- 868++6E08              	; ld d,(hl)
- 869++6E08 01 10 00     	ld bc,16
- 870++6E0B 09           	add hl,bc ;на следующий файл
- 871++6E0C 22 2B 6F     	ld (cat_cur_adr),hl
- 872++6E0F
- 873++6E0F
- 874++6E0F 3A 21 6F     	ld a,(scl_cat_cycl)
- 875++6E12 3D           	dec a
- 876++6E13 32 21 6F     	ld (scl_cat_cycl),a
- 877++6E16 20 93        	jr nz,scl_parse_file2	;на следующий файл
- 878++6E18
- 879++6E18
- 880++6E18
- 881++6E18              ;формирование системного сектора №9 (8)
- 882++6E18              	;
- 883++6E18              	;ld (cat_buf+8*256+#e1),a ;// #E1 Первый свободный сектор на дискете
- 884++6E18              	;
- 885++6E18              	;ld (cat_buf+8*256+#e2),a ;// #E2 Первый свободный трек
- 886++6E18 3E 16        	ld a,#16
- 887++6E1A 32 E3 50     	ld (cat_buf+8*256+#e3),a ;// #E3 16 80 дорожек, 2 стороны
- 888++6E1D 3A 22 6F     	ld a,(scl_files)
- 889++6E20 32 E4 50     	ld (cat_buf+8*256+#e4),a ;// #E4 Общее количество файлов записанных на диск
- 890++6E23              	;
- 891++6E23              	;ld (cat_buf+8*256+#e5),a ;// #Е5,Е6 Число свободных секторов на диске
- 892++6E23              	;ld (cat_buf+8*256+#e6),a
- 893++6E23 3E 10        	ld a,#10
- 894++6E25 32 E7 50     	ld (cat_buf+8*256+#e7),a ;// #E7 Код  #10,определяющий принадлежность к TR-DOS
- 895++6E28
- 896++6E28 21 E3 6E     	ld hl,f_name ;запишем имя диска, взяв для этого имя файла
- 897++6E2B 11 F5 50     	ld de,cat_buf+8*256+#f5 ;// #F5-#FC Имя диска в ASCII формате
- 898++6E2E 01 08 00     	ld bc,8
- 899++6E31 ED B0        	ldir
- 900++6E33
- 901++6E33 21 00 48     	ld hl,cat_buf ;запишем каталог на диск
- 902++6E36 11 00 00     	ld de,0
- 903++6E39 01 06 09         ld      bc,#0906 ;
- 904++6E3C CD 13 3D         call    #3d13
- 905++6E3F              	; ld a,c
- 906++6E3F              	; cp 255
- 907++6E3F              	; jp z,fwrite_no_chek ;выход если ошибка
- 908++6E3F C9           	ret
- 909++6E40
- 910++6E40
- 911++6E40              ;-----------scl end --------------------
- 912++6E40
- 913++6E40
- 914++6E40
- 915++6E40
- 916++6E40
- 917++6E40
- 918++6E40
- 919++6E40
- 920++6E40
- 921++6E40
- 922++6E40              ; A - file stream id
- 923++6E40              ; fsync:
- 924++6E40              ;     esxCall ESX_FSYNC
- 925++6E40                  ; ret
- 926++6E40
- 927++6E40
- 928++6E40              ; HL - name (name.ext)
- 929++6E40              ; Returns:
- 930++6E40              ; HL - name (name    e)
- 931++6E40              format_name ;подгоняет имя файла под стандарт trdos (8+1)
- 932++6E40
- 933++6E40              	;сначала попробуем убрать из пути подпапку, если она есть
- 934++6E40 22 FD 6E     	ld (temp_hl),hl ;сохраним адрес исходного имени
- 935++6E43 06 00        	ld b,#00 ;не больше 255 символов
- 936++6E45              format_name5
- 937++6E45 7E           	ld a,(hl)
- 938++6E46 FE 2F        	cp "/" ;если есть подпапка
- 939++6E48 28 0D        	jr z,format_name_path_yep
- 940++6E4A 7E           	ld a,(hl)
- 941++6E4B FE 2E        	cp "." ;если ещё не дошли до расширения
- 942++6E4D 20 05        	jr nz,format_name6
- 943++6E4F 2A FD 6E     	ld hl,(temp_hl) ;если дошли до расширения, то путей нет, вернёмся на начало имени
- 944++6E52 18 04        	jr format_name_7 ;на выход
- 945++6E54              format_name6
- 946++6E54 23           	inc hl
- 947++6E55 10 EE        	djnz format_name5
- 948++6E57
- 949++6E57              format_name_path_yep ;нашли
- 950++6E57 23           	inc hl ;пропустим знак "/"
- 951++6E58
- 952++6E58              format_name_7
- 953++6E58
- 954++6E58
- 955++6E58 E5           	push hl ;очистим место для нового имени
- 956++6E59 21 E3 6E     	ld hl,f_name
- 957++6E5C 11 E4 6E     	ld de,f_name+1
- 958++6E5F 36 20        	ld (hl)," "
- 959++6E61 01 08 00     	ld bc,8
- 960++6E64 ED B0        	ldir
- 961++6E66 E1           	pop hl
- 962++6E67
- 963++6E67 01 FF 09     	ld bc,#09ff ;длина имени 9 символов
- 964++6E6A 11 E3 6E     	ld de,f_name ;куда
- 965++6E6D              format_name2
- 966++6E6D 7E           	ld a,(hl)
- 967++6E6E FE 2E        	cp "."
- 968++6E70 20 08        	jr nz,format_name1
- 969++6E72 23           	inc hl
- 970++6E73 7E           	ld a,(hl)
- 971++6E74 32 EB 6E     	ld (f_name+8),a ; и в конце первую букву расширения
- 972++6E77 EB           	ex de,hl ;сохраним адрес исходного расширения
- 973++6E78 18 16        	jr format_name_e
- 974++6E7A              format_name1
- 975++6E7A ED A0        	ldi
- 976++6E7C 10 EF        	djnz format_name2
- 977++6E7E
- 978++6E7E              	;если имя длинное, пропустим лишнее до расширения
- 979++6E7E 06 00        	ld b,#00 ;не больше 255 символов
- 980++6E80              format_name3
- 981++6E80 7E           	ld a,(hl)
- 982++6E81 FE 2E        	cp "."
- 983++6E83 20 08        	jr nz,format_name4
- 984++6E85 23           	inc hl
- 985++6E86 7E           	ld a,(hl)
- 986++6E87 32 EB 6E     	ld (f_name+8),a ; и в конце первую букву расширения
- 987++6E8A EB           	ex de,hl ;сохраним адрес исходного расширения
- 988++6E8B 18 03        	jr format_name_e
- 989++6E8D              format_name4
- 990++6E8D 23           	inc hl
- 991++6E8E 10 F0        	djnz format_name3
- 992++6E90
- 993++6E90              format_name_e ;выход
- 994++6E90 21 E3 6E     	ld hl,f_name ;вернём результат
- 995++6E93 C9           	ret
- 996++6E94
- 997++6E94              ; DE - trk/sec
- 998++6E94              ; B - sectors step
- 999++6E94              ; Returns:
-1000++6E94              ; DE - trk/sec
-1001++6E94              calc_next_pos		;вперёд на N секторов
-1002++6E94              			;ld b,4
-1003++6E94              			;ld  de,(#5ceb)
-1004++6E94              calc_next_pos2
-1005++6E94 1C           			inc e
-1006++6E95 7B           			ld a,e
-1007++6E96 FE 10        			cp 16
-1008++6E98 38 03        			jr c,calc_next_pos1
-1009++6E9A 14           			inc d
-1010++6E9B 1E 00        			ld e,0
-1011++6E9D              calc_next_pos1
-1012++6E9D              			;ld (#5ceb),de
-1013++6E9D 10 F5        			djnz calc_next_pos2
-1014++6E9F C9           			ret
-1015++6EA0
-1016++6EA0
-1017++6EA0              ;testt db "123.trd"
-1018++6EA0 49 6E 73 65  write_ima db "Insert disk to drive "
-1018++6EA4 72 74 20 64
-1018++6EA8 69 73 6B 20
-1018++6EAC 74 6F 20 64
-1018++6EB0 72 69 76 65
-1018++6EB4 20
-1019++6EB5 41 2E 20     write_ima_d db "A. "
-1020++6EB8 41 6C 6C 20  		db "All data will be lost!",0
-1020++6EBC 64 61 74 61
-1020++6EC0 20 77 69 6C
-1020++6EC4 6C 20 62 65
-1020++6EC8 20 6C 6F 73
-1020++6ECC 74 21 00
-1021++6ECF
-1022++6ECF 2E 74 72 64  trdExt1 db ".trd", 0
-1022++6ED3 00
-1023++6ED4 2E 54 52 44  trdExt2 db ".TRD", 0
-1023++6ED8 00
-1024++6ED9
-1025++6ED9 2E 73 63 6C  sclExt1 db ".scl", 0
-1025++6EDD 00
-1026++6EDE 2E 53 43 4C  sclExt2 db ".SCL", 0
-1026++6EE2 00
-1027++6EE3
-1028++6EE3 00 00 00...  f_name ds 9 ;имя файла
-1029++6EEC 00 00        f_r_cur_trk dw 	 0 ;текущие сектор-дорожка файла на чтение
-1030++6EEE 00           f_r_len_sec db 0 ;длина файла на чтение в секторах
-1031++6EEF 00 00        f_r_len dw 0;длина файла в байтах
-1032++6EF1 00           f_r_flag db 0 ;флаг что открыт файл на чтение
-1033++6EF2
-1034++6EF2 00 00        f_w_cur_trk dw 	 0 ;текущие сектор-дорожка файла на запись
-1035++6EF4 00           f_w_len_sec db 0 ;длина файла на запись в секторах
-1036++6EF5 00           f_w_flag db 0 ;флаг что открыт файл на запись
-1037++6EF6 00 00 00 00  f_w_len ds 4 ;длина записанных данных
-1038++6EFA 00           write_end_flag db 0 ;флаг что нужно записать остаток
-1039++6EFB
-1040++6EFB 00 00        temp_bc dw 0 ;хранение регистра
-1041++6EFD 00 00        temp_hl dw 0 ;хранение регистра
-1042++6EFF 00 00        temp_hl2 dw 0 ;хранение регистра
-1043++6F01
-1044++6F01 00           sec_shift db 0 ;указатель на каком байте остановлена запись
-1045++6F02 00           sec_shift2 db 0 ;указатель на каком байте остановлена запись (остаток)
-1046++6F03 00           sec_part db 0 ;сколько секторов во второй порции для записи
-1047++6F04 00           sec_shift_flag db 0 ;флаг что буфер сектора не заполнен
-1048++6F05
-1049++6F05              ;секция scl
-1050++6F05 53 49 4E 43  scl_sign db "SINCLAIR" ;метка
-1050++6F09 4C 41 49 52
-1051++6F0D 00           scl_que db 0 ;флаг запроса порции данных
-1052++6F0E 53 43 4C 20  scl_err db "SCL image error!",0
-1052++6F12 69 6D 61 67
-1052++6F16 65 20 65 72
-1052++6F1A 72 6F 72 21
-1052++6F1E 00
-1053++6F1F 00 00        scl_parse_ret_adr dw 0; адрес возврата в цикл
-1054++6F21 00           scl_cat_cycl db 0 ;переменная цикла
-1055++6F22 00           scl_files db 0 ;всего файлов
-1056++6F23 00 00        scl_temp_hl dw 0;;хранение регистра
-1057++6F25 00 00        scl_temp_hl2 dw 0;
-1058++6F27 00 00        scl_temp_de dw 0;
-1059++6F29 00 00        scl_temp_bc dw 0;
-1060++6F2B 00 00        cat_cur_adr dw 0;
-1061++6F2D              ;scl end
-1062++6F2D 00 00 00...  	align 256 ;временно
+   1++69D3              ;trdos driver (izzx)
+   2++69D3                  MODULE Dos
+   3++69D3              ; API methods
+   4++69D3              ESX_GETSETDRV = #89
+   5++69D3              ESX_FOPEN = #9A
+   6++69D3              ESX_FCLOSE = #9B
+   7++69D3              ESX_FSYNC = #9C
+   8++69D3              ESX_FREAD = #9D
+   9++69D3              ESX_FWRITE = #9E
+  10++69D3
+  11++69D3              ; File modes
+  12++69D3              FMODE_READ = #01
+  13++69D3              FMODE_WRITE = #06
+  14++69D3              FMODE_CREATE = #0E
+  15++69D3
+  16++69D3                  ; MACRO esxCall func
+  17++69D3                  ; rst #8 : db func
+  18++69D3                  ; ENDM
+  19++69D3
+  20++69D3              ;id = 0 файл не открыт
+  21++69D3              ;id = 1 файл для чтения
+  22++69D3              ;id = 2 файл для записи
+  23++69D3              ;id = 3 файл для записи тип TRD
+  24++69D3              ;id = 4 файл для записи тип SCL
+  25++69D3
+  26++69D3              ; HL - filename in ASCIIZ
+  27++69D3              loadBuffer:
+  28++69D3 06 01            ld b, Dos.FMODE_READ
+  28++69D5 CD EF 69       call Dos.fopen
+  29++69D8 F5               push af
+  30++69D9 21 08 95 01          ld hl, outputBuffer, bc, #ffff - outputBuffer
+  30++69DD F7 6A
+  30++69DF CD DC 6A       call Dos.fread
+  31++69E2 21 08 95             ld hl, outputBuffer
+  31++69E5 09             add hl, bc
+  31++69E6 AF             xor a
+  31++69E7 77             ld (hl), a
+  31++69E8 23             inc hl
+  31++69E9 77             ld (hl), a
+  32++69EA F1               pop af
+  33++69EB CD C8 6A         call Dos.fclose
+  34++69EE C9               ret
+  35++69EF
+  36++69EF
+  37++69EF              ; Returns:
+  38++69EF              ;  A - current drive
+  39++69EF              ; getDefaultDrive: ;нигде не используется
+  40++69EF                  ; ld a, 0 : esxCall ESX_GETSETDRV
+  41++69EF                  ; ret
+  42++69EF
+  43++69EF
+  44++69EF
+  45++69EF              ; Opens file on default drive
+  46++69EF              ; B - File mode
+  47++69EF              ; HL - File name
+  48++69EF              ; Returns:
+  49++69EF              ;  A - file stream id
+  50++69EF              fopen:
+  51++69EF                  ; push bc : push hl
+  52++69EF                  ; call getDefaultDrive
+  53++69EF                  ; pop ix : pop bc
+  54++69EF                  ; esxCall ESX_FOPEN
+  55++69EF                  ; ret
+  56++69EF 78           	ld a,b
+  57++69F0 FE 01        	cp FMODE_READ ;если режим открытие файла
+  58++69F2 28 06        	jr z,fopen_r
+  59++69F4 FE 0E        	cp FMODE_CREATE
+  60++69F6 28 39        	jr z,fopen_c ;если режим создание файла
+  61++69F8 18 34        	jr fopen_err ;иначе выход
+  62++69FA
+  63++69FA              fopen_r	;открытие существующего файла на чтение (id=1)
+  64++69FA CD 5F 6E     			call format_name ;
+  65++69FD 0E 13        			ld      c,#13 ;move file info to syst var
+  66++69FF CD 13 3D                 call    #3d13
+  67++6A02 0E 0A                    ld      c,#0a ;find file
+  68++6A04 CD 13 3D                 call    #3d13
+  69++6A07 79                       ld      a,c
+  70++6A08 FE FF        			cp 		#ff
+  71++6A0A 28 22        			jr 		z,fopen_err ;если не нашли файла
+  72++6A0C 0E 08                    ld      c,#08 ;read file title
+  73++6A0E CD 13 3D                 call    #3d13
+  74++6A11                          ;ld      hl,loadadr ;куда
+  75++6A11 ED 5B EB 5C              ld      de,(#5ceb) ;начало файла сектор дорожка
+  76++6A15 ED 53 0B 6F              ld      (f_r_cur_trk),de
+  77++6A19
+  78++6A19 3A EA 5C                 ld      a,(#5cea)
+  79++6A1C 32 0D 6F                 ld      (f_r_len_sec),a ;длина в секторах
+  80++6A1F                          ;or      a
+  81++6A1F                          ;ret     z    ;выход если пустой
+  82++6A1F
+  83++6A1F ED 5B E8 5C  			ld de,(#5CE8) ; длина файла или программной части для BASIC
+  84++6A23 ED 53 0E 6F  			ld      (f_r_len),de
+  85++6A27
+  86++6A27                          ; ld      de,(fcurtrk) ;текущие сектор дорожка
+  87++6A27                          ; ld      (#5cf4),de ;восстановим
+  88++6A27 AF           			xor a
+  89++6A28 3E 01        			ld 		a,1
+  90++6A2A 32 10 6F     			ld (f_r_flag),a ;флаг что файл для чтения открыт
+  91++6A2D              			;id канала будет 1
+  92++6A2D C9           	ret
+  93++6A2E
+  94++6A2E              fopen_err
+  95++6A2E AF           	xor a ;если никакой файл не открыли, то id = 0
+  96++6A2F 37           	scf ;флаг ошибки
+  97++6A30 C9           	ret
+  98++6A31
+  99++6A31
+ 100++6A31              fopen_c	;создание нового файла (id=2-4)
+ 101++6A31 CD 5F 6E     	call format_name ;
+ 102++6A34              	;выясним, не образ ли это для разворачивания
+ 103++6A34 21 EE 6E         ld hl, trdExt1
+ 103++6A37 CD 27 62       call CompareBuff.search
+ 103++6A3A A7             and a
+ 103++6A3B 20 1D          jr nz, fopen_c_trd
+ 104++6A3D 21 F3 6E         ld hl, trdExt2
+ 104++6A40 CD 27 62       call CompareBuff.search
+ 104++6A43 A7             and a
+ 104++6A44 20 14          jr nz, fopen_c_trd
+ 105++6A46 21 F8 6E     	ld hl, sclExt1
+ 105++6A49 CD 27 62       call CompareBuff.search
+ 105++6A4C A7             and a
+ 105++6A4D 20 3A          jr nz, fopen_c_scl
+ 106++6A4F 21 FD 6E         ld hl, sclExt2
+ 106++6A52 CD 27 62       call CompareBuff.search
+ 106++6A55 A7             and a
+ 106++6A56 20 31          jr nz, fopen_c_scl
+ 107++6A58
+ 108++6A58
+ 109++6A58              fopen_c_2	;создание произвольного файла
+ 110++6A58 18 D4        	jr 		fopen_err ;пока отключено
+ 111++6A5A
+ 112++6A5A              	; ld      c,#13 ;move file info to syst var
+ 113++6A5A                  ; call    #3d13
+ 114++6A5A              	; ld de,256 ;запишем пока 1 сектор
+ 115++6A5A              	; ld hl,#4000 ;возьмём случайные данные из экрана
+ 116++6A5A                  ; ld      c,#0b ;запись файла CODE
+ 117++6A5A                  ; call    #3d13
+ 118++6A5A                  ; ld      a,c
+ 119++6A5A              	; cp 		#ff
+ 120++6A5A              	; jr 		z,fopen_err ;если ошибка
+ 121++6A5A
+ 122++6A5A                  ; ld      de,(#5ceb) ;начало файла сектор дорожка
+ 123++6A5A                  ; ld      (f_w_cur_trk),de
+ 124++6A5A                  ; ld      a,(#5cea)
+ 125++6A5A                  ; ld      (f_w_len_sec),a ;длина в секторах
+ 126++6A5A              	; xor a ;id канала будет 2
+ 127++6A5A              	; ld a,2
+ 128++6A5A              	; ld (f_w_flag),a ;флаг что файл для записи открыт
+ 129++6A5A              	; ret
+ 130++6A5A
+ 131++6A5A
+ 132++6A5A
+ 133++6A5A
+ 134++6A5A
+ 135++6A5A              fopen_c_trd	;открытие файла для разворачивания образа trd (id=3)
+ 136++6A5A 3A 19 5D     	ld a,(#5D19) ;номер дисковода по умолчанию
+ 137++6A5D C6 41        	add a,"A"
+ 138++6A5F 32 D4 6E     	ld (write_ima_d),a ;подставим букву в запросе
+ 139++6A62 21 BF 6E         ld hl, write_ima
+ 140++6A65 CD 10 68         call DialogBox.msgBox ;предуреждение
+ 141++6A68              WAITKEY_trd
+ 142++6A68 3A 04 5C     	ld 		a,(23556)
+ 143++6A6B FE FF        	cp 255
+ 144++6A6D 28 F9        	JR Z,WAITKEY_trd	;ждём любую клавишу
+ 145++6A6F
+ 146++6A6F 11 00 00     	ld      de,0 ;начало сектор дорожка
+ 147++6A72 ED 53 F4 5C      ld      (#5cf4),de
+ 148++6A76 AF           	xor a
+ 149++6A77 32 20 6F     	ld (sec_shift),a ;переменная
+ 150++6A7A 21 00 00     	ld hl,0
+ 151++6A7D 22 15 6F     	ld (f_w_len+0),hl
+ 152++6A80 22 17 6F     	ld (f_w_len+2),hl
+ 153++6A83 3E 03        	ld a,3 ;id канала
+ 154++6A85 32 14 6F     	ld (f_w_flag),a ;флаг что trd для записи открыт
+ 155++6A88 C9           	ret
+ 156++6A89
+ 157++6A89
+ 158++6A89
+ 159++6A89
+ 160++6A89              fopen_c_scl	;открытие файла для разворачивания образа scl (id=4)
+ 161++6A89 3A 19 5D     	ld a,(#5D19) ;номер дисковода по умолчанию
+ 162++6A8C C6 41        	add a,"A"
+ 163++6A8E 32 D4 6E     	ld (write_ima_d),a ;подставим букву в запросе
+ 164++6A91 21 BF 6E         ld hl, write_ima
+ 165++6A94 CD 10 68         call DialogBox.msgBox ;предуреждение
+ 166++6A97              WAITKEY_scl
+ 167++6A97 3A 04 5C     	ld 		a,(23556)
+ 168++6A9A FE FF        	cp 255
+ 169++6A9C 28 F9        	JR Z,WAITKEY_scl	;ждём любую клавишу
+ 170++6A9E
+ 171++6A9E 11 00 00     	ld      de,0 ;начало сектор дорожка
+ 172++6AA1 ED 53 F4 5C      ld      (#5cf4),de
+ 173++6AA5
+ 174++6AA5 21 00 48     	ld hl,cat_buf ;очистить место для каталога дискеты
+ 175++6AA8 11 01 48     	ld de,cat_buf+1
+ 176++6AAB 36 00        	ld (hl),0
+ 177++6AAD 01 FF 08     	ld bc,9*256-1
+ 178++6AB0 ED B0        	ldir
+ 179++6AB2
+ 180++6AB2 CD D4 6C     	call scl_parse ;запуск цикла сборки образа
+ 181++6AB5
+ 182++6AB5 AF           	xor a
+ 183++6AB6 32 20 6F     	ld (sec_shift),a ;переменная
+ 184++6AB9              	;ld (scl_que),a
+ 185++6AB9 21 00 00     	ld hl,0
+ 186++6ABC 22 15 6F     	ld (f_w_len+0),hl
+ 187++6ABF 22 17 6F     	ld (f_w_len+2),hl
+ 188++6AC2 3E 04        	ld a,4 ;id канала
+ 189++6AC4 32 14 6F     	ld (f_w_flag),a ;флаг что scl для записи открыт
+ 190++6AC7 C9           	ret
+ 191++6AC8
+ 192++6AC8
+ 193++6AC8
+ 194++6AC8              ; A - file stream id
+ 195++6AC8              fclose:
+ 196++6AC8                  ;esxCall ESX_FCLOSE
+ 197++6AC8              	; push af
+ 198++6AC8              ; WAITKEY2	XOR A:IN A,(#FE):CPL:AND #1F:JR Z,WAITKEY2
+ 199++6AC8              	; pop af
+ 200++6AC8 FE 04        	cp 4 ;если scl
+ 201++6ACA 20 08        	jr nz,fclose2
+ 202++6ACC 21 00 51     	ld hl,sec_buf ;
+ 203++6ACF 06 01        	ld b,1
+ 204++6AD1 CD B3 6C     	call scl_write_buf ;допишем остаток scl, если есть
+ 205++6AD4
+ 206++6AD4              fclose2
+ 207++6AD4 AF           	xor a ;как бы закрываем все файлы
+ 208++6AD5 32 10 6F     	ld (f_r_flag),a
+ 209++6AD8 32 14 6F     	ld (f_w_flag),a
+ 210++6ADB C9               ret
+ 211++6ADC
+ 212++6ADC
+ 213++6ADC
+ 214++6ADC
+ 215++6ADC              ; A - file stream id
+ 216++6ADC              ; BC - length
+ 217++6ADC              ; HL - buffer
+ 218++6ADC              ; Returns
+ 219++6ADC              ;  BC - length(how much was actually read)
+ 220++6ADC              fread: ;(id=1)
+ 221++6ADC                  ; push hl : pop ix
+ 222++6ADC                  ; esxCall ESX_FREAD
+ 223++6ADC              	; push af
+ 224++6ADC              	; ld a,4
+ 225++6ADC              	; out (254),a
+ 226++6ADC              ; WAITKEY	XOR A:IN A,(#FE):CPL:AND #1F:JR Z,WAITKEY
+ 227++6ADC              	; xor a
+ 228++6ADC              	; out (254),a
+ 229++6ADC              	; pop af
+ 230++6ADC
+ 231++6ADC FE 01        	cp 1 ;id = 1?
+ 232++6ADE 20 06        	jr nz,fread_no_chek ;выход если номер потока не = 1
+ 233++6AE0 3A 10 6F     	ld a,(f_r_flag)
+ 234++6AE3 B7           	or a
+ 235++6AE4 20 06        	jr nz,fread_chek ;файл уже открыт?
+ 236++6AE6              fread_no_chek ;выход с ошибкой
+ 237++6AE6 AF           	xor a
+ 238++6AE7 37           	scf ;флаг ошибки
+ 239++6AE8 01 00 00     	ld bc,0 ;ничего мы не считали
+ 240++6AEB C9           	ret
+ 241++6AEC
+ 242++6AEC              fread_chek
+ 243++6AEC ED 4B 0C 6F  	ld bc,(f_r_len_sec-1) ;загружаем файл целиком, не смотря на то, сколько байт было запрошено
+ 244++6AF0 0E 05            ld      c,5 ;read читаем целыми секторами
+ 245++6AF2 ED 5B 0B 6F  	ld de,(f_r_cur_trk)
+ 246++6AF6 CD 13 3D         call    #3d13
+ 247++6AF9 ED 4B 0E 6F  	ld bc,(f_r_len) ;возвратим сколько считали байт (длину файла)
+ 248++6AFD AF           	xor a ;флаги сбросим
+ 249++6AFE C9               ret
+ 250++6AFF
+ 251++6AFF              ; A - file stream id
+ 252++6AFF              ; BC - length
+ 253++6AFF              ; HL - buffer
+ 254++6AFF              ; Returns:
+ 255++6AFF              ;   BC - actually written bytes
+ 256++6AFF              fwrite: ;
+ 257++6AFF                  ; push hl : pop ix
+ 258++6AFF                  ; esxCall ESX_FWRITE
+ 259++6AFF
+ 260++6AFF              	; push af
+ 261++6AFF              	; ld a,2
+ 262++6AFF              	; out (254),a
+ 263++6AFF              ; WAITKEY1	XOR A:IN A,(#FE):CPL:AND #1F:JR Z,WAITKEY1
+ 264++6AFF              	; xor a
+ 265++6AFF              	; out (254),a
+ 266++6AFF              	; pop af
+ 267++6AFF
+ 268++6AFF FE 02        	cp 2 ;id = 2?
+ 269++6B01 28 0F        	jr z,fwrite_chek ;проверка id потока
+ 270++6B03 FE 03        	cp 3 ;id = 3?
+ 271++6B05 28 0D        	jr z,fwrite_chek_trd ;проверка id потока
+ 272++6B07 FE 04        	cp 4 ;id = 4?
+ 273++6B09 CA EE 6B     	jp z,fwrite_chek_scl ;проверка id потока
+ 274++6B0C
+ 275++6B0C
+ 276++6B0C              fwrite_no_chek ;выход с ошибкой
+ 277++6B0C AF           	xor a
+ 278++6B0D 37           	scf ;флаг ошибки
+ 279++6B0E 01 00 00     	ld bc,0 ;ничего мы не записали
+ 280++6B11 C9           	ret
+ 281++6B12
+ 282++6B12              fwrite_chek ;запись произвольного типа файла
+ 283++6B12 18 F8        	jr fwrite_no_chek ;пока отключено
+ 284++6B14              	; ld a,(f_w_flag)
+ 285++6B14              	; or a
+ 286++6B14              	; jr z,fwrite_no_chek ;файл уже открыт?
+ 287++6B14              	; ld (temp_bc),bc
+ 288++6B14              	; ;ld bc,(f_r_len_sec-1) ;
+ 289++6B14                  ; ld      c,6 ;пишем целыми секторами
+ 290++6B14              	; ld de,(f_w_cur_trk)
+ 291++6B14                  ; call    #3d13
+ 292++6B14              	; ld bc,(temp_bc) ;возвратим, что сколько запрашивали, столько и считали байт
+ 293++6B14              	; xor a ;флаги сбросим
+ 294++6B14                  ; ret
+ 295++6B14
+ 296++6B14
+ 297++6B14
+ 298++6B14
+ 299++6B14
+ 300++6B14              fwrite_chek_trd ;запись trd файла (разворачивание образа)
+ 301++6B14              	; ld a,2
+ 302++6B14              	; out (254),a
+ 303++6B14              ; WAITKEY_t	XOR A:IN A,(#FE):CPL:AND #1F:JR Z,WAITKEY_t
+ 304++6B14              	; xor a
+ 305++6B14              	; out (254),a
+ 306++6B14 3A 14 6F     	ld a,(f_w_flag)
+ 307++6B17 B7           	or a
+ 308++6B18 28 F2        	jr z,fwrite_no_chek ;файл уже открыт?
+ 309++6B1A ED 43 1A 6F  	ld (temp_bc),bc ;длина
+ 310++6B1E 22 1C 6F     	ld (temp_hl),hl ;адрес данных
+ 311++6B21 78           	ld a,b
+ 312++6B22 B1           	or c
+ 313++6B23 28 E7        	jr z,fwrite_no_chek ; если длина 0, то выход
+ 314++6B25
+ 315++6B25              	; ld a,b
+ 316++6B25              	; or a
+ 317++6B25              	; jr nz,testt1
+ 318++6B25              	; nop
+ 319++6B25
+ 320++6B25              ; testt1
+ 321++6B25
+ 322++6B25 AF           	xor a
+ 323++6B26 32 22 6F     	ld (sec_part),a ;обнулить переменные
+ 324++6B29 32 21 6F     	ld (sec_shift2),a
+ 325++6B2C 32 22 6F     	ld (sec_shift2+1),a
+ 326++6B2F 32 23 6F     	ld (sec_shift_flag),a
+ 327++6B32 32 19 6F     	ld (write_end_flag),a ;
+ 328++6B35
+ 329++6B35
+ 330++6B35 3A 20 6F     	ld a,(sec_shift)
+ 331++6B38 B7           	or a
+ 332++6B39 28 43        	jr z,fwrite_trd3 ;если смещения нет, то первую часть пропустим
+ 333++6B3B
+ 334++6B3B
+ 335++6B3B 4F           	ld c,a
+ 336++6B3C 06 00        	ld b,0
+ 337++6B3E 2A 1A 6F     	ld hl,(temp_bc) ;проверка заполнится ли целый сектор
+ 338++6B41 09           	add hl,bc
+ 339++6B42
+ 340++6B42 3E 01        	ld a,1
+ 341++6B44 32 19 6F     	ld (write_end_flag),a ;флаг что не нужно дописывать остаток
+ 342++6B47
+ 343++6B47 7C           	ld a,h
+ 344++6B48 B7           	or a
+ 345++6B49 20 05        	jr nz,fwrite_trd4
+ 346++6B4B 3E 01        	ld a,1
+ 347++6B4D 32 23 6F     	ld (sec_shift_flag),a ;флаг что не заполнен сектор
+ 348++6B50
+ 349++6B50              fwrite_trd4
+ 350++6B50 21 00 51     	ld hl,sec_buf ;буфер последнего сектора
+ 351++6B53 09           	add hl,bc ;на этой точке остановились
+ 352++6B54 EB           	ex de,hl
+ 353++6B55 2A 1C 6F     	ld hl,(temp_hl) ;присоединим начало данных в конец предыдущих
+ 354++6B58              	; ld a,c
+ 355++6B58              	; or a
+ 356++6B58              	; jr nz,fwrite_trd2
+ 357++6B58              	; inc b ;коррекция
+ 358++6B58              ; fwrite_trd2
+ 359++6B58              	; ld c,a
+ 360++6B58 AF           	xor a
+ 361++6B59 91           	sub c
+ 362++6B5A 4F           	ld c,a ;сколько осталось перенести до заполнения сектора
+ 363++6B5B ED 43 21 6F  	ld (sec_shift2),bc ;сохраним сколько добавили байт
+ 364++6B5F ED B0        	ldir
+ 365++6B61
+ 366++6B61 3A 23 6F     	ld a,(sec_shift_flag)
+ 367++6B64 B7           	or a
+ 368++6B65 20 17        	jr nz,fwrite_trd3 ;если сектор ещё не заполнен писать не будем
+ 369++6B67
+ 370++6B67 21 00 51     	ld hl,sec_buf
+ 371++6B6A ED 5B F4 5C  	ld de,(#5cf4)
+ 372++6B6E              	;ld (f_w_cur_trk),de	;запомним позицию
+ 373++6B6E 01 06 01         ld      bc,#0106 ;пишем 1 сектор из буфера
+ 374++6B71 CD 13 3D         call    #3d13
+ 375++6B74 79           	ld a,c
+ 376++6B75 FE FF        	cp 255
+ 377++6B77 CA 0C 6B     	jp z,fwrite_no_chek ;выход если ошибка
+ 378++6B7A
+ 379++6B7A AF           	xor a
+ 380++6B7B 32 19 6F     	ld (write_end_flag),a ;флаг что нужно дописывать остаток
+ 381++6B7E              	; ld de,(f_w_cur_trk) ;если сектор ещё не заполнен, останемся на старой позиции
+ 382++6B7E              	; ld (#5cf4),de
+ 383++6B7E              	; ld b,1 ;на сектор вперёд
+ 384++6B7E              	; ld de,(f_w_cur_trk)
+ 385++6B7E              	; call calc_next_pos
+ 386++6B7E              	; ld (f_w_cur_trk),de
+ 387++6B7E
+ 388++6B7E              fwrite_trd3
+ 389++6B7E 2A 1C 6F     	ld hl,(temp_hl) ;запишем остаток данных
+ 390++6B81              	;ld a,(sec_shift)
+ 391++6B81              	;ld c,a
+ 392++6B81              	;ld b,0
+ 393++6B81 ED 4B 21 6F  	ld bc,(sec_shift2)
+ 394++6B85 09           	add hl,bc ;с этой точки пишем
+ 395++6B86 22 1E 6F     	ld (temp_hl2),hl ;сохраним начало записи второго сектора
+ 396++6B89
+ 397++6B89 2A 1A 6F     	ld hl,(temp_bc) ;вычисление на чём остановимся в этот раз
+ 398++6B8C A7           	and a
+ 399++6B8D ED 42        	sbc hl,bc ;вычтем то, что добавили к первому сектору
+ 400++6B8F 4D           	ld c,l
+ 401++6B90 44           	ld b,h
+ 402++6B91 30 02        	jr nc,fwrite_trd5
+ 403++6B93 06 00        	ld b,0 ;коррекция если вышел минус
+ 404++6B95              fwrite_trd5
+ 405++6B95 2A 1C 6F     	ld hl,(temp_hl)
+ 406++6B98 09           	add hl,bc
+ 407++6B99
+ 408++6B99 11 08 95     	ld de,outputBuffer
+ 409++6B9C A7           	and a
+ 410++6B9D ED 52        	sbc hl,de
+ 411++6B9F
+ 412++6B9F 7D           	ld a,l
+ 413++6BA0 32 20 6F     	ld (sec_shift),a ;смещение на следующий раз
+ 414++6BA3              	;ld hl,(temp_hl)
+ 415++6BA3
+ 416++6BA3
+ 417++6BA3              	; or a
+ 418++6BA3              	; jr z,fwrite_trd1
+ 419++6BA3              	; inc b  ;коррекция количества секторов
+ 420++6BA3
+ 421++6BA3 78           	ld a,b ;нужна проверка на количество секторов!!!
+ 422++6BA4 32 22 6F     	ld (sec_part),a ;запомним сколько секторов во второй части
+ 423++6BA7
+ 424++6BA7              	;ld a,b
+ 425++6BA7 B7           	or a
+ 426++6BA8 28 16        	jr z,fwrite_trd1 ;если размер данных меньше сектора, то пропустим запись
+ 427++6BAA
+ 428++6BAA 2A 1E 6F     	ld hl,(temp_hl2)
+ 429++6BAD              	;push bc
+ 430++6BAD ED 5B F4 5C  	ld de,(#5cf4)
+ 431++6BB1 0E 06            ld      c,6 ;пишем целыми секторами
+ 432++6BB3 CD 13 3D         call    #3d13
+ 433++6BB6 79           	ld a,c
+ 434++6BB7              	;pop bc
+ 435++6BB7 FE FF        	cp 255
+ 436++6BB9 CA 0C 6B     	jp z,fwrite_no_chek ;выход если ошибка
+ 437++6BBC              	; ld de,(f_w_cur_trk)
+ 438++6BBC              	; call calc_next_pos
+ 439++6BBC              	; ld (f_w_cur_trk),de
+ 440++6BBC
+ 441++6BBC AF           	xor a
+ 442++6BBD 32 19 6F     	ld (write_end_flag),a ;флаг что нужно дописывать остаток
+ 443++6BC0
+ 444++6BC0              fwrite_trd1
+ 445++6BC0 3A 19 6F     	ld a,(write_end_flag) ;нужно записывать остаток?
+ 446++6BC3 B7           	or a
+ 447++6BC4 20 12        	jr nz,fwrite_trd_ex ;не нужно
+ 448++6BC6
+ 449++6BC6 2A 1E 6F     	ld hl,(temp_hl2) ;сохраним незаписанный остаток
+ 450++6BC9 3A 22 6F     	ld a,(sec_part)
+ 451++6BCC 47           	ld b,a
+ 452++6BCD 0E 00        	ld c,0
+ 453++6BCF 09           	add hl,bc
+ 454++6BD0 11 00 51     	ld de,sec_buf
+ 455++6BD3 01 00 01     	ld bc,256
+ 456++6BD6 ED B0        	ldir
+ 457++6BD8              ;fwrite_trd2
+ 458++6BD8
+ 459++6BD8
+ 460++6BD8              fwrite_trd_ex
+ 461++6BD8 ED 4B 1A 6F  	ld bc,(temp_bc) ;возвратим, что сколько запрашивали, столько и записали байт
+ 462++6BDC              	;посчитаем общую длину записанного
+ 463++6BDC 2A 15 6F     	ld hl,(f_w_len)
+ 464++6BDF 09           	add hl,bc
+ 465++6BE0 22 15 6F     	ld (f_w_len),hl
+ 466++6BE3 30 07        	jr nc,fwrite_trd_ex1
+ 467++6BE5 2A 17 6F     	ld hl,(f_w_len+2)
+ 468++6BE8 23           	inc hl
+ 469++6BE9 22 17 6F     	ld (f_w_len+2),hl
+ 470++6BEC
+ 471++6BEC              fwrite_trd_ex1
+ 472++6BEC AF           	xor a ;флаги сбросим
+ 473++6BED C9               ret
+ 474++6BEE
+ 475++6BEE
+ 476++6BEE
+ 477++6BEE
+ 478++6BEE
+ 479++6BEE              ;------------------scl----------------------
+ 480++6BEE              fwrite_chek_scl ;запись scl файла (разворачивание образа)
+ 481++6BEE              	; ld a,2
+ 482++6BEE              	; out (254),a
+ 483++6BEE              ; WAITKEY_t	XOR A:IN A,(#FE):CPL:AND #1F:JR Z,WAITKEY_t
+ 484++6BEE              	; xor a
+ 485++6BEE              	; out (254),a
+ 486++6BEE 3A 14 6F     	ld a,(f_w_flag)
+ 487++6BF1 B7           	or a
+ 488++6BF2 CA 0C 6B     	jp z,fwrite_no_chek ;файл уже открыт?
+ 489++6BF5 ED 43 1A 6F  	ld (temp_bc),bc ;длина
+ 490++6BF9 22 1C 6F     	ld (temp_hl),hl ;адрес данных
+ 491++6BFC 78           	ld a,b
+ 492++6BFD B1           	or c
+ 493++6BFE CA 0C 6B     	jp z,fwrite_no_chek ; если длина 0, то выход
+ 494++6C01
+ 495++6C01              	; ld a,b
+ 496++6C01              	; or a
+ 497++6C01              	; jr nz,testt1
+ 498++6C01              	; nop
+ 499++6C01
+ 500++6C01              ; testt1
+ 501++6C01
+ 502++6C01 AF           	xor a
+ 503++6C02 32 22 6F     	ld (sec_part),a ;обнулить переменные
+ 504++6C05 32 21 6F     	ld (sec_shift2),a
+ 505++6C08 32 22 6F     	ld (sec_shift2+1),a
+ 506++6C0B 32 23 6F     	ld (sec_shift_flag),a
+ 507++6C0E 32 19 6F     	ld (write_end_flag),a ;
+ 508++6C11
+ 509++6C11
+ 510++6C11 3A 20 6F     	ld a,(sec_shift)
+ 511++6C14 B7           	or a
+ 512++6C15 28 38        	jr z,fwrite_scl3 ;если смещения нет, то первую часть пропустим
+ 513++6C17
+ 514++6C17
+ 515++6C17 4F           	ld c,a
+ 516++6C18 06 00        	ld b,0
+ 517++6C1A 2A 1A 6F     	ld hl,(temp_bc) ;проверка заполнится ли целый сектор
+ 518++6C1D 09           	add hl,bc
+ 519++6C1E
+ 520++6C1E 3E 01        	ld a,1
+ 521++6C20 32 19 6F     	ld (write_end_flag),a ;флаг что не нужно дописывать остаток
+ 522++6C23
+ 523++6C23 7C           	ld a,h
+ 524++6C24 B7           	or a
+ 525++6C25 20 05        	jr nz,fwrite_scl4
+ 526++6C27 3E 01        	ld a,1
+ 527++6C29 32 23 6F     	ld (sec_shift_flag),a ;флаг что не заполнен сектор
+ 528++6C2C
+ 529++6C2C              fwrite_scl4
+ 530++6C2C 21 00 51     	ld hl,sec_buf ;буфер последнего сектора
+ 531++6C2F 09           	add hl,bc ;на этой точке остановились
+ 532++6C30 EB           	ex de,hl
+ 533++6C31 2A 1C 6F     	ld hl,(temp_hl) ;присоединим начало данных в конец предыдущих
+ 534++6C34              	; ld a,c
+ 535++6C34              	; or a
+ 536++6C34              	; jr nz,fwrite_scl2
+ 537++6C34              	; inc b ;коррекция
+ 538++6C34              ; fwrite_scl2
+ 539++6C34              	; ld c,a
+ 540++6C34 AF           	xor a
+ 541++6C35 91           	sub c
+ 542++6C36 4F           	ld c,a ;сколько осталось перенести до заполнения сектора
+ 543++6C37 ED 43 21 6F  	ld (sec_shift2),bc ;сохраним сколько добавили байт
+ 544++6C3B ED B0        	ldir
+ 545++6C3D
+ 546++6C3D 3A 23 6F     	ld a,(sec_shift_flag)
+ 547++6C40 B7           	or a
+ 548++6C41 20 0C        	jr nz,fwrite_scl3 ;если сектор ещё не заполнен писать не будем
+ 549++6C43
+ 550++6C43 21 00 51     	ld hl,sec_buf
+ 551++6C46              	;ld de,(#5cf4)
+ 552++6C46              	;ld (f_w_cur_trk),de	;запомним позицию
+ 553++6C46 06 01            ld      b,#01 ;пишем 1 сектор из буфера
+ 554++6C48 CD B3 6C         call    scl_write_buf
+ 555++6C4B              	; ld a,c
+ 556++6C4B              	; cp 255
+ 557++6C4B              	; jp z,fwrite_no_chek ;выход если ошибка
+ 558++6C4B
+ 559++6C4B AF           	xor a
+ 560++6C4C 32 19 6F     	ld (write_end_flag),a ;флаг что нужно дописывать остаток
+ 561++6C4F              	; ld de,(f_w_cur_trk) ;если сектор ещё не заполнен, останемся на старой позиции
+ 562++6C4F              	; ld (#5cf4),de
+ 563++6C4F              	; ld b,1 ;на сектор вперёд
+ 564++6C4F              	; ld de,(f_w_cur_trk)
+ 565++6C4F              	; call calc_next_pos
+ 566++6C4F              	; ld (f_w_cur_trk),de
+ 567++6C4F
+ 568++6C4F              fwrite_scl3
+ 569++6C4F 2A 1C 6F     	ld hl,(temp_hl) ;запишем остаток данных
+ 570++6C52              	;ld a,(sec_shift)
+ 571++6C52              	;ld c,a
+ 572++6C52              	;ld b,0
+ 573++6C52 ED 4B 21 6F  	ld bc,(sec_shift2)
+ 574++6C56 09           	add hl,bc ;с этой точки пишем
+ 575++6C57 22 1E 6F     	ld (temp_hl2),hl ;сохраним начало записи второго сектора
+ 576++6C5A
+ 577++6C5A 2A 1A 6F     	ld hl,(temp_bc) ;вычисление на чём остановимся в этот раз
+ 578++6C5D A7           	and a
+ 579++6C5E ED 42        	sbc hl,bc ;вычтем то, что добавили к первому сектору
+ 580++6C60 4D           	ld c,l
+ 581++6C61 44           	ld b,h
+ 582++6C62 30 02        	jr nc,fwrite_scl5
+ 583++6C64 06 00        	ld b,0 ;коррекция если вышел минус
+ 584++6C66              fwrite_scl5
+ 585++6C66 2A 1C 6F     	ld hl,(temp_hl)
+ 586++6C69 09           	add hl,bc
+ 587++6C6A
+ 588++6C6A 11 08 95     	ld de,outputBuffer
+ 589++6C6D A7           	and a
+ 590++6C6E ED 52        	sbc hl,de
+ 591++6C70
+ 592++6C70 7D           	ld a,l
+ 593++6C71 32 20 6F     	ld (sec_shift),a ;смещение на следующий раз
+ 594++6C74              	;ld hl,(temp_hl)
+ 595++6C74
+ 596++6C74
+ 597++6C74              	; or a
+ 598++6C74              	; jr z,fwrite_scl1
+ 599++6C74              	; inc b  ;коррекция количества секторов
+ 600++6C74
+ 601++6C74 78           	ld a,b ;нужна проверка на количество секторов!!!
+ 602++6C75 32 22 6F     	ld (sec_part),a ;запомним сколько секторов во второй части
+ 603++6C78
+ 604++6C78              	;ld a,b
+ 605++6C78 B7           	or a
+ 606++6C79 28 0A        	jr z,fwrite_scl1 ;если размер данных меньше сектора, то пропустим запись
+ 607++6C7B
+ 608++6C7B 2A 1E 6F     	ld hl,(temp_hl2)
+ 609++6C7E              	;push bc
+ 610++6C7E              	;ld de,(#5cf4)
+ 611++6C7E                  ;ld      c,6 ;пишем целыми секторами
+ 612++6C7E CD B3 6C         call    scl_write_buf
+ 613++6C81              	;ld a,c
+ 614++6C81              	;pop bc
+ 615++6C81              	; cp 255
+ 616++6C81              	; jp z,fwrite_no_chek ;выход если ошибка
+ 617++6C81              	; ld de,(f_w_cur_trk)
+ 618++6C81              	; call calc_next_pos
+ 619++6C81              	; ld (f_w_cur_trk),de
+ 620++6C81
+ 621++6C81 AF           	xor a
+ 622++6C82 32 19 6F     	ld (write_end_flag),a ;флаг что нужно дописывать остаток
+ 623++6C85
+ 624++6C85              fwrite_scl1
+ 625++6C85 3A 19 6F     	ld a,(write_end_flag) ;нужно записывать остаток?
+ 626++6C88 B7           	or a
+ 627++6C89 20 12        	jr nz,fwrite_scl_ex ;не нужно
+ 628++6C8B
+ 629++6C8B 2A 1E 6F     	ld hl,(temp_hl2) ;сохраним незаписанный остаток
+ 630++6C8E 3A 22 6F     	ld a,(sec_part)
+ 631++6C91 47           	ld b,a
+ 632++6C92 0E 00        	ld c,0
+ 633++6C94 09           	add hl,bc
+ 634++6C95 11 00 51     	ld de,sec_buf
+ 635++6C98 01 00 01     	ld bc,256
+ 636++6C9B ED B0        	ldir
+ 637++6C9D              ;fwrite_scl2
+ 638++6C9D
+ 639++6C9D
+ 640++6C9D              fwrite_scl_ex
+ 641++6C9D ED 4B 1A 6F  	ld bc,(temp_bc) ;возвратим, что сколько запрашивали, столько и записали байт
+ 642++6CA1              	;посчитаем общую длину записанного
+ 643++6CA1 2A 15 6F     	ld hl,(f_w_len)
+ 644++6CA4 09           	add hl,bc
+ 645++6CA5 22 15 6F     	ld (f_w_len),hl
+ 646++6CA8 30 07        	jr nc,fwrite_scl_ex1
+ 647++6CAA 2A 17 6F     	ld hl,(f_w_len+2)
+ 648++6CAD 23           	inc hl
+ 649++6CAE 22 17 6F     	ld (f_w_len+2),hl
+ 650++6CB1
+ 651++6CB1              fwrite_scl_ex1
+ 652++6CB1 AF           	xor a ;флаги сбросим
+ 653++6CB2 C9               ret
+ 654++6CB3
+ 655++6CB3
+ 656++6CB3
+ 657++6CB3
+ 658++6CB3
+ 659++6CB3
+ 660++6CB3              scl_write_buf ;заполнение промежуточного буфера
+ 661++6CB3 C5           	push bc ;сколько пакетов указано в b
+ 662++6CB4 11 00 53     	ld de,scl_buf ;перенесём сектор во временный буфер
+ 663++6CB7 01 00 01     	ld bc,256
+ 664++6CBA ED B0        	ldir
+ 665++6CBC 22 44 6F     	ld (scl_temp_hl2),hl ;сохраним адрес данных
+ 666++6CBF 3A 2C 6F     	ld a,(scl_que) ;проверим флаг что нужны данные
+ 667++6CC2 B7           	or a
+ 668++6CC3 28 08        	jr z,scl_write_buf_ret ;не будем вызывать парсер если не нужны
+ 669++6CC5 21 CD 6C     	ld hl,scl_write_buf_ret ;адрес возврата
+ 670++6CC8 E5           	push hl
+ 671++6CC9 2A 3E 6F     	ld hl,(scl_parse_ret_adr) ;адрес для продолжения основного цикла сборки
+ 672++6CCC E9           	jp (hl) ;отдадим пакет 256 байт парсеру
+ 673++6CCD              scl_write_buf_ret
+ 674++6CCD 2A 44 6F     	ld hl,(scl_temp_hl2)
+ 675++6CD0 C1           	pop bc
+ 676++6CD1 10 E0        	djnz scl_write_buf
+ 677++6CD3
+ 678++6CD3 C9           	ret
+ 679++6CD4
+ 680++6CD4
+ 681++6CD4
+ 682++6CD4              scl_parse ;разбор образа scl в trd, основной цикл
+ 683++6CD4              	;получить первый сектор
+ 684++6CD4              ;запрос порции данных по 256 байт
+ 685++6CD4 22 42 6F     	ld (scl_temp_hl),hl
+ 686++6CD7 ED 53 46 6F  	ld (scl_temp_de),de
+ 687++6CDB ED 43 48 6F  	ld (scl_temp_bc),bc
+ 688++6CDF 3E 01        	ld a,1
+ 689++6CE1 32 2C 6F     	ld (scl_que),a ;включим флаг что нужны данные
+ 690++6CE4 21 EB 6C     	ld hl,scl_parse_ret ;сохраним адрес возврата
+ 691++6CE7 22 3E 6F     	ld (scl_parse_ret_adr),hl
+ 692++6CEA C9           	ret ;вернёмся для ожидания данных
+ 693++6CEB              scl_parse_ret
+ 694++6CEB AF           	xor a
+ 695++6CEC 32 2C 6F     	ld (scl_que),a
+ 696++6CEF 2A 42 6F     	ld hl,(scl_temp_hl)
+ 697++6CF2 ED 5B 46 6F  	ld de,(scl_temp_de)
+ 698++6CF6 ED 4B 48 6F  	ld bc,(scl_temp_bc)
+ 699++6CFA
+ 700++6CFA 11 00 53     	ld de,scl_buf ;проверка метки образа
+ 701++6CFD 21 24 6F     	ld hl,scl_sign
+ 702++6D00 06 08        	ld b,8
+ 703++6D02              scl_parse_chk
+ 704++6D02 1A           	ld a,(de)
+ 705++6D03 BE           	cp (hl)
+ 706++6D04 20 06        	jr nz,scl_parse_chk_no
+ 707++6D06 23           	inc hl
+ 708++6D07 13           	inc de
+ 709++6D08 10 F8        	djnz scl_parse_chk
+ 710++6D0A 18 10        	jr scl_parse_chk_ok
+ 711++6D0C              scl_parse_chk_no ;если не совпало, значит плохой образ
+ 712++6D0C 21 2D 6F         ld hl, scl_err
+ 713++6D0F CD 10 68         call DialogBox.msgBox ;предуреждение
+ 714++6D12 AF           	xor a
+ 715++6D13 32 2C 6F     	ld (scl_que),a ;выключим флаг что нужны данные
+ 716++6D16 3E 04        	ld a,4 ;закроем файл
+ 717++6D18 CD C8 6A     	call fclose
+ 718++6D1B C9           	ret
+ 719++6D1C              scl_parse_chk_ok ;сигнатура правильная
+ 720++6D1C
+ 721++6D1C              ;формирование каталога
+ 722++6D1C 3A 08 53     	ld a,(scl_buf+8)
+ 723++6D1F 32 41 6F     	ld (scl_files),a ;всего файлов
+ 724++6D22 32 40 6F     	ld (scl_cat_cycl),a ;цикл
+ 725++6D25 21 09 53     	ld hl,scl_buf+9 ;адрес первого заголовка
+ 726++6D28 11 00 48     	ld de,cat_buf ;адрес формируемого каталога trd
+ 727++6D2B              scl_parse_cat2
+ 728++6D2B 06 0E        	ld b,14 ;14 байт одна запись
+ 729++6D2D              scl_parse_cat
+ 730++6D2D 7E           	ld a,(hl)
+ 731++6D2E 12           	ld (de),a
+ 732++6D2F 13           	inc de
+ 733++6D30 2C           	inc l ;адрес увеличиваем только в пределах младшего регистра
+ 734++6D31 20 26        	jr nz,scl_parse_cat1
+ 735++6D33              	;тут пора запросить следующий сектор
+ 736++6D33              ;запрос порции данных по 256 байт
+ 737++6D33 22 42 6F     	ld (scl_temp_hl),hl
+ 738++6D36 ED 53 46 6F  	ld (scl_temp_de),de
+ 739++6D3A ED 43 48 6F  	ld (scl_temp_bc),bc
+ 740++6D3E 3E 01        	ld a,1
+ 741++6D40 32 2C 6F     	ld (scl_que),a ;включим флаг что нужны данные
+ 742++6D43 21 4A 6D     	ld hl,scl_parse_ret1 ;сохраним адрес возврата
+ 743++6D46 22 3E 6F     	ld (scl_parse_ret_adr),hl
+ 744++6D49 C9           	ret ;вернёмся для ожидания данных
+ 745++6D4A              scl_parse_ret1
+ 746++6D4A AF           	xor a
+ 747++6D4B 32 2C 6F     	ld (scl_que),a
+ 748++6D4E 2A 42 6F     	ld hl,(scl_temp_hl)
+ 749++6D51 ED 5B 46 6F  	ld de,(scl_temp_de)
+ 750++6D55 ED 4B 48 6F  	ld bc,(scl_temp_bc)
+ 751++6D59
+ 752++6D59              scl_parse_cat1
+ 753++6D59 10 D2        	djnz scl_parse_cat
+ 754++6D5B 13           	inc de
+ 755++6D5C 13           	inc de
+ 756++6D5D 3A 40 6F     	ld a,(scl_cat_cycl)
+ 757++6D60 3D           	dec a
+ 758++6D61 32 40 6F     	ld (scl_cat_cycl),a
+ 759++6D64 20 C5        	jr nz,scl_parse_cat2
+ 760++6D66
+ 761++6D66 22 42 6F     	ld (scl_temp_hl),hl ;запомнить где остановились
+ 762++6D69
+ 763++6D69              ;подсчёт секторов и дорожек
+ 764++6D69 DD E5        	push ix
+ 765++6D6B 3A 41 6F     	ld a,(scl_files)
+ 766++6D6E 11 00 01     	ld de,#0100 ;данные с первой дорожки
+ 767++6D71 DD 21 00 48  	ld ix,cat_buf
+ 768++6D75 DD 73 0E     	ld (ix+14),e
+ 769++6D78 DD 72 0F     	ld (ix+15),d
+ 770++6D7B 21 00 00     	ld hl,0 ;общее количество секторов
+ 771++6D7E              scl_cacl
+ 772++6D7E 32 40 6F     	ld (scl_cat_cycl),a ;цикл
+ 773++6D81 DD 7E 0D     	ld a,(ix+13) ;длина файла в секторах
+ 774++6D84 4F           	ld c,a
+ 775++6D85 06 00        	ld b,0
+ 776++6D87 09           	add hl,bc ;секторов
+ 777++6D88
+ 778++6D88 01 10 00     	ld bc,16
+ 779++6D8B DD 09        	add ix,bc
+ 780++6D8D 47           	ld b,a
+ 781++6D8E CD B3 6E     	call calc_next_pos
+ 782++6D91 3A 40 6F     	ld a,(scl_cat_cycl)
+ 783++6D94 FE 01        	cp 1
+ 784++6D96 28 06        	jr z,scl_cacl2 ;в последний раз пропусим
+ 785++6D98 DD 73 0E     	ld (ix+14),e
+ 786++6D9B DD 72 0F     	ld (ix+15),d
+ 787++6D9E              scl_cacl2
+ 788++6D9E 3D           	dec a
+ 789++6D9F 20 DD        	jr nz,scl_cacl
+ 790++6DA1              	;теперь узнаем первый свободный сектор
+ 791++6DA1 DD 7E 0D     	ld a,(ix+13) ;длина файла в секторах
+ 792++6DA4 4F           	ld c,a
+ 793++6DA5 06 00        	ld b,0
+ 794++6DA7 09           	add hl,bc
+ 795++6DA8              	; ld b,a
+ 796++6DA8              	; call calc_next_pos
+ 797++6DA8 ED 53 E1 50  	ld (cat_buf+8*256+#e1),de ;Первый свободный сектор и дорожка на дискете
+ 798++6DAC 11 F0 09     	ld de,16*159
+ 799++6DAF EB           	ex de,hl
+ 800++6DB0 A7           	and a
+ 801++6DB1 ED 52        	sbc hl,de
+ 802++6DB3 22 E5 50     	ld (cat_buf+8*256+#e5),hl ;Число свободных секторов на диске
+ 803++6DB6 DD E1        	pop ix
+ 804++6DB8
+ 805++6DB8
+ 806++6DB8
+ 807++6DB8              ;запись содержимого файлов
+ 808++6DB8 3A 41 6F     	ld a,(scl_files) ;всего файлов
+ 809++6DBB 32 40 6F     	ld (scl_cat_cycl),a ;цикл
+ 810++6DBE 21 0D 48     	ld hl,cat_buf+13 ;адрес размер секторов файла
+ 811++6DC1 22 4A 6F     	ld (cat_cur_adr),hl
+ 812++6DC4
+ 813++6DC4 21 00 01     	ld hl,#0100 ;начиная с первой дорожки
+ 814++6DC7 22 F4 5C     	ld (#5cf4),hl
+ 815++6DCA              scl_parse_file2
+ 816++6DCA 2A 42 6F     	ld hl,(scl_temp_hl) ;адрес данных
+ 817++6DCD ED 5B 4A 6F  	ld de,(cat_cur_adr) ;адрес сектор дорожка файла
+ 818++6DD1              	;dec de
+ 819++6DD1 1A           	ld a,(de) ;количество секторов, цикл
+ 820++6DD2 4F           	ld c,a
+ 821++6DD3              scl_parse_file3
+ 822++6DD3 11 00 55     	ld de,scl_buf2 ;адрес ещё одного буфера
+ 823++6DD6 06 00        	ld b,0 ;256 байт один сектор, цикл
+ 824++6DD8              scl_parse_file
+ 825++6DD8 7E           	ld a,(hl)
+ 826++6DD9 12           	ld (de),a
+ 827++6DDA 13           	inc de
+ 828++6DDB 2C           	inc l ;адрес увеличиваем только в пределах младшего регистра
+ 829++6DDC 20 26        	jr nz,scl_parse_file1
+ 830++6DDE              	;тут пора запросить следующий сектор
+ 831++6DDE              ;запрос порции данных по 256 байт
+ 832++6DDE 22 42 6F     	ld (scl_temp_hl),hl
+ 833++6DE1 ED 53 46 6F  	ld (scl_temp_de),de
+ 834++6DE5 ED 43 48 6F  	ld (scl_temp_bc),bc
+ 835++6DE9 3E 01        	ld a,1
+ 836++6DEB 32 2C 6F     	ld (scl_que),a ;включим флаг что нужны данные
+ 837++6DEE 21 F5 6D     	ld hl,scl_parse_ret2 ;сохраним адрес возврата
+ 838++6DF1 22 3E 6F     	ld (scl_parse_ret_adr),hl
+ 839++6DF4 C9           	ret ;вернёмся для ожидания данных
+ 840++6DF5              scl_parse_ret2
+ 841++6DF5 AF           	xor a
+ 842++6DF6 32 2C 6F     	ld (scl_que),a
+ 843++6DF9 2A 42 6F     	ld hl,(scl_temp_hl)
+ 844++6DFC ED 5B 46 6F  	ld de,(scl_temp_de)
+ 845++6E00 ED 4B 48 6F  	ld bc,(scl_temp_bc)
+ 846++6E04
+ 847++6E04              scl_parse_file1
+ 848++6E04 10 D2        	djnz scl_parse_file
+ 849++6E06 22 42 6F     	ld (scl_temp_hl),hl
+ 850++6E09 ED 43 48 6F  	ld (scl_temp_bc),bc
+ 851++6E0D
+ 852++6E0D 21 00 55     	ld hl,scl_buf2 ;;запишем один сектор
+ 853++6E10 ED 5B F4 5C  	ld  de,(#5cf4)
+ 854++6E14 01 06 01         ld      bc,#0106 ;
+ 855++6E17 CD 13 3D         call    #3d13
+ 856++6E1A              	; ld a,c
+ 857++6E1A              	; cp 255
+ 858++6E1A              	; jp z,fwrite_no_chek ;выход если ошибка
+ 859++6E1A 2A 42 6F     	ld hl,(scl_temp_hl)
+ 860++6E1D ED 4B 48 6F  	ld bc,(scl_temp_bc)
+ 861++6E21
+ 862++6E21 0D           	dec c
+ 863++6E22 20 AF        	jr nz,scl_parse_file3
+ 864++6E24
+ 865++6E24 2A 4A 6F     	ld hl,(cat_cur_adr) ;адрес сектор дорожка файла
+ 866++6E27              	; ld e,(hl)
+ 867++6E27              	; inc hl
+ 868++6E27              	; ld d,(hl)
+ 869++6E27 01 10 00     	ld bc,16
+ 870++6E2A 09           	add hl,bc ;на следующий файл
+ 871++6E2B 22 4A 6F     	ld (cat_cur_adr),hl
+ 872++6E2E
+ 873++6E2E
+ 874++6E2E 3A 40 6F     	ld a,(scl_cat_cycl)
+ 875++6E31 3D           	dec a
+ 876++6E32 32 40 6F     	ld (scl_cat_cycl),a
+ 877++6E35 20 93        	jr nz,scl_parse_file2	;на следующий файл
+ 878++6E37
+ 879++6E37
+ 880++6E37
+ 881++6E37              ;формирование системного сектора №9 (8)
+ 882++6E37              	;
+ 883++6E37              	;ld (cat_buf+8*256+#e1),a ;// #E1 Первый свободный сектор на дискете
+ 884++6E37              	;
+ 885++6E37              	;ld (cat_buf+8*256+#e2),a ;// #E2 Первый свободный трек
+ 886++6E37 3E 16        	ld a,#16
+ 887++6E39 32 E3 50     	ld (cat_buf+8*256+#e3),a ;// #E3 16 80 дорожек, 2 стороны
+ 888++6E3C 3A 41 6F     	ld a,(scl_files)
+ 889++6E3F 32 E4 50     	ld (cat_buf+8*256+#e4),a ;// #E4 Общее количество файлов записанных на диск
+ 890++6E42              	;
+ 891++6E42              	;ld (cat_buf+8*256+#e5),a ;// #Е5,Е6 Число свободных секторов на диске
+ 892++6E42              	;ld (cat_buf+8*256+#e6),a
+ 893++6E42 3E 10        	ld a,#10
+ 894++6E44 32 E7 50     	ld (cat_buf+8*256+#e7),a ;// #E7 Код  #10,определяющий принадлежность к TR-DOS
+ 895++6E47
+ 896++6E47 21 02 6F     	ld hl,f_name ;запишем имя диска, взяв для этого имя файла
+ 897++6E4A 11 F5 50     	ld de,cat_buf+8*256+#f5 ;// #F5-#FC Имя диска в ASCII формате
+ 898++6E4D 01 08 00     	ld bc,8
+ 899++6E50 ED B0        	ldir
+ 900++6E52
+ 901++6E52 21 00 48     	ld hl,cat_buf ;запишем каталог на диск
+ 902++6E55 11 00 00     	ld de,0
+ 903++6E58 01 06 09         ld      bc,#0906 ;
+ 904++6E5B CD 13 3D         call    #3d13
+ 905++6E5E              	; ld a,c
+ 906++6E5E              	; cp 255
+ 907++6E5E              	; jp z,fwrite_no_chek ;выход если ошибка
+ 908++6E5E C9           	ret
+ 909++6E5F
+ 910++6E5F
+ 911++6E5F              ;-----------scl end --------------------
+ 912++6E5F
+ 913++6E5F
+ 914++6E5F
+ 915++6E5F
+ 916++6E5F
+ 917++6E5F
+ 918++6E5F
+ 919++6E5F
+ 920++6E5F
+ 921++6E5F
+ 922++6E5F              ; A - file stream id
+ 923++6E5F              ; fsync:
+ 924++6E5F              ;     esxCall ESX_FSYNC
+ 925++6E5F                  ; ret
+ 926++6E5F
+ 927++6E5F
+ 928++6E5F              ; HL - name (name.ext)
+ 929++6E5F              ; Returns:
+ 930++6E5F              ; HL - name (name    e)
+ 931++6E5F              format_name ;подгоняет имя файла под стандарт trdos (8+1)
+ 932++6E5F
+ 933++6E5F              	;сначала попробуем убрать из пути подпапку, если она есть
+ 934++6E5F 22 1C 6F     	ld (temp_hl),hl ;сохраним адрес исходного имени
+ 935++6E62 06 00        	ld b,#00 ;не больше 255 символов
+ 936++6E64              format_name5
+ 937++6E64 7E           	ld a,(hl)
+ 938++6E65 FE 2F        	cp "/" ;если есть подпапка
+ 939++6E67 28 0D        	jr z,format_name_path_yep
+ 940++6E69 7E           	ld a,(hl)
+ 941++6E6A FE 2E        	cp "." ;если ещё не дошли до расширения
+ 942++6E6C 20 05        	jr nz,format_name6
+ 943++6E6E 2A 1C 6F     	ld hl,(temp_hl) ;если дошли до расширения, то путей нет, вернёмся на начало имени
+ 944++6E71 18 04        	jr format_name_7 ;на выход
+ 945++6E73              format_name6
+ 946++6E73 23           	inc hl
+ 947++6E74 10 EE        	djnz format_name5
+ 948++6E76
+ 949++6E76              format_name_path_yep ;нашли
+ 950++6E76 23           	inc hl ;пропустим знак "/"
+ 951++6E77
+ 952++6E77              format_name_7
+ 953++6E77
+ 954++6E77
+ 955++6E77 E5           	push hl ;очистим место для нового имени
+ 956++6E78 21 02 6F     	ld hl,f_name
+ 957++6E7B 11 03 6F     	ld de,f_name+1
+ 958++6E7E 36 20        	ld (hl)," "
+ 959++6E80 01 08 00     	ld bc,8
+ 960++6E83 ED B0        	ldir
+ 961++6E85 E1           	pop hl
+ 962++6E86
+ 963++6E86 01 FF 09     	ld bc,#09ff ;длина имени 9 символов
+ 964++6E89 11 02 6F     	ld de,f_name ;куда
+ 965++6E8C              format_name2
+ 966++6E8C 7E           	ld a,(hl)
+ 967++6E8D FE 2E        	cp "."
+ 968++6E8F 20 08        	jr nz,format_name1
+ 969++6E91 23           	inc hl
+ 970++6E92 7E           	ld a,(hl)
+ 971++6E93 32 0A 6F     	ld (f_name+8),a ; и в конце первую букву расширения
+ 972++6E96 EB           	ex de,hl ;сохраним адрес исходного расширения
+ 973++6E97 18 16        	jr format_name_e
+ 974++6E99              format_name1
+ 975++6E99 ED A0        	ldi
+ 976++6E9B 10 EF        	djnz format_name2
+ 977++6E9D
+ 978++6E9D              	;если имя длинное, пропустим лишнее до расширения
+ 979++6E9D 06 00        	ld b,#00 ;не больше 255 символов
+ 980++6E9F              format_name3
+ 981++6E9F 7E           	ld a,(hl)
+ 982++6EA0 FE 2E        	cp "."
+ 983++6EA2 20 08        	jr nz,format_name4
+ 984++6EA4 23           	inc hl
+ 985++6EA5 7E           	ld a,(hl)
+ 986++6EA6 32 0A 6F     	ld (f_name+8),a ; и в конце первую букву расширения
+ 987++6EA9 EB           	ex de,hl ;сохраним адрес исходного расширения
+ 988++6EAA 18 03        	jr format_name_e
+ 989++6EAC              format_name4
+ 990++6EAC 23           	inc hl
+ 991++6EAD 10 F0        	djnz format_name3
+ 992++6EAF
+ 993++6EAF              format_name_e ;выход
+ 994++6EAF 21 02 6F     	ld hl,f_name ;вернём результат
+ 995++6EB2 C9           	ret
+ 996++6EB3
+ 997++6EB3              ; DE - trk/sec
+ 998++6EB3              ; B - sectors step
+ 999++6EB3              ; Returns:
+1000++6EB3              ; DE - trk/sec
+1001++6EB3              calc_next_pos		;вперёд на N секторов
+1002++6EB3              			;ld b,4
+1003++6EB3              			;ld  de,(#5ceb)
+1004++6EB3              calc_next_pos2
+1005++6EB3 1C           			inc e
+1006++6EB4 7B           			ld a,e
+1007++6EB5 FE 10        			cp 16
+1008++6EB7 38 03        			jr c,calc_next_pos1
+1009++6EB9 14           			inc d
+1010++6EBA 1E 00        			ld e,0
+1011++6EBC              calc_next_pos1
+1012++6EBC              			;ld (#5ceb),de
+1013++6EBC 10 F5        			djnz calc_next_pos2
+1014++6EBE C9           			ret
+1015++6EBF
+1016++6EBF
+1017++6EBF              ;testt db "123.trd"
+1018++6EBF 49 6E 73 65  write_ima db "Insert disk to drive "
+1018++6EC3 72 74 20 64
+1018++6EC7 69 73 6B 20
+1018++6ECB 74 6F 20 64
+1018++6ECF 72 69 76 65
+1018++6ED3 20
+1019++6ED4 41 2E 20     write_ima_d db "A. "
+1020++6ED7 41 6C 6C 20  		db "All data will be lost!",0
+1020++6EDB 64 61 74 61
+1020++6EDF 20 77 69 6C
+1020++6EE3 6C 20 62 65
+1020++6EE7 20 6C 6F 73
+1020++6EEB 74 21 00
+1021++6EEE
+1022++6EEE 2E 74 72 64  trdExt1 db ".trd", 0
+1022++6EF2 00
+1023++6EF3 2E 54 52 44  trdExt2 db ".TRD", 0
+1023++6EF7 00
+1024++6EF8
+1025++6EF8 2E 73 63 6C  sclExt1 db ".scl", 0
+1025++6EFC 00
+1026++6EFD 2E 53 43 4C  sclExt2 db ".SCL", 0
+1026++6F01 00
+1027++6F02
+1028++6F02 00 00 00...  f_name ds 9 ;имя файла
+1029++6F0B 00 00        f_r_cur_trk dw 	 0 ;текущие сектор-дорожка файла на чтение
+1030++6F0D 00           f_r_len_sec db 0 ;длина файла на чтение в секторах
+1031++6F0E 00 00        f_r_len dw 0;длина файла в байтах
+1032++6F10 00           f_r_flag db 0 ;флаг что открыт файл на чтение
+1033++6F11
+1034++6F11 00 00        f_w_cur_trk dw 	 0 ;текущие сектор-дорожка файла на запись
+1035++6F13 00           f_w_len_sec db 0 ;длина файла на запись в секторах
+1036++6F14 00           f_w_flag db 0 ;флаг что открыт файл на запись
+1037++6F15 00 00 00 00  f_w_len ds 4 ;длина записанных данных
+1038++6F19 00           write_end_flag db 0 ;флаг что нужно записать остаток
+1039++6F1A
+1040++6F1A 00 00        temp_bc dw 0 ;хранение регистра
+1041++6F1C 00 00        temp_hl dw 0 ;хранение регистра
+1042++6F1E 00 00        temp_hl2 dw 0 ;хранение регистра
+1043++6F20
+1044++6F20 00           sec_shift db 0 ;указатель на каком байте остановлена запись
+1045++6F21 00           sec_shift2 db 0 ;указатель на каком байте остановлена запись (остаток)
+1046++6F22 00           sec_part db 0 ;сколько секторов во второй порции для записи
+1047++6F23 00           sec_shift_flag db 0 ;флаг что буфер сектора не заполнен
+1048++6F24
+1049++6F24              ;секция scl
+1050++6F24 53 49 4E 43  scl_sign db "SINCLAIR" ;метка
+1050++6F28 4C 41 49 52
+1051++6F2C 00           scl_que db 0 ;флаг запроса порции данных
+1052++6F2D 53 43 4C 20  scl_err db "SCL image error!",0
+1052++6F31 69 6D 61 67
+1052++6F35 65 20 65 72
+1052++6F39 72 6F 72 21
+1052++6F3D 00
+1053++6F3E 00 00        scl_parse_ret_adr dw 0; адрес возврата в цикл
+1054++6F40 00           scl_cat_cycl db 0 ;переменная цикла
+1055++6F41 00           scl_files db 0 ;всего файлов
+1056++6F42 00 00        scl_temp_hl dw 0;;хранение регистра
+1057++6F44 00 00        scl_temp_hl2 dw 0;
+1058++6F46 00 00        scl_temp_de dw 0;
+1059++6F48 00 00        scl_temp_bc dw 0;
+1060++6F4A 00 00        cat_cur_adr dw 0;
+1061++6F4C              ;scl end
+1062++6F4C 00 00 00...  	align 256 ;временно
 1063++7000              	;по адресу #4000 шрифт
 1064++7000              cat_buf equ #4800 ;буфер для кататога диска 9*256
 1065++7000              sec_buf equ cat_buf + 9*256 ;буфер сектора для записи 256
@@ -2902,7 +2916,7 @@
    6++7017              ; Loads current resource
    7++7017              load:
    8++7017 21 34 70         ld hl, .msg
-   8++701A CD FA 67       call DialogBox.msgNoWait
+   8++701A CD 19 68       call DialogBox.msgNoWait
    9++701D AF               xor a
    9++701E 21 08 95 11    ld hl, outputBuffer, de, outputBuffer + 1
    9++7022 09 95
@@ -3024,7 +3038,7 @@
   81++70EC 18 EA            jr .portCopy
   82++70EE AF           1   xor a
   82++70EF 12             ld (de), a
-  83++70F0 21 A1 67 11      ld hl, DialogBox.inputBuffer, de, historyBlock.search, bc, #ff
+  83++70F0 21 C0 67 11      ld hl, DialogBox.inputBuffer, de, historyBlock.search, bc, #ff
   83++70F4 8B 72 01 FF
   83++70F8 00
   83++70F9 ED B0          ldir
@@ -3238,7 +3252,7 @@
   12+ 80E8 C3 39 81         jp MediaProcessor.processResource
   13+ 80EB              .error
   14+ 80EB 21 F4 80         ld hl, .err
-  14+ 80EE CD F1 67       call DialogBox.msgBox
+  14+ 80EE CD 10 68       call DialogBox.msgBox
   15+ 80F1 C3 00 70         jp History.back
   16+ 80F4
   17+ 80F4 44 6F 63 75  .err db "Document fetch error! Check your connection or hostname!", 0
@@ -3273,7 +3287,7 @@
   32+ 8130 ~            .fp db 0
   33+ 8130              	ELSE
   34+ 8130 21 A0 7F         ld hl, nameBuffer
-  35+ 8133 CD B4 69         call Dos.loadBuffer
+  35+ 8133 CD D3 69         call Dos.loadBuffer
   36+ 8136 C3 39 81         jp MediaProcessor.processResource
   37+ 8139              	ENDIF
   38+ 8139                  ENDMODULE
@@ -3298,8 +3312,8 @@
   11+ 8150              	endif
   12+ 8150              ; Fallback to plain text
   13+ 8150              processText:
-  14+ 8150 CD 76 66         call Render.renderPlainTextScreen
-  15+ 8153 C3 AB 66         jp   Render.plainTextLoop
+  14+ 8150 CD 82 66         call Render.renderPlainTextScreen
+  15+ 8153 C3 CA 66         jp   Render.plainTextLoop
   16+ 8156
   17+ 8156              processPT:
   18+ 8156 CD 95 88         call VortexProcessor.play
@@ -3312,16 +3326,16 @@
   25+ 815C              	endif
   26+ 815C
   27+ 815C              processPage:
-  28+ 815C 3A 45 67         ld a, (Render.play_next)
+  28+ 815C 3A 64 67         ld a, (Render.play_next)
   28+ 815F A7             and a
   28+ 8160 20 06          jr nz, .playNext
   29+ 8162 CD E5 64         call Render.renderGopherScreen
-  30+ 8165 C3 28 65         jp   Render.workLoop
+  30+ 8165 C3 34 65         jp   Render.workLoop
   31+ 8168              .playNext
   32+ 8168 21 8C 73         ld hl, Render.cursor_position
   33+ 816B 34               inc (hl)
   34+ 816C CD E5 64         call Render.renderGopherScreen
-  35+ 816F C3 12 65         jp Render.checkBorder
+  35+ 816F C3 1E 65         jp Render.checkBorder
   36+ 8172                  ENDMODULE
 # file closed: gopher/engine/media-processor.asm
   36  8172                  include "gopher/gopher.asm"
@@ -3439,7 +3453,7 @@
   94+ 81D6 20 F5          jr nz, .findFileName
   95+ 81D8              .copy
   96+ 81D8                  ;; HL - filename pointer
-  97+ 81D8 11 A1 67         ld de, DialogBox.inputBuffer
+  97+ 81D8 11 C0 67         ld de, DialogBox.inputBuffer
   98+ 81DB              .copyFileName
   99+ 81DB 7E               ld a, (hl)
   99+ 81DC A7             and a
@@ -3450,21 +3464,21 @@
  102+ 81E2 18 F7            jr .copyFileName
  103+ 81E4              .finishCopy
  104+ 81E4 12               ld (de), a
- 105+ 81E5 CD 4A 67         call DialogBox.inputBox.noclear
- 106+ 81E8 3A A1 67         ld a, (DialogBox.namedownload)
+ 105+ 81E5 CD 69 67         call DialogBox.inputBox.noclear
+ 106+ 81E8 3A C0 67         ld a, (DialogBox.namedownload)
  106+ 81EB A7             and a
  106+ 81EC CA 00 70       jp z, History.back
  107+ 81EF
  108+ 81EF CD 9D 81         call makeRequest
  108+ 81F2 DA EB 80       jp c, Fetcher.fetchFromNet.error
  109+ 81F5
- 110+ 81F5 06 0E 21 A1      ld b, Dos.FMODE_CREATE, hl, DialogBox.namedownload
+ 110+ 81F5 06 0E 21 C0      ld b, Dos.FMODE_CREATE, hl, DialogBox.namedownload
  110+ 81F9 67
- 111+ 81FA CD D0 69         call Dos.fopen
+ 111+ 81FA CD EF 69         call Dos.fopen
  112+ 81FD 32 9E 82         ld (.fp), a
  113+ 8200
  114+ 8200 21 79 82         ld hl, .progress
- 114+ 8203 CD FA 67       call DialogBox.msgNoWait
+ 114+ 8203 CD 19 68       call DialogBox.msgNoWait
  115+ 8206              .loop
  116+ 8206 21 08 95 22      ld hl, outputBuffer, (Wifi.buffer_pointer), hl
  116+ 820A 3B 85
@@ -3476,19 +3490,19 @@
  120+ 8215 3A 9E 82 21      ld a, (.fp), hl, outputBuffer, bc, (Wifi.bytes_avail)
  120+ 8219 08 95 ED 4B
  120+ 821D 39 85
- 121+ 821F CD E0 6A         call Dos.fwrite
+ 121+ 821F CD FF 6A         call Dos.fwrite
  122+ 8222 CD A1 82         call pulsing
  123+ 8225 CD C9 86         call Wifi.continue
  124+ 8228 18 DC            jr .loop
  125+ 822A              .exit
  126+ 822A 3A 9E 82         ld a, (.fp)
- 127+ 822D CD A9 6A         call Dos.fclose
+ 127+ 822D CD C8 6A         call Dos.fclose
  128+ 8230 C3 00 70         jp History.back
  129+ 8233              .error
  130+ 8233 3A 9E 82         ld a, (.fp)
- 131+ 8236 CD A9 6A         call Dos.fclose
+ 131+ 8236 CD C8 6A         call Dos.fclose
  132+ 8239 21 42 82         ld hl, .err
- 133+ 823C CD F1 67         call DialogBox.msgBox
+ 133+ 823C CD 10 68         call DialogBox.msgBox
  134+ 823F C3 00 70         jp History.back
  135+ 8242
  136+ 8242 4F 70 65 72  .err db "Operation failed! Sorry! Check filename or disk space!",0
@@ -3796,13 +3810,13 @@
   15++8563                  IFDEF AUTH
   16++8563 21 6B 95 06      ld hl, creds, b, Dos.FMODE_READ
   16++8567 01
-  16++8568 CD D0 69       call Dos.fopen
+  16++8568 CD EF 69       call Dos.fopen
   17++856B F5               push af
   18++856C 21 7C 95 01      ld hl,outputBuffer2, bc, 255
   18++8570 FF 00
-  18++8572 CD BD 6A       call Dos.fread
+  18++8572 CD DC 6A       call Dos.fread
   19++8575 F1               pop af
-  20++8576 CD A9 6A         call Dos.fclose
+  20++8576 CD C8 6A         call Dos.fclose
   21++8579
   22++8579 21 59 86         ld hl, .doneInit1
   22++857C CD 83 60       call TextMode.printZ
@@ -3883,7 +3897,7 @@
   44++860F C9               ret
   45++8610              .initError
   46++8610 21 18 86         ld hl, .errMsg
-  46++8613 CD F1 67       call DialogBox.msgBox
+  46++8613 CD 10 68       call DialogBox.msgBox
   47++8616 37               scf
   48++8617 C9               ret
   49++8618 57 69 46 69  .errMsg      db "WiFi chip init failed!", "\r", 0
@@ -4133,7 +4147,7 @@
  177++8805 2A 3B 85         ld hl, (buffer_pointer)
  178++8808              .readp
  179++8808 7C               ld a, h
- 179++8809 FE FE          cp #fe
+ 179++8809 FE FF          cp #ff
  179++880B D2 21 88       jp nc, .skipbuff
  180++880E C5 E5            push bc, hl
  181++8810 CD 05 85         call Uart.read
@@ -4706,16 +4720,16 @@
   26+ 8895 3E FF            ld a, 255
   27+ 8897 32 94 88         ld (oldminutes), a
   28+ 889A
-  29+ 889A CD 29 68         call Console.waitForKeyUp
+  29+ 889A CD 48 68         call Console.waitForKeyUp
   30+ 889D
   31+ 889D 21 D8 88         ld hl, message
-  31+ 88A0 CD FA 67       call DialogBox.msgNoWait
+  31+ 88A0 CD 19 68       call DialogBox.msgNoWait
   32+ 88A3
   33+ 88A3 21 08 95         ld hl, outputBuffer
   33+ 88A6 CD 2E 89       call VTPL.INIT
   34+ 88A9
   35+ 88A9
-  36+ 88A9 3E 01 32 45      ld a, 1, (Render.play_next), a
+  36+ 88A9 3E 01 32 64      ld a, 1, (Render.play_next), a
   36+ 88AD 67
   37+ 88AE
   38+ 88AE                  IFDEF GS
@@ -4735,7 +4749,7 @@
   45+ 88C0 3A F7 88         ld a, (VTPL.SETUP)
   45+ 88C3 17             rla
   45+ 88C4 30 E8          jr nc, .loop
-  46+ 88C6 3E 01 32 45      ld a, 1, (Render.play_next), a
+  46+ 88C6 3E 01 32 64      ld a, 1, (Render.play_next), a
   46+ 88CA 67
   47+ 88CB              .stop
   48+ 88CB CD 1C 89         call VTPL.MUTE
@@ -4744,11 +4758,11 @@
   51+ 88CE ~                call restoreAyState
   52+ 88CE                  ENDIF
   53+ 88CE
-  54+ 88CE CD 29 68         call Console.waitForKeyUp
+  54+ 88CE CD 48 68         call Console.waitForKeyUp
   55+ 88D1 C9               ret
   56+ 88D2              .stopKey
   57+ 88D2 AF               xor a
-  57+ 88D3 32 45 67       ld (Render.play_next), a
+  57+ 88D3 32 64 67       ld (Render.play_next), a
   58+ 88D6 18 F3            jr .stop
   59+ 88D8
   60+ 88D8                  IFDEF AY
@@ -6563,7 +6577,7 @@ player.asm(1545): warning: value 0xFC0 is truncated to 8bit value: 0xC0
 # file opened: screen/screen.asm
    1+ 94E3                  module ScreenViewer
    2+ 94E3              display:
-   3+ 94E3 CD 29 68         call Console.waitForKeyUp
+   3+ 94E3 CD 48 68         call Console.waitForKeyUp
    4+ 94E6 3E 07            ld a, 7
    4+ 94E8 CD 82 88       call Memory.setPage
    5+ 94EB 21 08 95 11      ld hl, outputBuffer, de, #c000, bc, 6912
@@ -6606,13 +6620,13 @@ player.asm(1545): warning: value 0xFC0 is truncated to 8bit value: 0xC0
   60  951F                  ;; Logo
   61  951F 21 5A 95 06      ld hl, logo, b, Dos.FMODE_READ
   61  9523 01
-  61  9524 CD D0 69       call Dos.fopen
+  61  9524 CD EF 69       call Dos.fopen
   62  9527 F5               push af
   63  9528 21 00 C0 01      ld hl, #c000, bc, 6912
   63  952C 00 1B
-  63  952E CD BD 6A       call Dos.fread
+  63  952E CD DC 6A       call Dos.fread
   64  9531 F1               pop af
-  65  9532 CD A9 6A         call Dos.fclose
+  65  9532 CD C8 6A         call Dos.fclose
   66  9535
   67  9535 06 32            ld b, 50
   68  9537 76           1   halt

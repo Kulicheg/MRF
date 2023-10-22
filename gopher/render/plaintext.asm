@@ -1,23 +1,28 @@
 renderPlainTextScreen:
-    call prepareScreen
-    ld b, PER_PAGE
     ld a, 255
     ld (oldminutes), a
+    call prepareScreen
+    
+    ld hl, (page_offset)        ; HL - offset to 0 Row on screen
+    ld bc,hl                    ; BC - offset to C Row on screen
+    call Render.findLine        ;BC - Search this line  HL - Return pointer to page with offset 
+    ld a, h
+    or l
+    jr z, .exit2
+    xor a
+    add CURSOR_OFFSET : ld d, a, e, 1 : call TextMode.gotoXY
+    call print70Text
+    ld b, PER_PAGE -1
 .loop
     push bc
     ld a, PER_PAGE
     sub b
-    ld b,a
     ld e,a
-    ld c,b
-    ld b,0
-    ld hl, (page_offset)
-    add hl,bc
-    ld bc,hl
-    push de
-    call Render.findLine
-    pop de
-    ld a, h : or l : jp z, .exit
+    ld bc, 1
+    call Render.findLine2   ;BC - Search this line  HL - Return pointer to page with offset 
+    ld a, h
+    or l
+    jr z, .exit
     ld a, e
     add CURSOR_OFFSET : ld d, a, e, 1 : call TextMode.gotoXY
     call print70Text
@@ -25,9 +30,11 @@ renderPlainTextScreen:
     djnz .loop
     ret
 .exit
-    pop bc
+    pop bc 
+    djnz .loop
+.exit2
+    call showCursor
     ret
-
 plainTextLoop:
     call printRTC
     call Console.getC
