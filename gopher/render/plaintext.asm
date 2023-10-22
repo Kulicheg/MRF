@@ -1,6 +1,8 @@
 renderPlainTextScreen:
     call prepareScreen
     ld b, PER_PAGE
+    ld a, 255
+    ld (oldminutes), a
 .loop
     push bc
     ld a, PER_PAGE
@@ -27,6 +29,7 @@ renderPlainTextScreen:
     ret
 
 plainTextLoop:
+    call printRTC
     call Console.getC
 
     cp '1' : jp z, History.back

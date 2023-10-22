@@ -1,5 +1,8 @@
     MODULE VortexProcessor
 play:
+    ld a, 255
+    ld (oldminutes), a
+
     call Console.waitForKeyUp
 
     ld hl, message : call DialogBox.msgNoWait

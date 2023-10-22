@@ -13,6 +13,9 @@
     endm
 	
 play:
+    ld a, 255
+    ld (oldminutes), a
+
     call Console.waitForKeyUp
 
     ld hl, Gopher.requestbuffer : call DialogBox.msgNoWait
@@ -37,6 +40,8 @@ play:
 	cp SPACE
     jp z, .playNext
     
+    call printRTC
+
    ;проверка что MOD начал играть сначала
     GS_SendCommand2 CMD_GET_SONG_POSITION
     GS_WaitCommand2

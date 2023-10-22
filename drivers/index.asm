@@ -34,9 +34,14 @@
 		include "wifi.asm"
 	ENDIF
 
-;	IFDEF NEDOOS
-;       	include "nedoos.asm"
-;	ENDIF
+    IFDEF SMUCRTC
+    include "smuc-rtc.asm"
+    ENDIF
+
+    IFDEF NOSRTC
+    include "nos-rtc.asm"
+    ENDIF
+
 	
 	include "proxy.asm"
 	include "memory.asm"

@@ -35,6 +35,7 @@ asmOrg:
     include "gopher/engine/media-processor.asm"
     include "gopher/gopher.asm"
     include "drivers/index.asm"
+    include "screen/rtc.asm"
     IFNDEF NEDOOS
     include "player/vortex-processor.asm"
     include "player/mod-processor.asm"
@@ -122,6 +123,7 @@ outputBuffer2:
     include "screen/msxscreen.asm"
     include "player/vortex-processor.asm"
     include "player/mod-processor.asm"
+    include "screen/rtc.asm"
 fontName db "font.bin",0
 start:
     ld hl,(0x0006)

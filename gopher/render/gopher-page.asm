@@ -1,6 +1,8 @@
 renderGopherScreen:
     call Render.prepareScreen
     ld b, PER_PAGE
+    ld a, 255
+    ld (oldminutes), a
 .loop
     push bc
     ld a, PER_PAGE
@@ -38,10 +40,14 @@ checkBorder:
 workLoop:
     ld a, (play_next) : and a : jp nz, navigate
 
-    dup 5
+    dup 4
     halt
     edup
 .nothing
+	
+    halt
+    call printRTC
+
     call Console.peekC
     and a : jp z, .nothing
 

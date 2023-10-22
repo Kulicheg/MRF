@@ -23,6 +23,9 @@ message db "Press key to stop...", 0
     include "msxplayer.asm"    
 	ELSE
 play:
+    ld a, 255
+    ld (oldminutes), a
+    
     call Console.waitForKeyUp
 
     ld hl, message : call DialogBox.msgNoWait
@@ -38,6 +41,7 @@ play:
 .loop
     halt : di : call VTPL.PLAY : ei
     xor a : in a, (#fe) : cpl : and 31 : jp nz, .stopKey
+    call printRTC
     ld a, (VTPL.SETUP) : rla : jr nc, .loop 
     ld a, 1, (Render.play_next), a
 .stop
