@@ -75,14 +75,14 @@ flashRTS:
 	ld bc,MCR           // Open the gate
     ld a, 2
 	out (c),a
-    call uart_delay6k   // Wait while FIFO
+    ld bc, LSR          // Test FIFO for data
+flashRTS2:
+	in a, (c)
+    rrca
+    jp nc,flashRTS2      // No data? Once more.
     ld bc,MCR           // Close the gate
     ld a, 0
 	out (c),a
-    ld bc, LSR          // Test FIFO for data
-	in a, (c)
-    rrca
-    jp nc,flashRTS      // No data? Once more.
     ei
 	ret
 
@@ -99,15 +99,5 @@ write:
 	ld bc,RBR_THR   //Write data to FIFO
 	out (c),a	
     ret
-
-uart_delay6k:       // Determined delay. More then 1 byte to recieve, less then time for fullfill FIFO buffer
-		push de
-		ld e, 0xFA
-loop2:		
-		NOP
-		dec e
-		jr nz,loop2
-		pop de
-		ret
 
     endmodule

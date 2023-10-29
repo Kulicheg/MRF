@@ -161,43 +161,50 @@ getPacket:
     cp 'O' : jp z, .closedBegun ; It enough to check "OSED\n" :-)
     jp getPacket
 .closedBegun
-    call Uart.read : cp 'S' : jp nz, getPacket
-    call Uart.read : cp 'E' : jp nz, getPacket
-    call Uart.read : cp 'D' : jp nz, getPacket
-    call Uart.read : cp 13 : jp nz, getPacket
+    call Uart.read : cp 'S' : jp nz, .closedBegun
+    call Uart.read : cp 'E' : jp nz, .closedBegun
+    call Uart.read : cp 'D' : jp nz, .closedBegun
+    call Uart.read : cp 13 : jp nz, .closedBegun
     ld a, 1, (closed), a
     ret
 .ipdBegun
-    call Uart.read : cp 'I' : jp nz, getPacket
-    call Uart.read : cp 'P' : jp nz, getPacket
-    call Uart.read : cp 'D' : jp nz, getPacket
-    call Uart.read ; Comma
+    call Uart.read : cp 'I' : jp nz, .ipdBegun
+    call Uart.read : cp 'P' : jp nz, .ipdBegun
+    call Uart.read : cp 'D' : jp nz, .ipdBegun
+    call Uart.read  ;Comma
     call .count_ipd_lenght : ld (bytes_avail), hl 
-    ld bc, hl
+    ld de, hl
     ld hl, (buffer_pointer)
 .readp
     ld a, h : cp #ff : jp nc, .skipbuff
-    push bc, hl
     call Uart.read
-    pop hl, bc
     ld (hl), a
-    dec bc : inc hl
-    ld a, b : or c : jp nz, .readp
+    dec de
+    inc hl
+    ld a, d : or e : jp nz, .readp
     ld (buffer_pointer), hl
     ret
 .skipbuff 
-    push bc
     call Uart.read
-    pop bc
-    dec bc : ld a, b : or c : jp nz, .skipbuff
+    dec de : ld a, d : or e : jp nz, .skipbuff
     ret
 .count_ipd_lenght
 		ld hl,0			; count lenght
 .cil1	push  hl
         call Uart.read
         pop hl 
-		cp ':' : ret z
-		sub 0x30 : ld c,l : ld b,h : add hl,hl : add hl,hl : add hl,bc : add hl,hl : ld c,a : ld b,0 : add hl,bc
+		cp ':'
+        ret z
+		sub 0x30
+        ld c,l
+        ld b,h
+        add hl,hl
+        add hl,hl
+        add hl,bc
+        add hl,hl
+        ld c,a
+        ld b,0
+        add hl,bc
 		jp .cil1
 
 ; Based on: https://wikiti.brandonw.net/index.php?title=Z80_Routines:Other:DispHL

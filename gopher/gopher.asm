@@ -74,7 +74,7 @@ loadMod:
     jr .loadLoop
 .nextFrame
     call pulsing
-    call Wifi.continue
+    ;call Wifi.continue
     jr .loop
 .exit
     call GeneralSound.finishLoadingModule
@@ -120,7 +120,7 @@ download:
     ld a, (.fp), hl, outputBuffer, bc, (Wifi.bytes_avail)
     call Dos.fwrite
     call pulsing
-    call Wifi.continue
+    ;call Wifi.continue
     jr .loop
 .exit
     ld a, (.fp)
@@ -143,16 +143,14 @@ pulsing
     ld a, (pulsator)
     cp '*'
     jp z, printasterix
+    call TextMode.putC
     ld a, '*'
     ld (pulsator),a
-    ld a,' '
-    call TextMode.putC
     ret 
 printasterix
+    call TextMode.putC
     ld a, ' '
     ld (pulsator),a
-    ld a,'*'
-    call TextMode.putC
     ret 
 
 requestbuffer ds #1ff
