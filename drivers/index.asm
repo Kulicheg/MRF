@@ -26,7 +26,7 @@
 
 	IFDEF NEDOOSEVO
 		include "evo-uart.asm"
-       	ENDIF
+    ENDIF
 	
 	IFDEF NEDONET
 		include "nedowifi.asm"

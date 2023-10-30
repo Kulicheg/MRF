@@ -41,15 +41,10 @@
         pop bc
 	endm	
 
-
-
 init:
+; Nothing to init there
 	ret
-	
-	
-	
-	
-	
+
 host_ia:
 .curport=$+1
 	defb 0,0,80,8,8,8,8
@@ -93,7 +88,7 @@ letsgo:
     BIT 7,H
     JR Z,RECEIVED	;ошибок нет
 	CP 35   ;ERR_EAGAIN
-    jp z, getPacket
+    jp z, letsgo
     ;обработка ошибки
     ld a,1
     ld (closed), a

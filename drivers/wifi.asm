@@ -12,7 +12,7 @@ init:
     EspCmdOkErr "ATE0"
     jp c, .initError
 
-    IFDEF AUTH  
+; Reading auth.pwd and send it to ESP
     ld hl, creds, b, Dos.FMODE_READ : call Dos.fopen
     push af
     ld hl,outputBuffer2, bc, 255 : call Dos.fread
@@ -20,7 +20,6 @@ init:
     call Dos.fclose
    
     ld hl, .doneInit1 : call TextMode.printZ
-    ;ld hl, outputBuffer2 : call TextMode.printZ
     
     ld hl,outputBuffer2
     call espSendT
@@ -28,8 +27,7 @@ init:
     ld a, 10 : call Uart.write
     call checkOkErr
     jp c, .initError    
-    ENDIF
-    
+;    
    	EspCmdOkErr "AT+CIPSERVER=0" 
     EspCmdOkErr "AT+CIPCLOSE" ; Close if there some connection was. Don't care about result
     EspCmdOkErr "AT+CIPMUX=0" ; Single connection mode
@@ -50,7 +48,7 @@ init:
 .uartIniting db "Uart initing...", CRLF, 0
 .chipIniting db "Chip initing...", CRLF, 0
 .doneInit    db "Done!",CRLF, 0
-.doneInit1   db "Connecting to AP",CRLF, 0
+.doneInit1   db "Sending auth.pwd to ESP",CRLF, 0
     IFNDEF PROXY   
 ; HL - host pointer in gopher row
 ; DE - port pointer in gopher row
