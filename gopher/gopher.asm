@@ -118,9 +118,8 @@ download:
     ld a, (Wifi.closed) : and a : jr nz, .exit
     
     ld a, (.fp), hl, outputBuffer, bc, (Wifi.bytes_avail)
-    ;call Dos.fwrite
+    call Dos.fwrite
     call pulsing
-    ;call Wifi.continue
     jr .loop
 .exit
     ld a, (.fp)
