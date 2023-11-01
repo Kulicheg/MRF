@@ -37,13 +37,13 @@ esxdos-ay: $(SOURCES)
 	$(SJASMPLUS) main.asm -DAY -DZXSCR --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
 	
 nedoos: $(SOURCES)
-	$(SJASMPLUS) main.asm -DNOSRTC -DNEDOOS -DNEDONET -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
+	$(SJASMPLUS) main.asm -DRTC -DNEDOOS -DNEDONET -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
 
 nedoosatm: $(SOURCES)
-	$(SJASMPLUS) main.asm -DNOSRTC -DNEDOOS -DNEDOOSATM -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
+	$(SJASMPLUS) main.asm -DRTC -DNEDOOS -DNEDOOSATM -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
 
 nedoosevo: $(SOURCES)
-	$(SJASMPLUS) main.asm -DNOSRTC -DNEDOOS  -DNEDOOSEVO -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
+	$(SJASMPLUS) main.asm -DRTC -DNEDOOS  -DNEDOOSEVO -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
 
 atmtrdos: $(SOURCES)
 	copy data\Sample.trd MOONR.TRD

@@ -27,8 +27,21 @@ readTimeCL2
 	call in3d2f
 	ld b,a
 	or a
-    ret
-	
+;сохранение текущего времени
+	jr nc,read_time_ok
+	; ld hl,mes_no_RTC
+	; call print_mes
+	; scf
+	ret ;выход	
+read_time_ok
+	ld a,e ;часы
+	ld (hours),a
+	ld a,b ;минуты
+	ld (minutes),a
+	ld a,c ;секунды
+	ld (seconds),a
+	ret
+
 in3d2f
 	ld hl,#3ff3
 	push hl
@@ -38,6 +51,4 @@ out3d2f
 	ld hl,#2A53
 	push hl
 	jp #3d2f
-
-	
     endmodule
