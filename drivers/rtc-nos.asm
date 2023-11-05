@@ -46,5 +46,5 @@ readTime
 ;   ld (month),a
 
 
-  	ret ;return bc=date, hl=time
+  	ret
     endmodule

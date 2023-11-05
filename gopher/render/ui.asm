@@ -1,21 +1,26 @@
     IFDEF ZXSCR
-    DEFINE LEFT_TAB "[D]omain:                                  "
+        DEFINE LEFT_TAB "[D]omain:                                  "
+        DEFINE SCREEN_WIDTH 64
     ENDIF
 
     IFDEF TIMEX     ;UNKNOWM fallback to 64
-    DEFINE LEFT_TAB "[D]omain:                                  "
+        DEFINE LEFT_TAB "[D]omain:                                  "
+        DEFINE SCREEN_WIDTH 64
     ENDIF
 
     IFDEF TIMEX80
-    DEFINE LEFT_TAB "[D]omain:                                                      "
+        DEFINE LEFT_TAB "[D]omain:                                                      "
+        DEFINE SCREEN_WIDTH 85
     ENDIF
 
     IFDEF NEDOOS
-    DEFINE LEFT_TAB "[D]omain:                                                  "
+        DEFINE LEFT_TAB "[D]omain:                                                  "
+        DEFINE SCREEN_WIDTH 80
     ENDIF
 
     IFDEF MSX
-    DEFINE LEFT_TAB "[D]omain:                                              "
+        DEFINE LEFT_TAB "[D]omain:                                              "
+        DEFINE SCREEN_WIDTH 80
     ENDIF
 prepareScreen:
     call TextMode.cls
@@ -89,27 +94,22 @@ header db LEFT_TAB, "MRF "
 	ENDIF
 
     IFDEF ZW
-       db " [ZXWiFi]",13, 0
+       db "  [ZXWiFi]",13, 0
     ENDIF	
  
-     IFDEF NEDOOSATM
+     IFDEF UARTATM
        db " [ATM UART]",13, 0
     ENDIF
 	
-    IFDEF NEDOOSEVO
-       db " [EVO UART]",13, 0
+    IFDEF UARTEVO
+        db " [EVO UART]",13, 0
     ENDIF
 
     IFDEF UNOUART
-       db " [UNO UART]",13, 0
+        db " [UNO UART]",13, 0
     ENDIF
 
-    IFDEF NEDOOS
-	IFNDEF NEDOOSATM
-	IFNDEF NEDOOSEVO
-       db "  [nedoNET]",13, 0
-       
-    ENDIF
-	ENDIF
+    IFDEF NEDONET
+	    db "  [nedoNET]",13, 0
 	ENDIF	
 

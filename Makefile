@@ -40,20 +40,20 @@ nedoos: $(SOURCES)
 	$(SJASMPLUS) main.asm -DRTC -DNEDOOS -DNEDONET -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
 
 nedoosatm: $(SOURCES)
-	$(SJASMPLUS) main.asm -DRTC -DNEDOOS -DNEDOOSATM -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
+	$(SJASMPLUS) main.asm -DRTC -DNEDOOS -DUARTATM -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
 
 nedoosevo: $(SOURCES)
-	$(SJASMPLUS) main.asm -DRTC -DNEDOOS  -DNEDOOSEVO -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
+	$(SJASMPLUS) main.asm -DRTC -DNEDOOS  -DUARTEVO -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
 
 atmtrdos: $(SOURCES)
 	copy data\Sample.trd MOONR.TRD
-	$(SJASMPLUS) main.asm -DTRDOS -DNEDOOSATM -DZXSCR -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
+	$(SJASMPLUS) main.asm -DTRDOS -DUARTATM -DZXSCR -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
 	del TRD\MR-TR-AU-64.TRD
 	move MOONR.TRD TRD\MR-TR-AU-64.TRD
 
 evotrdos: $(SOURCES)
 	copy data\Sample.trd MOONR.TRD
-	$(SJASMPLUS) main.asm -DTRDOS -DNEDOOSEVO -DZXSCR -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
+	$(SJASMPLUS) main.asm -DTRDOS -DUARTEVO -DZXSCR -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
 	del TRD\MR-TR-EU-64.TRD
 	move MOONR.TRD TRD\MR-TR-EU-64.TRD
 
@@ -92,9 +92,10 @@ msx: $(SOURCES)
 	copy DATA\msxfont.bin MSX\font.bin
 	copy DATA\msxindex.gph MSX\index.gph
 	move mrfmsx.com MSX\mrfmsx.com
+
 godzilla: $(SOURCES)
 	copy data\Sample.trd MOONR.TRD
-	$(SJASMPLUS) main.asm -DTRDOS -DZW -DTIMEX80 -DGZ --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
+	$(SJASMPLUS) main.asm -DTRDOS -DSMUCRTC -DZW -DZXSCR  -DRTC --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
 	del TRD\MR-TR-GZ-80.TRD
 	move MOONR.TRD TRD\MR-TR-GZ-80.TRD
 

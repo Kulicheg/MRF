@@ -53,7 +53,7 @@ navigate:
     IFDEF MSX
     	ld bc, #ff
     ELSE
-    	ld bc, #fff
+    	ld bc, #ff
     ENDIF
     
     cpir

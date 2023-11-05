@@ -63,7 +63,11 @@ outputBuffer:
  
     call TextMode.init
 	ld hl, initing : call TextMode.printZ
-  	call Wifi.init
+    
+    IFNDEF NOINIT
+  	    call Wifi.init
+    ENDIF
+    
     jp History.home
 
 initing db "Initing Wifi...", CRLF, 0

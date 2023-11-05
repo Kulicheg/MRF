@@ -10,8 +10,6 @@
     include "gopher/engine/urlencoder.asm"
     include "gopher/engine/fetcher.asm"
     include "gopher/engine/media-processor.asm"
-;    include "drivers/unapi/unapi.asm"
-;    include "drivers/unapi/tcp.asm"
     include "drivers/index.asm"
     include "gopher/msxgopher.asm"
     include "screen/msxscreen.asm"

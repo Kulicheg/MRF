@@ -10,7 +10,7 @@ printRTC
 	ld (oldminutes), a
 
 	ld d,1 ;координаты Y,X
-	ld e,73
+	ld e,SCREEN_WIDTH - 7
 	call TextMode.gotoXY
 	ld a,'['
 	call TextMode.putC

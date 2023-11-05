@@ -20,11 +20,11 @@
 	
 	include "utils.asm"
    
-	IFDEF NEDOOSATM
+	IFDEF UARTATM
 		include "uart-atm.asm"
 	ENDIF
 
-	IFDEF NEDOOSEVO
+	IFDEF UARTEVO
 		include "uart-evo.asm"
     ENDIF
 	
