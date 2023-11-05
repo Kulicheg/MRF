@@ -88,10 +88,10 @@ ayp3d64: $(SOURCES)
 	move MOONR.TRD TRD\MR-P3-AY-64.TRD
 
 msx: $(SOURCES)
-	$(SJASMPLUS) main.asm -DMSX --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
+	$(SJASMPLUS) main.asm -DMSX -DRTC --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
 	copy DATA\msxfont.bin MSX\font.bin
 	copy DATA\msxindex.gph MSX\index.gph
-	move moonr.com MSX\moonr.com
+	move mrfmsx.com MSX\mrfmsx.com
 godzilla: $(SOURCES)
 	copy data\Sample.trd MOONR.TRD
 	$(SJASMPLUS) main.asm -DTRDOS -DZW -DTIMEX80 -DGZ --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)

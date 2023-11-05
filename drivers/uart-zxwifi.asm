@@ -41,6 +41,7 @@ init:
     outp LCR,     #03 // 8n1, DLAB=0
     outp IER,     #00 // Disable int
     outp MCR,     #2f // Enable AFE
+
     ret
     ENDIF
 retry_rec_count_max equ 50 ;ждать 1 байт максимум столько прерываний

@@ -1,48 +1,59 @@
     IFDEF UNO
-    	include "uno-uart.asm"
+    	include "uart-uno.asm"
     ENDIF
 
     IFDEF UNOUART
-    	include "uno-uart.asm"
+    	include "uart-uno.asm"
     ENDIF
 
     IFDEF MB03
-    	include "mb03-uart.asm"
+    	include "uart-mb03.asm"
     ENDIF
 
     IFDEF AY
-    	include "ay-uart.asm"
+    	include "uart-ay.asm"
     ENDIF
 	
     IFDEF ZW
-    	include "zx-wifi.asm"
+    	include "uart-zxwifi.asm"
     ENDIF
 	
 	include "utils.asm"
    
 	IFDEF NEDOOSATM
-		include "atm-uart.asm"
+		include "uart-atm.asm"
 	ENDIF
 
 	IFDEF NEDOOSEVO
-		include "evo-uart.asm"
+		include "uart-evo.asm"
     ENDIF
 	
 	IFDEF NEDONET
 		include "nedowifi.asm"
 	ELSE
+	IFNDEF MSX
 		include "wifi.asm"
+	ENDIF		
 	ENDIF
 
     IFDEF NEDOOS
     	include "rtc-nos.asm"
     ENDIF
 
+
     IFDEF SMUCRTC
     	include "rtc-smuc.asm"
     ENDIF
-	
-	include "proxy.asm"
-	include "memory.asm"
-	include "general-sound.asm"
     
+	IFDEF MSX
+        include "drivers/unapi/unapi.asm"
+    	include "drivers/unapi/tcp.asm"
+		include "rtc-msx.asm"
+    ELSE
+		include "proxy.asm"
+		include "memory.asm"
+	ENDIF
+
+	IFDEF GS
+		include "general-sound.asm"	
+	ENDIF		

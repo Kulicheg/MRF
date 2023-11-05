@@ -1,5 +1,5 @@
 ;****************************** MSX ***********************************************
-    output "moonr.com"
+    output "mrfmsx.com"
     org 100h
     jp start
     include "vdp/vdpdriver.asm"
@@ -10,8 +10,9 @@
     include "gopher/engine/urlencoder.asm"
     include "gopher/engine/fetcher.asm"
     include "gopher/engine/media-processor.asm"
-    include "drivers/unapi/unapi.asm"
-    include "drivers/unapi/tcp.asm"
+;    include "drivers/unapi/unapi.asm"
+;    include "drivers/unapi/tcp.asm"
+    include "drivers/index.asm"
     include "gopher/msxgopher.asm"
     include "screen/msxscreen.asm"
     include "player/vortex-processor.asm"
@@ -41,4 +42,4 @@ ramtop:
 outputBuffer:
 font:
     display "ENDS: ", $
-     
+    display "Buff size: ", #D000 - $  ;ramtop

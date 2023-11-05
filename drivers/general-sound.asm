@@ -1,4 +1,3 @@
-    ifdef GS
     macro GS_WaitCommand
 .wait
     in a, (GeneralSound.CMD)
@@ -93,5 +92,3 @@ toggleDownload:
 GSdownType  db 0
 state db 0
     endmodule
-
-    endif

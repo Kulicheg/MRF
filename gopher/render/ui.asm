@@ -73,7 +73,7 @@ header db LEFT_TAB, "MRF "
        db "."
        db BUILD_STRING
 	IFDEF MSX
-       db " [MSX UNAPI]",13, 0
+       db "    [MSX UNAPI]",13, 0
 	ENDIF      
 
     IFDEF MB03
