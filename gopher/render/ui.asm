@@ -1,26 +1,31 @@
     IFDEF ZXSCR
         DEFINE LEFT_TAB "[D]omain:                                  "
         DEFINE SCREEN_WIDTH 64
+        DEFINE SCREEN64
     ENDIF
 
     IFDEF TIMEX     ;UNKNOWM fallback to 64
         DEFINE LEFT_TAB "[D]omain:                                  "
         DEFINE SCREEN_WIDTH 64
+        DEFINE SCREEN64
     ENDIF
 
     IFDEF TIMEX80
         DEFINE LEFT_TAB "[D]omain:                                                      "
         DEFINE SCREEN_WIDTH 85
+        DEFINE SCREEN85
     ENDIF
 
     IFDEF NEDOOS
         DEFINE LEFT_TAB "[D]omain:                                                  "
         DEFINE SCREEN_WIDTH 80
+        DEFINE SCREEN80
     ENDIF
 
     IFDEF MSX
         DEFINE LEFT_TAB "[D]omain:                                              "
         DEFINE SCREEN_WIDTH 80
+        DEFINE SCREEN80
     ENDIF
 prepareScreen:
     call TextMode.cls

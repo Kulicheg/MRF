@@ -99,7 +99,7 @@ minutes
 	db 0
 seconds
 	db 0
-decimalS	ds 6 ;десятичные цифры
+decimalS	ds 7 ;десятичные цифры
 	ENDIF	
 	ret
 oldminutes		; не убирать под услоаие

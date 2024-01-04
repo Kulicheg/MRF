@@ -95,7 +95,7 @@ msx: $(SOURCES)
 
 godzilla: $(SOURCES)
 	copy data\Sample.trd MOONR.TRD
-	$(SJASMPLUS) main.asm -DTRDOS -DSMUCRTC -DZW -DZXSCR  -DRTC --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
+	$(SJASMPLUS) main.asm -DNOINIT -DTRDOS -DSMUCRTC -DZW -DZXSCR  -DRTC --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
 	del TRD\MR-TR-GZ-80.TRD
 	move MOONR.TRD TRD\MR-TR-GZ-80.TRD
 

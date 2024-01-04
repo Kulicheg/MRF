@@ -62,9 +62,17 @@ play:
     xor a : ld (Render.play_next), a ;флаг что не надо играть следующий файл
     jr .stop
 
+message
+    IFDEF SCREEN64
+    ENDIF    
+    IFDEF SCREEN80
+    db "       "
+    ENDIF    
+    IFDEF SCREEN85
+    db "         "
+    ENDIF
 
-message db "Playing MODs [SPACE] for next song [BACKSPACE] for stop playing", 0
-
+    db "Playing MODs [SPACE] for next song [BACKSPACE] for stop playing.", 0
 
 CMD_GET_SONG_POSITION     = #60	
 last_song_position db 0
