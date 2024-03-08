@@ -4,9 +4,9 @@ KEY_DN = 10
 KEY_LT = 8
 KEY_RT = 9
 BACKSPACE = 12
-keyCode db 0 
-
 BASIC_KEY = #5C08
+keyCode db 0
+tableShift db 0
 
 waitForKeyUp:
 	halt
@@ -14,7 +14,14 @@ waitForKeyUp:
    ld (BASIC_KEY), a
    ret
 
+keyWait:
+    dup 11
+    halt
+    edup
+   ret
+
 getC:
+getCint:       ; for nedoOS
    xor a
    ld (BASIC_KEY),a
 getC2:
@@ -24,11 +31,27 @@ getC2:
    xor a : ld (BASIC_KEY), a
    ld a, b
    ret
-
+;0xE - to Russian
+;0xF - to Englich
 peekC:
     xor a: ld (BASIC_KEY),a
     call inkey
+    cp 0xE
+    jp z, toRus
+    cp 0xF
+    jp z, toEng
     ret
+toRus
+   ld a, russiantable - englishTable
+   ld (tableShift), a
+   xor a
+   call keyWait
+   ret
+toEng
+   xor a
+   ld (tableShift), a
+   call keyWait  
+   ret
 
 inkey:
    ld de,0
@@ -121,9 +144,11 @@ inkey:
    add a,e
    ld e,a
 
-   ld hl,.table
-   add hl,de
-
+   ld  hl, englishTable
+   add hl, de
+   ld  a, (tableShift)
+   ld e, a
+   add hl, de
    ld a,$fe
    in a,($fe)
    and $01
@@ -152,7 +177,7 @@ inkey:
    defb 255,3,255,255,255,2,255,1
    defb 0,255
 
-.table
+englishTable
    db 0,'z','x','c','v'      ; CAPS SHIFT, Z, X, C, V
    db 'a','s','d','f','g'      ; A, S, D, F, G
    db 'q','w','e','r','t'      ; Q, W, E, R, T
@@ -167,7 +192,7 @@ inkey:
    db 0,'Z','X','C','V'      ; CAPS SHIFT, Z, X, C, V
    db 'A','S','D','F','G'      ; A, S, D, F, G
    db 'Q','W','E','R','T'      ; Q, W, E, R, T
-   db 7,6,128,129,8            ; 1, 2, 3, 4, 5
+   db 14,6,128,129,8           ; 1, 2, 3, 4, 5
    db 12,0,9,11,10             ; 0, 9, 8, 7, 6
    db 'P','O','I','U','Y'      ; P, O, I, U, Y
    db 13,'L','K','J','H'       ; ENTER, L, K, J, H
@@ -188,6 +213,49 @@ inkey:
 
    db 0,26,24,3,22           ; CAPS SHIFT, Z, X, C, V
    db 1,19,4,6,7               ; A, S, D, F, G
+   db 17,23,5,18,20            ; Q, W, E, R, T
+   db 27,28,29,30,31           ; 1, 2, 3, 4, 5
+   db 127,0,134,'`',135      ; 0, 9, 8, 7, 6
+   db 16,15,9,21,25            ; P, O, I, U, Y
+   db 13,12,11,10,8            ; ENTER, L, K, J, H
+   db ' ',0,13,14,2          ; SPACE, SYM SHIFT, M, N, B
+
+russiantable
+   db 0,'Ô','Á','·','¨'      ; CAPS SHIFT, Z, X, C, V
+   db '‰','Î','¢','†','Ø'      ; A, S, D, F, G
+   db '©','Ê','„','™','•'      ; Q, W, E, R, T
+   db '1','2','3','4','5'      ; 1, 2, 3, 4, 5
+   db '0','9','8','7','6'      ; 0, 9, 8, 7, 6
+   db 'ß','È','Ë','£','≠'      ; P, O, I, U, Y
+   db 13,'§','´','Æ','‡'       ; ENTER, L, K, J, H
+   db ' ',0,'Ï','‚','®'      ; SPACE, SYM SHIFT, M, N, B
+
+   ; the following are CAPS SHIFTed
+
+   db 0,'ü','ó','ë','å'      ; CAPS SHIFT, Z, X, C, V
+   db 'î','õ','Ç','Ä','è'      ; A, S, D, F, G
+   db 'â','ñ','ì','ä','Ö'      ; Q, W, E, R, T
+   db 15,6,128,129,8            ; 1, 2, 3, 4, 5
+   db 12,0,9,11,10             ; 0, 9, 8, 7, 6
+   db 'á','ô','ò','É','ç'      ; P, O, I, U, Y
+   db 13,'Ñ','ã','é','ê'       ; ENTER, L, K, J, H
+   db ' ',0,'ú','í','à'      ; SPACE, SYM SHIFT, M, N, B
+
+   ; the following are SYM SHIFTed
+
+   db 0,':','Ó','?','/'       ; CAPS SHIFT, Z, X, C, V
+   db '°','Ì',92,'Â','¶'       ; A, S, D, F, G
+   db 131,132,133,'<','>'      ; Q, W, E, R, T
+   db '!','@','#','$','%'      ; 1, 2, 3, 4, 5
+   db '_',')','(',39,'&'       ; 0, 9, 8, 7, 6
+   db 34,';',130,']','['       ; P, O, I, U, Y
+   db 13,'=','+','-','^'       ; ENTER, L, K, J, H
+   db ' ',0,'.',',','*'      ; SPACE, SYM SHIFT, M, N, B
+
+   ; the following are CAPS SHIFTed and SYM SHIFTed ("CTRL" key)
+
+   db 0,26,'û',3,22           ; CAPS SHIFT, Z, X, C, V
+   db 'Å','ù',4,'ï','Ü'               ; A, S, D, F, G
    db 17,23,5,18,20            ; Q, W, E, R, T
    db 27,28,29,30,31           ; 1, 2, 3, 4, 5
    db 127,0,134,'`',135      ; 0, 9, 8, 7, 6

@@ -9,9 +9,17 @@ inputBox:
     ld hl, inputBuffer : call TextMode.printZ
     ld a, MIME_INPUT : call TextMode.putC : ld a, ' ' : call TextMode.putC
 .checkkey
-    call Console.getC
+    call Console.peekC
+    cp 00 :  jp z, .checkkey
+    cp CR : ret z
+    
+    IFNDEF MSX
+    dup 11
+    halt
+    edup
+    ENDIF
+
     cp Console.BACKSPACE : jr z, .removeChar
-	cp CR : ret z
     cp SPACE : jr c, .checkkey
 .putC
     ld e, a
@@ -31,18 +39,12 @@ inputBox:
     dec hl : dec hl : ld (hl), a 
     jr .loop
 
-	IFNDEF MSX
-delayinput:
-   ld b, 50
-.loop2
-    halt
-    djnz .loop2
-    ret
+
 namedownload
     IFDEF NEDOOS
 		db "..",92,"downloads",92
     ENDIF
-    ENDIF
+
 inputBuffer ds 80
 
 msgBox:
