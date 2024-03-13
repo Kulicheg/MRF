@@ -83,12 +83,5 @@ toggleModule:
     jr z, continueModule
     jr stopModule
 
-toggleDownload:
-    ld a,(GSdownType)
-    xor 1
-    ld (GSdownType),a       
-    ret
-
-GSdownType  db 0
 state db 0
     endmodule

@@ -39,7 +39,10 @@ getIcon:
     inc hl
     jr .nameLoop
 .check
-    ld hl, scrExt1 : call CompareBuff.search : and a : jr nz, .image
+	ld a,(saveMode+1);фикс обход открытия файлов, чтобы их скачать по кнопке Caps
+	or a
+	jr nz,.checkExit
+	ld hl, scrExt1 : call CompareBuff.search : and a : jr nz, .image
     ld hl, scrExt2 : call CompareBuff.search : and a : jr nz, .image
     ld a, 3 : ld (VTPL.SETUP), a ; 0 bit - looping, 1 bit - pt2 file
     ld hl, pt2Ext1 : call CompareBuff.search : and a : jr nz, .music 
@@ -80,3 +83,12 @@ pt2Ext1 db ".pt2", 0
 pt2Ext2 db ".PT2", 0
 modExt1 db ".mod", 0
 modExt2 db ".MOD", 0
+
+toggleSaveMode
+			push af
+			call Console.waitForKeyUp
+saveMode	ld a,0 ; Флаг Open/Save files
+			xor 1
+			ld (saveMode+1),a
+			pop af
+			ret

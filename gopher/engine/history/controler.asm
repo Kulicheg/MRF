@@ -89,19 +89,7 @@ navigate:
     ld a,(historyBlock.mediaType) : cp MIME_DOWNLOAD : jp z, Gopher.download
     
     ifdef GS
-    ld a,(historyBlock.mediaType)
-    cp MIME_MOD
-    jp nz,load 
-    ld a,(GeneralSound.GSdownType)
-    xor 1
-    jp z, downMod2file
-
-downMod2GS
-    jp Gopher.loadMod
-downMod2file    
-    jp Gopher.download
-    else
-    ld a,(historyBlock.mediaType) : cp MIME_MOD : jp z, Gopher.download
+    cp MIME_MOD : jp z, Gopher.loadMod
     endif
 
     jp load
