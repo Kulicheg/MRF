@@ -17,6 +17,7 @@ renderRow:
 getIcon:
     cp 'i' : jp z, .info
     cp '9' : jp z, .down
+    cp 's' : jp z, .down
     cp '1' : jp z, .page
     cp '0' : jp z, .text
     cp '7' : jp z, .input
@@ -39,8 +40,7 @@ getIcon:
     inc hl
     jr .nameLoop
 .check
-	ld a,(saveMode+1);Їшъё юсїюф юЄъЁ√Єш  Їрщыют, ўЄюс√ шї ёърўрЄ№ яю ъэюяъх Caps
-	or a
+	ld a,(saveMode+1);фикс обход открытия файлов, чтобы их скачать по кнопке Caps
 	jr nz,.checkExit
 	ld hl, scrExt1 : call CompareBuff.search : and a : jr nz, .image
     ld hl, scrExt2 : call CompareBuff.search : and a : jr nz, .image
@@ -87,7 +87,7 @@ modExt2 db ".MOD", 0
 toggleSaveMode
 			push af
 			call Console.waitForKeyUp
-saveMode	ld a,0 ; ╘ыру Open/Save files
+saveMode	ld a,0 ; Флаг  Open/Save files
 			xor 1
 			ld (saveMode+1),a
 			pop af

@@ -40,4 +40,4 @@ ramtop:
 outputBuffer:
 font:
     display "ENDS: ", $
-    display "Buff size: ", #D000 - $  ;ramtop
+    display "Buff size: ", #D000 - $  ;ramtop  

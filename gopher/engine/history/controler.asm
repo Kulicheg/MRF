@@ -49,13 +49,7 @@ navigate:
     ld a, (hl) : push hl, de : call Render.getIcon : pop de, hl
     ld (de), a : inc de
     ld a, 9
-    
-    IFDEF MSX
-    	ld bc, #ff
-    ELSE
-    	ld bc, #ff
-    ENDIF
-    
+    ld bc, #1ff
     cpir
 .locatorCopy
     ld a, (hl) : cp 9 : jr z, 1f
