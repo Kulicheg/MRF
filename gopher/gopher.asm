@@ -136,7 +136,7 @@ download:
 .progress db "Downloading in progress! Wait a bit!", 0
 .fp db 0
 socket db 0
-pulsator db ' '
+pulsator db " "
 pulsing
     ld de, #0B01 : call TextMode.gotoXY
     ld a, (pulsator)

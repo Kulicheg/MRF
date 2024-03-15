@@ -17,10 +17,10 @@ renderRow:
 getIcon:
     cp 'i' : jp z, .info
     cp '9' : jp z, .down
-    cp 's' : jp z, .down
     cp '1' : jp z, .page
     cp '0' : jp z, .text
     cp '7' : jp z, .input
+    cp 's' : jp z, .down
     ld a, ' '
     ret 
 .info
@@ -40,7 +40,8 @@ getIcon:
     inc hl
     jr .nameLoop
 .check
-	ld a,(saveMode+1);ä¨ªá ®¡å®¤ ®âªàëâ¨ï ä ©«®¢, çâ®¡ë ¨å áª ç âì ¯® ª­®¯ª¥ Caps
+	ld a,(saveMode+1);ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Caps
+	or a
 	jr nz,.checkExit
 	ld hl, scrExt1 : call CompareBuff.search : and a : jr nz, .image
     ld hl, scrExt2 : call CompareBuff.search : and a : jr nz, .image
@@ -87,7 +88,7 @@ modExt2 db ".MOD", 0
 toggleSaveMode
 			push af
 			call Console.waitForKeyUp
-saveMode	ld a,0 ; ”« £  Open/Save files
+saveMode	ld a,0 ; ï¿½ï¿½ï¿½ï¿½ Open/Save files
 			xor 1
 			ld (saveMode+1),a
 			pop af

@@ -1,10 +1,10 @@
-total   equ 7
+total   equ 5
 depth   db 0
 
 historyBlock:  
 .isFile    db  0
 .mediaType db  0
-.locator   ds  #1ff 
+.locator   ds  #ff 
 .host      ds  64
 .port      ds  6
 .search    ds  #ff

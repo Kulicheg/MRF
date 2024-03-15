@@ -95,9 +95,9 @@ workLoop:
 	cp 's' : call z, toggleSaveMode
     
     
-     IFDEF MSX
+    IFDEF MSX
     	cp ESC : jp z, exit
-     ENDIF
+    ENDIF
 
     IFDEF GS
     cp 'M' : call z, GeneralSound.toggleModule
@@ -125,10 +125,10 @@ navigate:
     pop de
     ld a, (hl)
     cp '1' : jp z, .load
-    cp MIME_SOUND : jp z, .load
     cp '0' : jp z, .load
     cp '9' : jp z, .load
     cp '7' : jp z, .input
+    cp MIME_SOUND : jp z, .load
     call showCursor
     jp workLoop
 .load
