@@ -44,6 +44,9 @@ aytrsmuc: $(SOURCES)
 zwtrdos: $(SOURCES)
 	$(SJASMPLUS) main.asm -DTRDOS -DZW -DZXSCR -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD) -DBINNAME="\"ZXW-64.C\""
 
+zwtrsmuc: $(SOURCES)
+	$(SJASMPLUS) main.asm -DTRDOS -DRTC -DSMUCRTC -DZW -DZXSCR -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD) -DBINNAME="\"ZW-64-SC.C\""
+
 t80trdos: $(SOURCES)
 	$(SJASMPLUS) main.asm -DTRDOS -DAY -DTIMEX80 -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD) -DBINNAME="\"AY-80.C\""
 
