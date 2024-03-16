@@ -9,13 +9,13 @@ printRTC
 	ret z
 	ld (oldminutes), a
 
-	ld d,1 ;–∫–æ–æ—Ä–¥–∏–Ω–∞—Ç—ã Y,X
+	ld d,1 ;Ú??†˝?ˇ¢´ Y,X
 	ld e,SCREEN_WIDTH - 7
 	call TextMode.gotoXY
 	ld a,'['
 	call TextMode.putC
 	ld h,0
-	ld a,(hours) ;—á–∞—Å—ã
+	ld a,(hours) ;Á†·Î
 	ld l,a
 	call toDecimal
 	ld hl,decimalS+3
@@ -23,7 +23,7 @@ printRTC
 	ld a,':'
 	call TextMode.putC
 	ld h,0
-	ld a,(minutes) ;–º–∏–Ω—É—Ç—ã
+	ld a,(minutes) ;¨®≠„‚Î
 	ld l,a
 	call toDecimal
 	ld hl,decimalS+3
@@ -31,7 +31,7 @@ printRTC
 	;ld a,':'
 	;call TextMode.putC
 	;ld h,0
-	;ld a,(seconds) ;—Å–µ–∫—É–Ω–¥—ã
+	;ld a,(seconds) ;·•™„≠§Î
 	;ld l,a
 	;call toDecimal
 	;ld hl,decimalS+3
@@ -40,9 +40,9 @@ printRTC
 	call TextMode.putC
 	ret
 
-toDecimal		;–∫–æ–Ω–≤–µ—Ä—Ç–∏—Ä—É–µ—Ç 2 –±–∞–π—Ç–∞ –≤ 5 –¥–µ—Å—è—Ç–∏—á–Ω—ã—Ö —Ü–∏—Ñ—Ä
-				;–Ω–∞ –≤—Ö–æ–¥–µ –≤ HL —á–∏—Å–ª–æ
-	ld de,10000 ;–¥–µ—Å—è—Ç–∫–∏ —Ç—ã—Å—è—á
+toDecimal		;™Æ≠¢•‡‚®‡„•‚ 2 °†©‚† ¢ 5 §•·Ô‚®Á≠ÎÂ Ê®‰‡
+				;≠† ¢ÂÆ§• ¢ HL Á®·´Æ
+	ld de,10000 ;§•·Ô‚™® ‚Î·ÔÁ
 	ld a,255
 toDecimal10k			
 	and a
@@ -52,7 +52,7 @@ toDecimal10k
 	add hl,de
 	add a,48
 	ld (decimalS),a
-	ld de,1000 ;—Ç—ã—Å—è—á–∏
+	ld de,1000 ;‚Î·ÔÁ®
 	ld a,255
 toDecimal1k			
 	and a
@@ -62,7 +62,7 @@ toDecimal1k
 	add hl,de
 	add a,48
 	ld (decimalS+1),a
-	ld de,100 ;—Å–æ—Ç–Ω–∏
+	ld de,100 ;·Æ‚≠®
 	ld a,255
 toDecimal01k			
 	and a
@@ -72,7 +72,7 @@ toDecimal01k
 	add hl,de
 	add a,48
 	ld (decimalS+2),a
-	ld de,10 ;–¥–µ—Å—è—Ç–∫–∏
+	ld de,10 ;§•·Ô‚™®
 	ld a,255
 toDecimal001k			
 	and a
@@ -82,7 +82,7 @@ toDecimal001k
 	add hl,de
 	add a,48
 	ld (decimalS+3),a
-	ld de,1 ;–µ–¥–∏–Ω–∏—Ü—ã
+	ld de,1 ;•§®≠®ÊÎ
 	ld a,255
 toDecimal0001k			
 	and a
@@ -99,10 +99,10 @@ minutes
 	db 0
 seconds
 	db 0
-decimalS	ds 7 ;–¥–µ—Å—è—Ç–∏—á–Ω—ã–µ —Ü–∏—Ñ—Ä—ã
+decimalS	ds 7 ;§•·Ô‚®Á≠Î• Ê®‰‡Î
 	ENDIF	
 	ret
-oldminutes		; –Ω–µ —É–±–∏—Ä–∞—Ç—å –ø–æ–¥ —É—Å–ª–æ–∞–∏–µ
+oldminutes		; ≠• „°®‡†‚Ï ØÆ§ „·´Æ†®•
 	db 255
 
 

@@ -75,15 +75,12 @@ logo    db "browser/logo.scr", 0
 creds   db "browser/auth.pwd", 0
 outputBuffer2:
     db  "ATE0", 0
-
     display "ENDS: ", $
     display "Buff size", #ffff - $
-    IFDEF NEDOOS
-        savebin "moon.com", asmOrg, $ - asmOrg
-    ELSE
-		IFDEF TRDOS
-			SAVETRD "MOONR.TRD",|"moon.C",asmOrg, $ - asmOrg
-		ELSE
-			savebin "moon.bin", asmOrg, $ - asmOrg
-	    	ENDIF        
-    ENDIF
+
+	IFDEF TRDOS
+		SAVETRD "TRD/MRF.TRD",|BINNAME,asmOrg, $ - asmOrg
+	        ELSE
+			    savebin BINNAME, asmOrg, $ - asmOrg
+   	ENDIF        
+

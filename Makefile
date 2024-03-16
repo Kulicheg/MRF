@@ -10,10 +10,6 @@ LST=main.lst
 VERSION="17"
 BUILD = $(shell type version.txt)
 all: 
-	@echo "For making MB03 version call: 'make mb03'"
-	@echo "For making ZXUno(esxDOS) version call: 'make zxuno'"
-	@echo "For making ZXUno(esxDOS, usual screen) version call: 'make zxuno-zxscreen'"
-	@echo "For making Ay-Wifi(esxDOS) version call: make esxdos-ay"
 	@echo "For making NedoOS version call: 'make nedoos'"
 	@echo "For making NedoOS(ATM UART) version call: 'make nedoosatm'"
 	@echo "For making NedoOS(EVO UART) version call: 'make nedoosevo'"
@@ -24,80 +20,44 @@ all:
 	@echo ""
 	@echo "Before changing version call: 'make clean' for removing builded images"
 	
-mb03: $(SOURCES)
-	$(SJASMPLUS) main.asm -DPROXY -DMB03 -DTIMEX -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
-	
-zxuno: $(SOURCES)
-	$(SJASMPLUS) main.asm -DP3DOS -DUNO -DTIMEX --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
-
-zxuno-zxscreen: $(SOURCES)
-	$(SJASMPLUS) main.asm -DP3DOS -DUNO -DZXSCR --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
-
-esxdos-ay: $(SOURCES)
-	$(SJASMPLUS) main.asm -DAY -DZXSCR --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
-	
 nedoos: $(SOURCES)
-	$(SJASMPLUS) main.asm -DRTC -DNEDOOS -DNEDONET -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
+	$(SJASMPLUS) main.asm -DRTC -DNEDOOS -DNEDONET -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD) -DBINNAME="\"mrf.com\""
 
 nedoosatm: $(SOURCES)
-	$(SJASMPLUS) main.asm -DRTC -DNEDOOS -DUARTATM -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
+	$(SJASMPLUS) main.asm -DRTC -DNEDOOS -DUARTATM -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD) -DBINNAME="\"mrfua.com\""
 
 nedoosevo: $(SOURCES)
-	$(SJASMPLUS) main.asm -DRTC -DNEDOOS  -DUARTEVO -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
+	$(SJASMPLUS) main.asm -DRTC -DNEDOOS  -DUARTEVO -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD) -DBINNAME="\"mrfue.com\""
 
 atmtrdos: $(SOURCES)
-	copy data\Sample.trd MOONR.TRD
-	$(SJASMPLUS) main.asm -DTRDOS -DUARTATM -DZXSCR -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
-	del TRD\MR-TR-AU-64.TRD
-	move MOONR.TRD TRD\MR-TR-AU-64.TRD
+	$(SJASMPLUS) main.asm -DTRDOS -DUARTATM -DZXSCR -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD) -DBINNAME="\"ATM-64.C\""
 
 evotrdos: $(SOURCES)
-	copy data\Sample.trd MOONR.TRD
-	$(SJASMPLUS) main.asm -DTRDOS -DUARTEVO -DZXSCR -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
-	del TRD\MR-TR-EU-64.TRD
-	move MOONR.TRD TRD\MR-TR-EU-64.TRD
+	$(SJASMPLUS) main.asm -DTRDOS -DUARTEVO -DZXSCR -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD) -DBINNAME="\"EVO-64.C\""
 
 aytrdos: $(SOURCES)
-	copy data\Sample.trd MOONR.TRD
-	$(SJASMPLUS) main.asm -DTRDOS -DAY -DZXSCR -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
-	del TRD\MR-TR-AY-64.TRD
-	move MOONR.TRD TRD\MR-TR-AY-64.TRD
+	$(SJASMPLUS) main.asm -DTRDOS -DAY -DZXSCR -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD) -DBINNAME="\"AY-64.C\""
+
+aytrsmuc: $(SOURCES)
+	$(SJASMPLUS) main.asm -DTRDOS -DRTC -DSMUCRTC -DAY -DZXSCR -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD) -DBINNAME="\"AY-64-SC.C\""
 
 zwtrdos: $(SOURCES)
-	copy data\Sample.trd MOONR.TRD
-	$(SJASMPLUS) main.asm -DTRDOS -DZW -DZXSCR -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
-	del TRD\MR-TR-ZW-64.TRD
-	move MOONR.TRD TRD\MR-TR-ZW-64.TRD
+	$(SJASMPLUS) main.asm -DTRDOS -DZW -DZXSCR -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD) -DBINNAME="\"ZXW-64.C\""
 
 t80trdos: $(SOURCES)
-	copy data\Sample.trd MOONR.TRD
-	$(SJASMPLUS) main.asm -DTRDOS -DAY -DTIMEX80 -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
-	del TRD\MR-TR-AY-80.TRD
-	move MOONR.TRD TRD\MR-TR-AY-80.TRD
+	$(SJASMPLUS) main.asm -DTRDOS -DAY -DTIMEX80 -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD) -DBINNAME="\"AY-80.C\""
 
 truno64: $(SOURCES)
-	copy data\Sample.trd MOONR.TRD
-	$(SJASMPLUS) main.asm -DTRDOS -DUNOUART -DZXSCR --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
-	del TRD\MR-TR-UN-64.TRD
-	move MOONR.TRD TRD\MR-TR-UN-64.TRD
-
-ayp3d64: $(SOURCES)
-	copy data\Sample.trd MOONR.TRD
-	$(SJASMPLUS) main.asm -DP3DOS -DAY -DZXSCR -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
-	del TRD\MR-P3-AY-64.TRD
-	move MOONR.TRD TRD\MR-P3-AY-64.TRD
+	$(SJASMPLUS) main.asm -DTRDOS -DUNOUART -DZXSCR --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD) -DBINNAME="\"UN-64.C\""
 
 msx: $(SOURCES)
-	$(SJASMPLUS) main.asm -DMSX -DRTC --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
+	$(SJASMPLUS) main.asm -DMSX -DRTC --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD) -DBINNAME="\"mrfmsx.com\""
 	copy DATA\msxfont.bin MSX\font.bin
 	copy DATA\msxindex.gph MSX\index.gph
 	move mrfmsx.com MSX\mrfmsx.com
 
 godzilla: $(SOURCES)
-	copy data\Sample.trd MOONR.TRD
-	$(SJASMPLUS) main.asm -DNOINIT -DTRDOS -DSMUCRTC -DZW -DZXSCR  -DRTC --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD)
-	del TRD\MR-TR-GZ-80.TRD
-	move MOONR.TRD TRD\MR-TR-GZ-80.TRD
-
+	$(SJASMPLUS) main.asm -DNOINIT -DTRDOS -DSMUCRTC -DZW -DZXSCR  -DRTC --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD) -DBINNAME="\"GZ-80.C\""
+	
 clean:
 	rm $(BINARY) $(LST)

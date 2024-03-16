@@ -1,2 +1,2 @@
-"../../tools\mingw\make.exe" atmtrdos
+"../../tools\mingw\make.exe" aytrsmuc
 if "%makeall%"=="" ..\..\us\emul.exe TRD\MRF.TRD
