@@ -65,7 +65,6 @@ read:
 	in a, (c)
     rrca
     call nc,flashRTS    // No data in FIFO let's set RTS for awile 
-readData:
     ld bc, RBR_THR      // Recieve data from FIFO
 	in a, (c)
 	ret

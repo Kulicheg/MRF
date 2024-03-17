@@ -21,7 +21,7 @@ fetchFromFS:
     call UrlEncoder.extractPath
 loadFile
 	IFDEF MSX
-    ld de, nameBuffer, a, FMODE_NO_WRITE
+    ld de, Gopher.requestbuffer, a, FMODE_NO_WRITE
     call Dos.fopen
     ld a, b, (.fp), a
     ld de, outputBuffer, hl, (ramtop)
@@ -31,7 +31,7 @@ loadFile
     jp MediaProcessor.processResource
 .fp db 0
 	ELSE
-    ld hl, nameBuffer
+    ld hl, Gopher.requestbuffer
     call Dos.loadBuffer
     jp MediaProcessor.processResource
 	ENDIF

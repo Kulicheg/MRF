@@ -185,7 +185,14 @@ getPacket:
 .skipbuff 
     call Uart.read
     dec de : ld a, d : or e : jp nz, .skipbuff
+    ld a,1
+	ld (closed),a
+	xor a
+	ld (bytes_avail),a
+    ld hl, .errMem : call DialogBox.msgBox
     ret
+.errMem:
+	db "Out of memory. Page loading error.",0 
 .count_ipd_lenght
 		ld hl,0			; count lenght
 .cil1	push  hl

@@ -47,7 +47,7 @@ isValidGopherRow:
     ret
 
 extractPath:
-    ld hl, historyBlock.locator, de, nameBuffer, bc, #ff : ldir
+    ld hl, historyBlock.locator, de, Gopher.requestbuffer, bc, #ff : ldir
     ret
 
 extractHostName:
@@ -56,7 +56,7 @@ extractHostName:
     
     ENDMODULE
     
-nameBuffer ds #ff, 0   
+;nameBuffer ds #ff, 0   
      
          db 0
 hostName ds 64

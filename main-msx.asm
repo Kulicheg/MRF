@@ -1,6 +1,7 @@
-;****************************** MSX **********************************************
+;******************************* MSX **********************************************
     output "mrfmsx.com"
     org 100h
+asmOrg:
     jp start
     include "vdp/vdpdriver.asm"
     include "utils/index.asm"
