@@ -20,30 +20,16 @@ SR      = RBR_THR + 7
 
 
 init:
-    IFDEF GZ
     outp MCR,     #0d  // Assert RTS
     outp IIR_FCR, #87  // Enable fifo 8 level, and clear it
     outp LCR,     #83  // 8n1, DLAB=1
-    outp RBR_THR, 12  //(divider 12)
+    outp RBR_THR, #01  // 115200 (divider 1)
     outp IER,     #00  // (divider 0). Divider is 16 bit, so we get (#0002 divider)
 
     outp LCR,     #03 // 8n1, DLAB=0
     outp IER,     #00 // Disable int
     outp MCR,     #2f // Enable AFE
     ret
-    ELSE
-    outp MCR,     #0d  // Assert RTS
-    outp IIR_FCR, #87  // Enable fifo 8 level, and clear it
-    outp LCR,     #83  // 8n1, DLAB=1
-    outp RBR_THR, 1  // 115200 (divider 1)
-    outp IER,     #00  // (divider 0). Divider is 16 bit, so we get (#0002 divider)
-
-    outp LCR,     #03 // 8n1, DLAB=0
-    outp IER,     #00 // Disable int
-    outp MCR,     #2f // Enable AFE
-
-    ret
-    ENDIF
 retry_rec_count_max equ 50 ;ждать 1 байт максимум столько прерываний
     
 ; Flag C <- Data available
