@@ -64,7 +64,7 @@ read:
 	ld bc, LSR          // Test FIFO for data
 	in a, (c)
     rrca
-    call nc,flashRTS    // No data in FIFO let's set RTS for awile 
+    jp nc,flashRTS    // No data in FIFO let's set RTS for awile 
     ld bc, RBR_THR      // Recieve data from FIFO
 	in a, (c)
 	ret
@@ -83,10 +83,11 @@ flashRTS2:
     ld a, 0
 	out (c),a
     ei
+    ld bc, RBR_THR      // Recieve data from FIFO
+	in a, (c)
 	ret
 
 ; A -> byte to send
-
 write:
 	push af
 .wait

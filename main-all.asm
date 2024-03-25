@@ -25,9 +25,12 @@ asmOrg:
     include "screen/rtc.asm"
 
     IFDEF NEDOOS
+    ;Gap about 8kb, CMD_SETMUSIC 0x4000 mandatory
+    ;Stack down from 0x4000
         include "screen/nedoscreen.asm"
-        include "player/vortexnedoos.asm"
         include "player/mod-processor.asm"
+        include "player/vortexnedoos.asm"
+
 start:
 outputBuffer:
         ld sp, 0x4000
@@ -35,9 +38,10 @@ outputBuffer:
      	ex af,af'   
 	    call nos.BDOS
 	ELSE
-        include "player/vortex-processor.asm"
         include "player/mod-processor.asm"
         include "screen/screen.asm"
+        include "player/vortex-processor.asm"
+
 start:
 outputBuffer:
         di

@@ -152,6 +152,6 @@ printasterix
     ld (pulsator),a
     ret 
 
-requestbuffer ds #1ff
+requestbuffer ds #ff
     endmodule
     
