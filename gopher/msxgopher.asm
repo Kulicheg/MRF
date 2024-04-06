@@ -176,6 +176,6 @@ printasterix
     pop de
     ret 
 
-requestbuffer ds #ff
+requestbuffer ds #1ff
     endmodule
     

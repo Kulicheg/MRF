@@ -4,7 +4,7 @@ depth   db 0
 historyBlock:  
 .isFile    db  0
 .mediaType db  0
-.locator   ds  #ff 
+.locator   ds  #1ff 
 .host      ds  64
 .port      ds  6
 .search    ds  #ff

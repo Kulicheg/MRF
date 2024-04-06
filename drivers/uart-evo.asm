@@ -80,7 +80,7 @@ flashRTS2:
     rrca
     jp nc,flashRTS2      // No data? Once more.
     ld bc,MCR           // Close the gate
-    ld a, 0
+    xor a
 	out (c),a
     ei
     ld bc, RBR_THR      // Recieve data from FIFO

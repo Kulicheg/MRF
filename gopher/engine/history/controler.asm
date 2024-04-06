@@ -50,11 +50,7 @@ navigate:
     ld (de), a : inc de
     ld a, 9
     
-    IFDEF MSX
-    	ld bc, #ff
-    ELSE
-    	ld bc, #ff
-    ENDIF
+    ld bc, #1ff
     
     cpir
 .locatorCopy
