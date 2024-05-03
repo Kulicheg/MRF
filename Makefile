@@ -38,6 +38,9 @@ evotrdos: $(SOURCES)
 aytrdos: $(SOURCES)
 	$(SJASMPLUS) main.asm -DTRDOS -DAY -DZXSCR -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD) -DBINNAME="\"AY-64.C\""
 
+ay56trdos: $(SOURCES)
+	$(SJASMPLUS) main.asm -DTRDOS -DAY56 -DZXSCR -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD) -DBINNAME="\"AY56-64.C\""
+
 aytrsmuc: $(SOURCES)
 	$(SJASMPLUS) main.asm -DTRDOS -DRTC -DSMUCRTC -DAY -DZXSCR -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD) -DBINNAME="\"AY-64-SC.C\""
 

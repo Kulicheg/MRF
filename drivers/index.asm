@@ -13,7 +13,11 @@
     IFDEF AY
     	include "uart-ay.asm"
     ENDIF
-	
+
+    IFDEF AY56
+    	include "uart-ay.asm"
+    ENDIF
+
     IFDEF ZW
     	include "uart-zxwifi.asm"
     ENDIF
