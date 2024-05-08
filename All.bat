@@ -12,3 +12,4 @@ call build-TR-UN-64.bat
 call build-MX-BC-80.bat
 call build-TR-GZ-80.bat
 call build-TR-AY-64-SMUC.bat
+call build-TR-A5-64.bat

@@ -63,7 +63,6 @@ msx: $(SOURCES)
 	move mrfmsx.com MSX\mrfmsx.com
 
 godzilla: $(SOURCES)
-	$(SJASMPLUS) main.asm -DNOINIT -DTRDOS -DSMUCRTC -DZW -DZXSCR  -DRTC --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD) -DBINNAME="\"GZ-80.C\""
-	
+	$(SJASMPLUS) main.asm -DNOINIT -DTRDOS -DAY56 -DZXSCR -DGS --lst=main.lst -DV=$(VERSION) -DBLD=$(BUILD) -DBINNAME="\"UN-64.C\""	
 clean:
 	rm $(BINARY) $(LST)

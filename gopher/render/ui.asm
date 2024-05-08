@@ -4,7 +4,7 @@
         DEFINE SCREEN64
     ENDIF
 
-    IFDEF TIMEX     ;UNKNOWM fallback to 64
+    IFDEF TIMEX     ;UNKNOWN fallback to 64
         DEFINE LEFT_TAB "[D]omain:                                  "
         DEFINE SCREEN_WIDTH 64
         DEFINE SCREEN64
@@ -83,38 +83,42 @@ header db LEFT_TAB, "MRF "
        db "."
        db BUILD_STRING
 	IFDEF MSX
-       db "    [MSX UNAPI]",13, 0
+       db "    [MSX UNAPI]"
 	ENDIF      
 
     IFDEF MB03
-       db " [MB03+]",13, 0
+       db " [MB03+]"
        ENDIF
     
     IFDEF UNO
-       db " [UNO UART]",13, 0
+       db " [UNO UART]"
     ENDIF
 
     IFDEF AY
-       db " [AYWIFI]",13, 0
+       db " [AYWiFi]"
 	ENDIF
 
     IFDEF ZW
-       db "  [ZXWiFi]",13, 0
+       db "  [ZXWiFi]"
     ENDIF	
  
      IFDEF UARTATM
-       db " [ATM UART]",13, 0
+       db " [ATM UART]"
     ENDIF
 	
     IFDEF UARTEVO
-        db " [EVO UART]",13, 0
+        db " [EVO UART]"
     ENDIF
 
     IFDEF UNOUART
-        db " [UNO UART]",13, 0
+        db " [UNO UART]"
     ENDIF
 
     IFDEF NEDONET
-	    db "  [nedoNET]",13, 0
+	    db "  [nedoNET]"
 	ENDIF	
 
+    IFDEF AY56
+	    db " [AYWiFi56]"
+	ENDIF
+        db 13, 0 
