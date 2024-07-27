@@ -5,14 +5,27 @@
 ;
 
 ; Internal port constants
-RBR_THR equ 0xF8EF
+;RBR_THR equ 0xF8EE
+;IER		equ	0xF9EE
+;IIR_FCR	equ	0xFAEE
+;LCR		equ	0xFBEE
+;MCR		equ	0xFCEE
+;LSR		equ	0xFDEE
+;MSR		equ	0xFEEE
+;SR		equ	0xFFEE
+
+
+RBR_THR 	equ 	0xF8EF
 IER		equ	0xF9EF
-IIR_FCR	equ	0xFAEF
+IIR_FCR		equ	0xFAEF
 LCR		equ	0xFBEF
 MCR		equ	0xFCEF
 LSR		equ	0xFDEF
 MSR		equ	0xFEEF
 SR		equ	0xFFEF
+
+
+
 
 init:
 	push bc

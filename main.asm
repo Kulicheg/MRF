@@ -1,4 +1,4 @@
-    DEFINE TCP_BUF_SIZE 1024
+    DEFINE TCP_BUFFER_SIZE 2048
 ; Generate version string
     LUA ALLPASS
     v = tostring(sj.get_define("V"))

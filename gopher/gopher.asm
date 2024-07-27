@@ -51,8 +51,10 @@ loadBuffer:
     ld (Wifi.buffer_pointer), hl
 .loop
     call Wifi.getPacket
-    ld a, (Wifi.closed) : and a : ret nz
-    call Wifi.continue
+    ld a, (Wifi.closed)
+    and a
+    ret nz
+    ;call Wifi.continue
     jr .loop
 
     ifdef GS

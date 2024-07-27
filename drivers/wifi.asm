@@ -66,9 +66,6 @@ openTCP:
     ld a, 10 : call Uart.write
     xor a : ld (closed), a
     jp checkOkErr
-
-continue:
-    ret
     ENDIF
 
 
@@ -159,32 +156,42 @@ getPacket:
     cp 'O' : jp z, .closedBegun ; It enough to check "OSED\n" :-)
     jp getPacket
 .closedBegun
-    call Uart.read : cp 'S' : jp nz, .closedBegun
-    call Uart.read : cp 'E' : jp nz, .closedBegun
-    call Uart.read : cp 'D' : jp nz, .closedBegun
-    call Uart.read : cp 13 : jp nz, .closedBegun
-    ld a, 1, (closed), a
+    call Uart.read; : cp 'S' : jp nz, .closedBegun
+    call Uart.read; : cp 'E' : jp nz, .closedBegun
+    call Uart.read; : cp 'D' : jp nz, .closedBegun
+    call Uart.read; : cp 13 : jp nz, .closedBegun
+    ld a, 1
+    ld (closed), a
     ret
 .ipdBegun
-    call Uart.read : cp 'I' : jp nz, .ipdBegun
-    call Uart.read : cp 'P' : jp nz, .ipdBegun
-    call Uart.read : cp 'D' : jp nz, .ipdBegun
-    call Uart.read  ;Comma
-    call .count_ipd_lenght : ld (bytes_avail), hl 
-    ld de, hl
+    call Uart.read; : cp 'I' : jp nz, .ipdBegun
+    call Uart.read; : cp 'P' : jp nz, .ipdBegun
+    call Uart.read; : cp 'D' : jp nz, .ipdBegun
+    call Uart.read  ;','
+    call .count_ipd_lenght
+    ld (bytes_avail), hl 
+    ;ld de, hl
+    ex de,hl
     ld hl, (buffer_pointer)
 .readp
-    ld a, h : cp #ff : jp nc, .skipbuff
+    ld a, h
+    inc a
+    jp z, .skipbuff
     call Uart.read
     ld (hl), a
     dec de
     inc hl
-    ld a, d : or e : jp nz, .readp
+    ld a, d
+    or e
+    jp nz, .readp
     ld (buffer_pointer), hl
     ret
 .skipbuff 
     call Uart.read
-    dec de : ld a, d : or e : jp nz, .skipbuff
+    dec de
+    ld a, d
+    or e
+    jp nz, .skipbuff
     ld a,1
 	ld (closed),a
 	xor a

@@ -82,7 +82,7 @@ getPacket
 	db "Out of memory. Page loading error.",0
 letsgo:
     ld de,(buffer_pointer)
-    ld hl,TCP_BUF_SIZE
+    ld hl,TCP_BUFFER_SIZE
     ld a,(sock_fd)
 	OS_WIZNETREAD
     BIT 7,H
@@ -110,7 +110,6 @@ RECEIVED
 	or a
 	sbc hl,de
     ld (bytes_avail),HL
-continue
     ret
 	
 	

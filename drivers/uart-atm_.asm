@@ -13,18 +13,31 @@ init:
 		ret
 read:
 		di
-read2:
 		ld	bc,#55FE	;55FEh
 		in	a,(c)		;Переход в режим команды
-		ld	b,#C2		;команда - чтение счетчика буфера приема
-		in	a,(c)		;Получили число байт в буфере
+		ld	b,0x42		;команда - чтение регистра статуса RS232
+		in	a,(c)		;Проверили состояние приемника
+		rra
+		jp nc,read
 
+		ld	bc,#55FE	;55FEh
+		in	a,(c)		;Переход в режим команды
+		ld	b,0xc2		;команда - чтение счетчика буфера приема
+		in	a,(c)		;Проверили состояние приемника ;Получили число байт в буфере
 		or a
 		jp nz,togetb	; В буфере есть байт
 		call startrts2	; в буфере нет байта, приподнимем на секундочку RTS
-		jp read2		; А теперь есть?
+		jp read			; А теперь есть?
 
 togetb:		
+		di
+		ld	bc,#55FE	;55FEh
+		in	a,(c)		;Переход в режим команды
+		ld	b,0x42		;команда - чтение регистра статуса RS232
+		in	a,(c)		;Проверили состояние приемника ;Получили число байт в буфере
+		rra
+		jp nc,togetb
+
 		ld	bc,#55FE	;подать комнаду контроллеру клавиатуры
 		in	a,(c)		;Переход в режим команды
 		ld	b,#02		;команда - чтение 
@@ -58,6 +71,7 @@ readytx:
 		ret
 
 startrts2
+		di
 		ld	bc,#55FE	;55FEh
 		in	a,(c)		;Переход в режим команды
 		ld	b,#43		;команда - установить статус
@@ -65,43 +79,6 @@ startrts2
 		ld	b,#03		;Параметры - убрать RTS (START)
 		in	a, (c)
 
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		
 		ld	bc,#55FE	;55FEh
 		in	a,(c)		;Переход в режим команды
 		ld	b,#43		;команда - установить статус
@@ -109,5 +86,7 @@ startrts2
 		ld	b,0			;Параметры - установить RTS (STOP)
 		in	a,(c)
 		ret
-
-    ENDMODULE
+dihalt:
+	di
+	halt
+	ENDMODULE
