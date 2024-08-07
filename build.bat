@@ -24,7 +24,7 @@ md ..\..\release\downloads
 
 del /Q *.lst
 del /Q mrf.com
-rem del /Q mrfua.com
+del /Q mrfua.com
 del /Q mrfue.com
 
 if "%makeall%"=="" ..\..\us\emul.exe

@@ -192,6 +192,9 @@ getPacket:
     ld a, d
     or e
     jp nz, .skipbuff
+    
+        call flushToLF1
+    
     ld a,1
 	ld (closed),a
 	xor a
@@ -202,10 +205,8 @@ getPacket:
 	db "Out of memory. Page loading error.",0 
 .count_ipd_lenght
 		ld hl,0			; count lenght
-.cil1	push  hl
-        call Uart.read
-        pop hl 
-		cp ':'
+.cil1   call Uart.read
+     	cp ':'
         ret z
 		sub 0x30
         ld c,l

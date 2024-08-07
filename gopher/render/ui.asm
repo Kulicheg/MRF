@@ -33,6 +33,12 @@ prepareScreen:
     ld de, #000A : call TextMode.gotoXY
     ld hl, hostName : call TextMode.printZ
     xor a : call TextMode.highlightLine
+    
+    push bc
+    push hl
+    push de ; Dont remove, pops in printsavemode
+    push af
+    call printsavemode
     ret
 
 inputHost:

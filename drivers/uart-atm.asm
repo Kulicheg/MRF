@@ -1,11 +1,10 @@
     MODULE Uart
-
 init:
 ;инициализируем порт
 		di
 		ld	bc,#55FE	;55FEh
 		in	a,(c)		;Переход в режим команды
-		ld	b,#C3		;команда - установить скорость порта
+		ld	b,0xc3		;команда - установить скорость порта
 		in	a,(c)
 		ld	b,3			;параметр - установить скорость порта 19200(6) 38400(3) 115200(1) 57600(2) 9600(12) 14400(8)
 		in	a,(c)
@@ -16,9 +15,8 @@ read:
 read2:
 		ld	bc,#55FE	;55FEh
 		in	a,(c)		;Переход в режим команды
-		ld	b,#C2		;команда - чтение счетчика буфера приема
+		ld	b,0xc2		;команда - чтение счетчика буфера приема
 		in	a,(c)		;Получили число байт в буфере
-
 		or a
 		jp nz,togetb	; В буфере есть байт
 		call startrts2	; в буфере нет байта, приподнимем на секундочку RTS
@@ -63,45 +61,10 @@ startrts2
 		ld	b,#43		;команда - установить статус
 		IN	a,(c)
 		ld	b,#03		;Параметры - убрать RTS (START)
-		in	a, (c)
-
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		push de
-		pop  de
-		
+		in	a,(c)
+		ld  b,10
+loop
+		djnz loop
 		ld	bc,#55FE	;55FEh
 		in	a,(c)		;Переход в режим команды
 		ld	b,#43		;команда - установить статус

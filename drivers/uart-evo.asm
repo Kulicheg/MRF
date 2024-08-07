@@ -95,9 +95,9 @@ flashRTS2:
     ld bc,MCR           // Close the gate
     xor a
 	out (c),a
-    ei
     ld bc, RBR_THR      // Recieve data from FIFO
 	in a, (c)
+    ei
 	ret
 
 ; A -> byte to send
