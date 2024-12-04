@@ -40,7 +40,7 @@ getIcon:
     inc hl
     jr .nameLoop
 .check
-	ld a,(saveMode+1);
+	ld a,(saveTMode+1);���� ����� �������� ������, ����� �� ������� �� ������ Caps
 	or a
 	jr nz,.checkExit
 	ld hl, scrExt1 : call CompareBuff.search : and a : jr nz, .image
@@ -86,28 +86,23 @@ modExt1 db ".mod", 0
 modExt2 db ".MOD", 0
 
 toggleSaveMode
-			push bc
-            push hl
-            push de
             push af
 			call Console.waitForKeyUp
-saveMode	ld a,0 ;Open/Save files
+saveTMode	ld a,0 ;Open/Save files
 			xor 1
-			ld (saveMode+1),a
+			ld (saveTMode+1),a
+            nop
 printsavemode
             ld de, #0100
             call TextMode.gotoXY
             ld hl, playmodetext
-            ld a,(saveMode+1)
+            ld a,(saveTMode+1)
             or a
             jp z, playmodeselect
             ld hl, savemodetext
 playmodeselect
             call TextMode.printZ
 			pop af
-            pop de
-            pop hl
-            pop bc
 			ret
             
 savemodetext
